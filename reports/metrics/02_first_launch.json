@@ -527,6 +527,120 @@
       }
     ]
   },
+  "degradation": {
+    "target_availability": 0.9,
+    "satellites_in_service": 16,
+    "seed": 20260912,
+    "tolerated_failures": 0,
+    "slope_pp_per_satellite": 0.9851381257631256,
+    "linear_fit_error_pp": 1.3514575702075753,
+    "points": [
+      {
+        "failures": 0,
+        "trials": 1,
+        "mean_worst_availability": 0.12638888888888888,
+        "best_worst_availability": 0.12638888888888888,
+        "worst_worst_availability": 0.12638888888888888,
+        "meets_target_share": 0.0
+      },
+      {
+        "failures": 1,
+        "trials": 40,
+        "mean_worst_availability": 0.1114236111111111,
+        "best_worst_availability": 0.11388888888888889,
+        "worst_worst_availability": 0.10833333333333334,
+        "meets_target_share": 0.0
+      },
+      {
+        "failures": 2,
+        "trials": 40,
+        "mean_worst_availability": 0.09371527777777777,
+        "best_worst_availability": 0.10555555555555556,
+        "worst_worst_availability": 0.08611111111111111,
+        "meets_target_share": 0.0
+      },
+      {
+        "failures": 3,
+        "trials": 40,
+        "mean_worst_availability": 0.07850694444444445,
+        "best_worst_availability": 0.09027777777777778,
+        "worst_worst_availability": 0.07083333333333333,
+        "meets_target_share": 0.0
+      },
+      {
+        "failures": 4,
+        "trials": 40,
+        "mean_worst_availability": 0.06663194444444445,
+        "best_worst_availability": 0.08333333333333333,
+        "worst_worst_availability": 0.05555555555555555,
+        "meets_target_share": 0.0
+      },
+      {
+        "failures": 5,
+        "trials": 40,
+        "mean_worst_availability": 0.05496527777777778,
+        "best_worst_availability": 0.07083333333333333,
+        "worst_worst_availability": 0.041666666666666664,
+        "meets_target_share": 0.0
+      },
+      {
+        "failures": 6,
+        "trials": 40,
+        "mean_worst_availability": 0.04569444444444444,
+        "best_worst_availability": 0.07083333333333333,
+        "worst_worst_availability": 0.03194444444444444,
+        "meets_target_share": 0.0
+      },
+      {
+        "failures": 7,
+        "trials": 40,
+        "mean_worst_availability": 0.035173611111111114,
+        "best_worst_availability": 0.05138888888888889,
+        "worst_worst_availability": 0.016666666666666666,
+        "meets_target_share": 0.0
+      },
+      {
+        "failures": 8,
+        "trials": 40,
+        "mean_worst_availability": 0.029652777777777778,
+        "best_worst_availability": 0.043055555555555555,
+        "worst_worst_availability": 0.015277777777777777,
+        "meets_target_share": 0.0
+      },
+      {
+        "failures": 9,
+        "trials": 40,
+        "mean_worst_availability": 0.023680555555555555,
+        "best_worst_availability": 0.041666666666666664,
+        "worst_worst_availability": 0.008333333333333333,
+        "meets_target_share": 0.0
+      },
+      {
+        "failures": 10,
+        "trials": 40,
+        "mean_worst_availability": 0.0165625,
+        "best_worst_availability": 0.03611111111111111,
+        "worst_worst_availability": 0.001388888888888889,
+        "meets_target_share": 0.0
+      },
+      {
+        "failures": 11,
+        "trials": 40,
+        "mean_worst_availability": 0.010034722222222221,
+        "best_worst_availability": 0.020833333333333332,
+        "worst_worst_availability": 0.0,
+        "meets_target_share": 0.0
+      },
+      {
+        "failures": 12,
+        "trials": 40,
+        "mean_worst_availability": 0.006527777777777778,
+        "best_worst_availability": 0.016666666666666666,
+        "worst_worst_availability": 0.0,
+        "meets_target_share": 0.0
+      }
+    ]
+  },
   "sweep": {
     "baseline": {
       "raan_deg": [
@@ -3136,5 +3250,5 @@
     ],
     "changes": []
   },
-  "elapsed_s": 2.19
+  "elapsed_s": 3.87
 }
