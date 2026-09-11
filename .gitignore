@@ -34,4 +34,9 @@ CLAUDE.md
 .vscode/
 .idea/
 
+# Working notes, not deliverables. The defence script and anything else written to
+# explain the work to ourselves stays out of the repository.
+docs/presentation.md
+docs/notes/
+
 .DS_Store
