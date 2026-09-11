@@ -28,7 +28,12 @@ from pydantic import BaseModel, Field
 from cosmo_net import __version__
 from cosmo_net.analysis.compare import compare_runs
 from cosmo_net.analysis.criticality import rank_satellites
+from cosmo_net.analysis.degradation import degradation_curve
+from cosmo_net.analysis.delivery import delivery_report
+from cosmo_net.analysis.families import spacing_curve
 from cosmo_net.analysis.optimise import refine, sweep_spacing
+from cosmo_net.analysis.placement import placement_grid
+from cosmo_net.analysis.redundancy import redundancy_report
 from cosmo_net.analysis.resources import usable_workers
 from cosmo_net.analysis.simulate import simulate, snapshot_at
 from cosmo_net.config import STATIC_DIR
@@ -96,6 +101,30 @@ class CompareRequest(BaseModel):
 
 class SweepRequest(DesignRef):
     mode: Literal["spacing", "refine"] = "spacing"
+    workers: int | None = None
+
+
+class DegradationRequest(DesignRef):
+    """
+    Сколько случайных отказов разыгрывать и по сколько наборов на каждое число.
+
+    Значения по умолчанию здесь меньше, чем у отчёта: отчёт считается один раз и
+    может позволить себе 481 прогон и одиннадцать секунд, а ручка живёт за кнопкой
+    в интерфейсе, где важнее ответить быстро. Кривая от этого не меняет формы —
+    проверено повтором с другим зерном, средние расходятся на десятые доли пункта.
+    """
+
+    max_failures: int = Field(default=8, ge=1, le=48)
+    trials: int = Field(default=20, ge=1, le=200)
+
+
+class PlacementRequest(DesignRef):
+    """Сетка кандидатов на вторую точку приземления."""
+
+    lat_min_deg: float = Field(default=50.0, ge=-90, le=90)
+    lat_max_deg: float = Field(default=85.0, ge=-90, le=90)
+    lat_step_deg: float = Field(default=5.0, gt=0, le=45)
+    lon_step_deg: float = Field(default=15.0, gt=0, le=90)
     workers: int | None = None
 
 
@@ -251,6 +280,27 @@ def get_trajectory(run_id: str) -> dict[str, Any]:
     return trajectory_payload(_require_run(run_id))
 
 
+@app.get("/api/runs/{run_id}/redundancy")
+def get_redundancy(run_id: str) -> dict[str, Any]:
+    """
+    Сколько независимых маршрутов есть на каждом отсчёте: запас, а не наличие связи.
+
+    Привязано к прогону, а не к проекту, потому что интерфейс раскрашивает этим
+    временную шкалу того же прогона, который сейчас показан. Стоит 0.14 с на весь
+    горизонт, поэтому считается по запросу и не хранится.
+    """
+
+    result = _require_run(run_id)
+    report = redundancy_report(result.scenario)
+    return {
+        **report.to_dict(),
+        "times_s": result.times_s,
+        "series": {
+            client.client_id: client.disjoint_paths.tolist() for client in report.clients
+        },
+    }
+
+
 @app.get("/api/runs/{run_id}/export")
 def export_run(run_id: str) -> JSONResponse:
     """Прогон в формате `cosmo-A-result-1.0`, отдаётся браузеру файлом."""
@@ -301,6 +351,57 @@ def analyse_sweep(body: SweepRequest) -> dict[str, Any]:
         else refine(scenario, workers=workers)
     )
     return report.to_dict()
+
+
+@app.post("/api/analysis/delivery")
+def analyse_delivery(body: DesignRef) -> dict[str, Any]:
+    """
+    Через сколько данные дойдут, если разрешить аппарату увезти их и сбросить позже.
+
+    Мгновенная доступность — это строка с нулевой задержкой. Остальные строки
+    отвечают на вопрос, который постановка не задаёт, но который решает, провалена
+    ли конфигурация: для какого класса трафика она провалена.
+    """
+
+    return delivery_report(resolve(body)).to_dict()
+
+
+@app.post("/api/analysis/degradation")
+def analyse_degradation(body: DegradationRequest) -> dict[str, Any]:
+    """Сколько произвольных отказов проект переносит, не теряя цель."""
+
+    return degradation_curve(
+        resolve(body), max_failures=body.max_failures, trials=body.trials
+    ).to_dict()
+
+
+@app.post("/api/analysis/placement")
+def analyse_placement(body: PlacementRequest) -> dict[str, Any]:
+    """
+    Перебрать места для второй точки приземления и вернуть поверхность целиком.
+
+    Выданные данные не меняются: каждая точка сетки — отдельный прогон на копии
+    сценария, и ответ описывает, чего стоил бы второй шлюз, а не предлагает
+    переписать вход. Формы для добавления пунктов в интерфейсе поэтому и нет.
+    """
+
+    if body.lat_max_deg < body.lat_min_deg:
+        raise HTTPException(422, "lat_max_deg должна быть не меньше lat_min_deg")
+
+    return placement_grid(
+        resolve(body),
+        lat_range=(body.lat_min_deg, body.lat_max_deg),
+        lat_step=body.lat_step_deg,
+        lon_step=body.lon_step_deg,
+        workers=usable_workers(body.workers),
+    ).to_dict()
+
+
+@app.post("/api/analysis/families")
+def analyse_families(body: SweepRequest) -> dict[str, Any]:
+    """Кривая по разносу плоскостей целиком, с разбором на семейства звезды и дельты."""
+
+    return spacing_curve(resolve(body), workers=usable_workers(body.workers)).to_dict()
 
 
 def _require_run(run_id: str):

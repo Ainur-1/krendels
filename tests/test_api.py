@@ -243,3 +243,71 @@ def test_the_root_page_works_in_both_states(client):
         assert '<div id="root">' in response.text
     else:
         assert "npm" in response.text
+
+
+def test_delivery_endpoint_returns_the_deadline_breakdown(client):
+    """Разрез по допустимой задержке, с нулевой строкой, равной мгновенной доступности."""
+
+    body = client.post("/api/analysis/delivery", json={"bundled": "04_link_range"}).json()
+    shares = {row["deadline_s"]: row["share"] for row in body["worst_within"]}
+
+    assert shares[0] == pytest.approx(0.622, abs=0.005)
+    assert shares[900] == pytest.approx(1.0, abs=0.005)
+    assert body["worst_max_latency_s"] == pytest.approx(840, abs=1)
+    assert len(body["clients"]) == 3
+
+
+def test_redundancy_endpoint_is_tied_to_a_run(client):
+    """Шкалу раскрашивает тот же прогон, который показан, поэтому ручка привязана к нему."""
+
+    run_id = client.post("/api/runs", json={"bundled": "01_full_constellation"}).json()["run_id"]
+    body = client.get(f"/api/runs/{run_id}/redundancy").json()
+
+    assert body["worst_single_path_share"] == pytest.approx(0.801, abs=0.005)
+    assert len(body["times_s"]) == 720
+    assert set(body["series"]) == {"C65", "C70", "C72"}
+    assert all(len(series) == 720 for series in body["series"].values())
+
+    assert client.get("/api/runs/нет-такого/redundancy").status_code == 404
+
+
+def test_degradation_endpoint_answers_quickly(client):
+    """У ручки своя, меньшая сетка: она живёт за кнопкой, а не в отчёте."""
+
+    body = client.post(
+        "/api/analysis/degradation",
+        json={"bundled": "01_full_constellation", "max_failures": 4, "trials": 5},
+    ).json()
+
+    assert [point["failures"] for point in body["points"]] == [0, 1, 2, 3, 4]
+    assert body["points"][0]["mean_worst_availability"] == pytest.approx(0.9667, abs=0.002)
+    assert body["satellites_in_service"] == 48
+
+
+def test_placement_endpoint_takes_its_own_grid(client):
+    """Сетку задаёт запрос: полная нужна отчёту, интерфейсу хватает грубой."""
+
+    body = client.post(
+        "/api/analysis/placement",
+        json={"bundled": "04_link_range", "lat_step_deg": 10, "lon_step_deg": 45},
+    ).json()
+
+    assert len(body["lat_deg"]) == 4 and len(body["lon_deg"]) == 8
+    assert len(body["points"]) == 32
+    assert body["best"]["worst_availability"] > body["baseline_worst_availability"]
+
+    bad = client.post(
+        "/api/analysis/placement",
+        json={"bundled": "04_link_range", "lat_min_deg": 80, "lat_max_deg": 50},
+    )
+    assert bad.status_code == 422
+
+
+def test_families_endpoint_names_the_family_of_the_supplied_design(client):
+    """Выданный проект — звезда, и ручка это говорит, а не оставляет читателю."""
+
+    body = client.post("/api/analysis/families", json={"bundled": "01_full_constellation"}).json()
+
+    assert body["supplied_family"] == "star"
+    assert body["supplied_spacing_deg"] == pytest.approx(60.0)
+    assert body["star_best"]["worst_availability"] > body["delta_best"]["worst_availability"]
