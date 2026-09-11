@@ -16,6 +16,7 @@ build/
 src/cosmo_net/serving/static/
 frontend/node_modules/
 frontend/dist/
+frontend/tsconfig.tsbuildinfo
 
 # Runs are reproducible from the scenario that produced them: the store is a cache,
 # not a record. reports/metrics/ holds the numbers that README and the deck cite.
