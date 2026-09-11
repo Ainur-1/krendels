@@ -1,10 +1,15 @@
 """
-Построить графики разведочного анализа в reports/figures/.
+Построить графики к защите в reports/figures/.
 
-Считает `cosmo_net.analysis.exploration`, здесь только отрисовка. Каждый график
-отвечает на один вопрос о входных данных, и ответ на него не зависит от того, что мы
-насчитали потом — кроме шестого, где нарочно сопоставлены геометрия на входе и
-измеренный результат.
+Здесь только отрисовка: считают модули `cosmo_net.analysis`, и ни одно число не
+появляется на картинке, минуя их.
+
+Графики идут двумя группами. С первого по шестой — разведка входных данных: каждый
+отвечает на один вопрос о том, что нам выдали, и ответ не зависит от того, что мы
+насчитали потом (кроме шестого, где геометрия на входе нарочно сопоставлена с
+измеренным результатом). С седьмого по одиннадцатый — исследования сверх постановки:
+допустимая задержка, деградация, запас маршрутов, семейства разноса и место для
+второй точки приземления.
 
     uv sync --extra figures
     uv run python scripts/make_figures.py
@@ -22,12 +27,17 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
 
+from cosmo_net.analysis.degradation import degradation_curve  # noqa: E402
+from cosmo_net.analysis.delivery import delivery_report  # noqa: E402
 from cosmo_net.analysis.exploration import (  # noqa: E402
     contact_durations_s,
     explore,
     ring_geometry,
 )
+from cosmo_net.analysis.families import spacing_curve  # noqa: E402
+from cosmo_net.analysis.placement import placement_grid  # noqa: E402
 from cosmo_net.analysis.reachability import availability_series  # noqa: E402
+from cosmo_net.analysis.redundancy import redundancy_report  # noqa: E402
 from cosmo_net.analysis.simulate import simulate  # noqa: E402
 from cosmo_net.config import REPORTS_DIR, SCENARIOS_DIR  # noqa: E402
 from cosmo_net.geometry.orbit import orbit_radius_km  # noqa: E402
@@ -296,6 +306,261 @@ def figure_grid(scenario, path: Path) -> str:
     return f"короче шага {short:.1f} % сеансов, разброс доступности {spread:.2f} п.п."
 
 
+def figure_delivery(scenarios: dict[str, object], path: Path) -> str:
+    """
+    Что даёт разрешение подождать, по всем четырём сценариям сразу.
+
+    Ось задержки логарифмическая по смыслу, но подписи ставятся по посчитанным порогам,
+    а не по секундам: между ними никто ничего не мерил, и рисовать там линию было бы
+    обещанием, которого расчёт не давал. Поэтому точки соединены, но подписаны только
+    измеренные пороги.
+    """
+
+    fig, ax = plt.subplots(figsize=(9, 4.2))
+    deadlines = None
+    notes = []
+
+    for index, (label, scenario) in enumerate(scenarios.items()):
+        report = delivery_report(scenario)
+        deadlines = report.deadlines_s
+        shares = [100 * report.worst_share_within(d) for d in deadlines]
+        ax.plot(
+            range(len(deadlines)),
+            shares,
+            marker="o",
+            color=PLANE_COLOURS[index % len(PLANE_COLOURS)],
+            label=label,
+        )
+        notes.append(f"{label}: {shares[0]:.1f} → {shares[2]:.1f} %")
+
+    target = 100 * next(iter(scenarios.values())).environment.target_availability
+    ax.axhline(target, color=BAD, linestyle="--", linewidth=1)
+    ax.text(0.05, target + 1.5, f"цель {target:.0f} %", color=BAD, fontsize=9)
+
+    ax.set_xticks(range(len(deadlines)))
+    ax.set_xticklabels(["сразу" if d == 0 else _minutes(d) for d in deadlines])
+    ax.set_ylim(0, 104)
+    ax.set_xlabel("допустимая задержка доставки")
+    ax.set_ylabel("доля отсчётов, %")
+    ax.set_title("Доступность худшего пункта, если данные разрешено подождать")
+    ax.legend(loc="lower right", framealpha=0.95, fontsize=9)
+
+    fig.savefig(path)
+    plt.close(fig)
+    return "; ".join(notes)
+
+
+def figure_degradation(scenario, path: Path) -> str:
+    """
+    Кривая деградации с полосой разброса наборов и отмеченной границей цели.
+
+    Ось начинается от наименьшего измеренного значения, а не от нуля: интерес здесь в
+    том, где кривая пересекает цель, и растянутый до нуля график этот момент прячет.
+    Обрезка честная, потому что нижняя граница подписана.
+    """
+
+    curve = degradation_curve(scenario)
+    failures = [p.failures for p in curve.points]
+    mean = [100 * p.mean_worst_availability for p in curve.points]
+    low = [100 * p.worst_worst_availability for p in curve.points]
+    high = [100 * p.best_worst_availability for p in curve.points]
+    target = 100 * curve.target_availability
+
+    fig, ax = plt.subplots(figsize=(9, 4.2))
+    ax.fill_between(failures, low, high, color=ACCENT, alpha=0.18, label="разброс наборов")
+    ax.plot(failures, mean, color=ACCENT, marker="o", label="в среднем по наборам")
+    ax.axhline(target, color=BAD, linestyle="--", linewidth=1)
+    ax.text(failures[-1] * 0.45, target + 0.6, f"цель {target:.0f} %", color=BAD, fontsize=9)
+
+    kept = [f for f, p in zip(failures, curve.points, strict=True) if p.meets_target_share == 1]
+    if kept:
+        # Подпись ставится вверху, у самого начала кривой: внизу её накрывает легенда.
+        ax.axvline(max(kept), color=GOOD, linewidth=1)
+        ax.text(
+            max(kept) + 0.2,
+            max(high) - 1.5,
+            f"переносит {max(kept)} отказа",
+            color=GOOD,
+            fontsize=9,
+        )
+
+    ax.set_xlabel("выведено из строя аппаратов (случайный набор)")
+    ax.set_ylabel("доступность худшего пункта, %")
+    ax.set_title(
+        f"Деградация при случайных отказах: −{curve.slope_pp_per_satellite:.1f} п.п. за аппарат"
+    )
+    ax.set_xticks(failures)
+    ax.legend(loc="lower left", framealpha=0.95, fontsize=9)
+
+    fig.savefig(path)
+    plt.close(fig)
+    return (
+        f"переносит {curve.tolerated_failures}, наклон {curve.slope_pp_per_satellite:.2f} п.п., "
+        f"отклонение от прямой {curve.linear_fit_error_pp:.2f} п.п."
+    )
+
+
+def figure_redundancy(scenarios: dict[str, object], path: Path) -> str:
+    """
+    Сколько независимых маршрутов есть в каждый момент, долями отсчётов.
+
+    Столбцы сложены, потому что доли дают в сумме единицу и вопрос ровно в том, как
+    сутки делятся между «пути нет», «путь один» и «есть запас».
+    """
+
+    labels: list[str] = []
+    parts = {0: [], 1: [], 2: []}
+    for label, scenario in scenarios.items():
+        for client in redundancy_report(scenario).clients:
+            labels.append(f"{label}\n{client.client_id}")
+            parts[0].append(100 * client.no_path_share)
+            parts[1].append(100 * client.single_path_share)
+            parts[2].append(100 * client.redundant_share)
+
+    fig, ax = plt.subplots(figsize=(9, 4.0))
+    bottom = np.zeros(len(labels))
+    for key, colour, name in (
+        (2, GOOD, "два маршрута и больше"),
+        (1, "#f0a30a", "маршрут ровно один"),
+        (0, BAD, "маршрута нет"),
+    ):
+        values = np.array(parts[key])
+        ax.bar(labels, values, bottom=bottom, color=colour, label=name)
+        bottom += values
+
+    ax.set_ylim(0, 100)
+    ax.set_ylabel("доля отсчётов, %")
+    ax.set_title("Запас маршрутов: на скольких аппаратах держится связь")
+    ax.legend(loc="lower center", bbox_to_anchor=(0.5, -0.32), ncol=3, fontsize=9)
+    ax.tick_params(axis="x", labelsize=9)
+
+    fig.savefig(path)
+    plt.close(fig)
+    return f"единственный маршрут занимает до {max(parts[1]):.1f} % отсчётов"
+
+
+def figure_families(scenario, path: Path) -> str:
+    """Кривая по разносу плоскостей: два семейства как два максимума."""
+
+    report = spacing_curve(scenario)
+    spacings = [p.spacing_deg for p in report.points]
+    shares = [100 * p.worst_availability for p in report.points]
+
+    fig, ax = plt.subplots(figsize=(9, 4.2))
+    ax.plot(spacings, shares, color=ACCENT, linewidth=1.8)
+
+    for rule, name in (
+        (report.star_spacing_deg, "180°/P — звезда"),
+        (report.delta_spacing_deg, "360°/P — дельта"),
+    ):
+        ax.axvline(rule, color=GREY, linestyle=":", linewidth=1)
+        ax.text(rule + 1.5, min(shares) + 2, name, color=GREY, fontsize=9, rotation=90)
+
+    for peak in (report.star_best, report.delta_best):
+        if peak is None:
+            continue
+        ax.plot(peak.spacing_deg, 100 * peak.worst_availability, "o", color=GOOD, markersize=8)
+        ax.annotate(
+            f"{peak.spacing_deg:.0f}° → {100 * peak.worst_availability:.1f} %",
+            (peak.spacing_deg, 100 * peak.worst_availability),
+            textcoords="offset points",
+            xytext=(0, 12),
+            ha="center",
+            color=GOOD,
+            fontsize=9,
+        )
+
+    if report.supplied_spacing_deg is not None:
+        supplied = min(
+            report.points, key=lambda p: abs(p.spacing_deg - report.supplied_spacing_deg)
+        )
+        ax.plot(
+            supplied.spacing_deg,
+            100 * supplied.worst_availability,
+            "o",
+            markerfacecolor="none",
+            markeredgecolor=BAD,
+            markersize=12,
+            markeredgewidth=2,
+        )
+        ax.annotate(
+            "выданная конфигурация",
+            (supplied.spacing_deg, 100 * supplied.worst_availability),
+            textcoords="offset points",
+            xytext=(-10, -24),
+            ha="right",
+            color=BAD,
+            fontsize=9,
+        )
+
+    ax.set_xlabel("равномерный разнос плоскостей, градусы")
+    ax.set_ylabel("доступность худшего пункта, %")
+    # Запас сверху нужен подписям максимумов: без него верхняя уезжает в заголовок.
+    ax.set_ylim(top=max(shares) + 9)
+    ax.set_title("Два классических семейства видны как два максимума")
+
+    fig.savefig(path)
+    plt.close(fig)
+    star, delta = report.star_best, report.delta_best
+    return (
+        f"звезда {star.spacing_deg:.0f}° → {100 * star.worst_availability:.1f} %, "
+        f"дельта {delta.spacing_deg:.0f}° → {100 * delta.worst_availability:.1f} %"
+    )
+
+
+def figure_placement(scenario, path: Path) -> str:
+    """Поверхность прироста от второй точки приземления, широта против долготы."""
+
+    report = placement_grid(scenario)
+    grid = 100 * report.grid - 100 * report.baseline_worst_availability
+
+    fig, ax = plt.subplots(figsize=(9, 3.6))
+    image = ax.imshow(
+        grid,
+        origin="lower",
+        aspect="auto",
+        cmap="YlGn",
+        extent=(
+            report.lon_deg[0],
+            report.lon_deg[-1],
+            report.lat_deg[0],
+            report.lat_deg[-1],
+        ),
+    )
+    fig.colorbar(image, ax=ax, label="прирост худшему пункту, п.п.")
+
+    for site in scenario.ground_sites:
+        ax.plot(site.lon_deg, site.lat_deg, "x" if site.role == "gateway" else "+", color="#1a1a1a")
+        ax.annotate(
+            site.id,
+            (site.lon_deg, site.lat_deg),
+            textcoords="offset points",
+            xytext=(4, 4),
+            fontsize=8,
+            color="#1a1a1a",
+        )
+
+    best = report.best
+    if best is not None:
+        ax.plot(best.lon_deg, best.lat_deg, "o", markerfacecolor="none",
+                markeredgecolor=BAD, markersize=12, markeredgewidth=2)
+
+    ax.set_xlabel("долгота, градусы")
+    ax.set_ylabel("широта, градусы")
+    ax.set_title("Где стоило бы поставить вторую точку приземления")
+
+    fig.savefig(path)
+    plt.close(fig)
+    return (
+        f"лучшее {best.lat_deg:.0f}°/{best.lon_deg:.0f}° даёт "
+        f"+{best.gain_pp:.1f} п.п., худшее место +{min(p.gain_pp for p in report.points):.1f}"
+    )
+
+
+def _minutes(seconds: int) -> str:
+    return f"{seconds // 60} мин" if seconds < 3600 else f"{seconds // 3600} ч"
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--out", type=Path, default=REPORTS_DIR / "figures")
@@ -304,6 +569,15 @@ def main() -> None:
 
     full = load_scenario(SCENARIOS_DIR / "01_full_constellation.json")
     outages = load_scenario(SCENARIOS_DIR / "03_satellite_outages.json")
+    link_range = load_scenario(SCENARIOS_DIR / "04_link_range.json")
+    first = load_scenario(SCENARIOS_DIR / "02_first_launch.json")
+
+    four = {
+        "01 полная": full,
+        "02 первая очередь": first,
+        "03 отказы": outages,
+        "04 дальность 2000": link_range,
+    }
 
     work = [
         ("01_ocheredi_i_ploskosti.png", lambda p: figure_batches(full, p)),
@@ -312,6 +586,14 @@ def main() -> None:
         ("04_vidimost.png", lambda p: figure_visibility(full, p)),
         ("05_otkazy_po_ploskostyam.png", lambda p: figure_failures(outages, p)),
         ("06_shag_setki.png", lambda p: figure_grid(full, p)),
+        ("07_dopustimaya_zaderzhka.png", lambda p: figure_delivery(four, p)),
+        ("08_krivaya_degradacii.png", lambda p: figure_degradation(full, p)),
+        (
+            "09_zapas_marshrutov.png",
+            lambda p: figure_redundancy({"01": full, "04": link_range}, p),
+        ),
+        ("10_semeystva_raznosa.png", lambda p: figure_families(full, p)),
+        ("11_mesto_dlya_shlyuza.png", lambda p: figure_placement(link_range, p)),
     ]
 
     for name, build in work:
