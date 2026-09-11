@@ -39,6 +39,8 @@ interface State {
   step: number;
   client: string | null;
   tab: "metrics" | "compare" | "analysis";
+  playing: boolean;
+  stepMs: number;
   saved: SavedRun[];
   busy: string | null;
   errors: FieldError[] | null;
@@ -55,6 +57,8 @@ type Action =
   | { type: "step"; step: number }
   | { type: "client"; client: string }
   | { type: "tab"; tab: State["tab"] }
+  | { type: "playing"; playing: boolean }
+  | { type: "stepMs"; stepMs: number }
   | { type: "remember"; run: SavedRun }
   | { type: "forget"; runId: string }
   | { type: "busy"; busy: string | null }
@@ -71,6 +75,8 @@ const initial: State = {
   step: 0,
   client: null,
   tab: "metrics",
+  playing: false,
+  stepMs: 160,
   saved: [],
   busy: null,
   errors: null,
@@ -94,6 +100,7 @@ function reducer(state: State, action: Action): State {
         run: null,
         step: 0,
         client: null,
+        playing: false,
         errors: null,
         message: null,
       };
@@ -128,6 +135,12 @@ function reducer(state: State, action: Action): State {
 
     case "tab":
       return { ...state, tab: action.tab };
+
+    case "playing":
+      return { ...state, playing: action.playing };
+
+    case "stepMs":
+      return { ...state, stepMs: action.stepMs };
 
     case "remember":
       return {
@@ -300,14 +313,24 @@ export default function App() {
             />
           )}
 
-          <MapView run={run} step={step} client={client} />
+          <MapView
+            run={run}
+            step={step}
+            client={client}
+            stepMs={state.stepMs}
+            playing={state.playing}
+          />
 
           <Timeline
             run={run}
             step={step}
             client={client}
+            playing={state.playing}
+            stepMs={state.stepMs}
             onStep={(next) => dispatch({ type: "step", step: next })}
             onClient={(next) => dispatch({ type: "client", client: next })}
+            onPlaying={(next) => dispatch({ type: "playing", playing: next })}
+            onStepMs={(next) => dispatch({ type: "stepMs", stepMs: next })}
           />
 
           <section className="panel">

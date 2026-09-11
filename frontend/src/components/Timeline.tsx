@@ -21,23 +21,41 @@ const BAND_GAP = 6;
 const LABEL_WIDTH = 54;
 const AXIS_HEIGHT = 18;
 
+// Wall-clock milliseconds per step of the calculation grid. A day at 120 s steps is
+// 720 of them, so 1x plays the whole horizon in about two minutes - slow enough to
+// watch a pattern form, fast enough not to be a waiting room. The map interpolates
+// between steps, so these are smooth rather than a slideshow.
+const SPEEDS: { label: string; stepMs: number }[] = [
+  { label: "0.5×", stepMs: 320 },
+  { label: "1×", stepMs: 160 },
+  { label: "2×", stepMs: 80 },
+  { label: "4×", stepMs: 40 },
+];
+
 export function Timeline({
   run,
   step,
   client,
+  playing,
+  stepMs,
   onStep,
   onClient,
+  onPlaying,
+  onStepMs,
 }: {
   run: Run | null;
   step: number;
   client: string | null;
+  playing: boolean;
+  stepMs: number;
   onStep: (step: number) => void;
   onClient: (client: string) => void;
+  onPlaying: (playing: boolean) => void;
+  onStepMs: (stepMs: number) => void;
 }) {
   const canvas = useRef<HTMLCanvasElement>(null);
   const wrapper = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(900);
-  const [playing, setPlaying] = useState(false);
 
   const clients = run ? Object.keys(run.clients) : [];
   const steps = run?.times_s.length ?? 0;
@@ -60,9 +78,9 @@ export function Timeline({
     if (!playing || !steps) return;
     const timer = window.setInterval(() => {
       onStep((step + 1) % steps);
-    }, 60);
+    }, stepMs);
     return () => window.clearInterval(timer);
-  }, [playing, step, steps, onStep]);
+  }, [playing, step, steps, stepMs, onStep]);
 
   useEffect(() => {
     const context = canvas.current?.getContext("2d");
@@ -176,7 +194,7 @@ export function Timeline({
       </div>
 
       <div className="row" style={{ marginTop: 8 }}>
-        <button className="ghost" onClick={() => setPlaying((value) => !value)}>
+        <button className="ghost" onClick={() => onPlaying(!playing)}>
           {playing ? "❚❚" : "▶"}
         </button>
         <input
@@ -184,8 +202,25 @@ export function Timeline({
           min={0}
           max={Math.max(0, steps - 1)}
           value={step}
-          onChange={(event) => onStep(Number(event.target.value))}
+          onChange={(event) => {
+            // Dragging the slider is navigation, not playback. Leaving it running
+            // would fight the hand that is moving it.
+            if (playing) onPlaying(false);
+            onStep(Number(event.target.value));
+          }}
         />
+        <select
+          aria-label="скорость проигрывания"
+          style={{ width: "auto", flexShrink: 0 }}
+          value={stepMs}
+          onChange={(event) => onStepMs(Number(event.target.value))}
+        >
+          {SPEEDS.map((speed) => (
+            <option key={speed.stepMs} value={speed.stepMs}>
+              {speed.label}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div className="legend" style={{ marginTop: 8 }}>

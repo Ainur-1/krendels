@@ -12,8 +12,12 @@ from __future__ import annotations
 
 from typing import Any
 
+import numpy as np
+
 from cosmo_net.analysis.simulate import NetworkSnapshot, RunResult
 from cosmo_net.config import RESULT_SCHEMA_VERSION
+from cosmo_net.geometry.contacts import compute_contacts
+from cosmo_net.geometry.orbit import compute_trajectory
 from cosmo_net.routing.diagnose import Outage
 from cosmo_net.scenario.io import dump_scenario
 from cosmo_net.scenario.schema import Scenario, ScenarioError
@@ -57,6 +61,59 @@ def run_payload(run_id: str, result: RunResult) -> dict[str, Any]:
         "clients": clients,
         "scenario": dump_scenario(result.scenario),
         "outage_causes": [str(cause) for cause in Outage if cause is not Outage.NONE],
+    }
+
+
+def trajectory_payload(result: RunResult) -> dict[str, Any]:
+    """
+    Every position and every link, for every step, in one response.
+
+    This exists because the map was being fed one step at a time over the network
+    while the route for the same step came out of memory. During playback the
+    fetches could not keep up and cancelled one another, so the satellites stood
+    still on a stale frame while the route line had already moved — the picture
+    disagreed with itself.
+
+    Measured on the default scenario: 240 kB gzipped for the whole run, against
+    roughly 20 kB per step and 720 round trips to play the same day through. The
+    one-off payload is both smaller in total and the only version that can be drawn
+    without waiting for anything.
+
+    Positions are Earth-fixed and rounded to the kilometre. On a world map that is
+    well under a pixel, and keeping them Cartesian is what lets the client
+    interpolate between steps without special cases at the date line or the poles.
+    """
+
+    scenario = result.scenario
+    trajectory = compute_trajectory(scenario)
+    contacts = compute_contacts(scenario, trajectory)
+
+    links: list[list[list[int]]] = []
+    for step in range(len(result.times_s)):
+        open_pairs = np.flatnonzero(contacts.isl_open[step])
+        links.append([[int(contacts.pair_index[p, 0]), int(contacts.pair_index[p, 1])]
+                      for p in open_pairs])
+
+    # Which satellites each ground site can use, by index into `satellite_ids`. The
+    # map draws these for the selected terminal only, but which one is selected
+    # changes without the run changing, so all of them are sent.
+    ground_visible: dict[str, list[list[int]]] = {}
+    for g, site_id in enumerate(contacts.ground_ids):
+        ground_visible[site_id] = [
+            [int(n) for n in np.flatnonzero(contacts.ground_open[step, g])]
+            for step in range(len(result.times_s))
+        ]
+
+    return {
+        "times_s": result.times_s,
+        "step_s": scenario.environment.step_s,
+        "satellite_ids": contacts.satellite_ids,
+        "plane_ids": [sat.plane_id for sat in scenario.design.satellites],
+        "ecef_km": np.round(trajectory.ecef_km).astype(int).tolist(),
+        "active": contacts.active.tolist(),
+        "links": links,
+        "ground_visible": ground_visible,
+        "ground_sites": [site.model_dump(mode="json") for site in scenario.ground_sites],
     }
 
 

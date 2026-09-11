@@ -41,6 +41,7 @@ from cosmo_net.serving.payloads import (
     run_payload,
     scenario_summary,
     snapshot_payload,
+    trajectory_payload,
 )
 from cosmo_net.serving.store import RunCache, VariantStore
 
@@ -235,6 +236,18 @@ def get_snapshot(run_id: str, t_s: float = 0.0) -> dict[str, Any]:
 
     result = _require_run(run_id)
     return snapshot_payload(snapshot_at(result.scenario, t_s), result.scenario)
+
+
+@app.get("/api/runs/{run_id}/trajectory")
+def get_trajectory(run_id: str) -> dict[str, Any]:
+    """
+    Positions and links for every step, fetched once so playback needs no network.
+
+    See `trajectory_payload`: asking for one step at a time is what made the map
+    disagree with the route drawn on top of it.
+    """
+
+    return trajectory_payload(_require_run(run_id))
 
 
 @app.get("/api/runs/{run_id}/export")

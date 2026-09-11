@@ -154,6 +154,25 @@ export interface Snapshot {
   ground_sites: GroundSite[];
 }
 
+/**
+ * Positions and links for the whole run, fetched once.
+ *
+ * Every outer array is indexed by step, in step with `Run.times_s`. `ecef_km` is
+ * Earth-fixed and rounded to the kilometre, which is what lets the map interpolate
+ * between steps without the date line and the poles needing special cases.
+ */
+export interface Trajectory {
+  times_s: number[];
+  step_s: number;
+  satellite_ids: string[];
+  plane_ids: string[];
+  ecef_km: [number, number, number][][];
+  active: boolean[][];
+  links: [number, number][][];
+  ground_visible: Record<string, number[][]>;
+  ground_sites: GroundSite[];
+}
+
 export interface ScenarioSummary {
   source: string;
   id: string;

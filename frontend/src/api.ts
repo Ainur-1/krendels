@@ -18,6 +18,7 @@ import type {
   Snapshot,
   Strategy,
   SweepReport,
+  Trajectory,
   VariantListing,
 } from "./types";
 
@@ -95,6 +96,9 @@ export const api = {
 
   snapshot: (runId: string, tSeconds: number) =>
     request<Snapshot>(`/runs/${runId}/snapshot?t_s=${tSeconds}`),
+
+  /** The whole run's geometry in one response - see MapView for why it is not per step. */
+  trajectory: (runId: string) => request<Trajectory>(`/runs/${runId}/trajectory`),
 
   /** The export is a download, so it is fetched as a blob and handed to the browser. */
   exportUrl: (runId: string) => `/api/runs/${runId}/export`,
