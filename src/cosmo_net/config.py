@@ -10,6 +10,7 @@ reference module's output.
 from __future__ import annotations
 
 import math
+import os
 from pathlib import Path
 
 # Earth radius, km. Spherical Earth throughout - the model has no oblateness and
@@ -34,6 +35,13 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 SCENARIOS_DIR = PROJECT_ROOT / "data" / "scenarios"
 REPORTS_DIR = PROJECT_ROOT / "reports"
 METRICS_DIR = REPORTS_DIR / "metrics"
+
+# Where saved variants live. Overridable because the container puts it on a mounted
+# volume: a design someone kept has to survive a redeploy, and the default sits
+# inside the source tree, which in the image is read-only to the service user.
+RUNS_DATABASE = Path(os.environ.get("COSMO_NET_DB", ""))
+if not RUNS_DATABASE.name:
+    RUNS_DATABASE = Path(__file__).resolve().parents[2] / "runs.sqlite3"
 
 # The compiled frontend. Written by `npm run build`, absent in a fresh clone, and the
 # service reports that plainly instead of failing to start - the API is useful on its own.

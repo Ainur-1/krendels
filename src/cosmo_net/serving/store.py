@@ -21,11 +21,11 @@ from pathlib import Path
 from typing import Any
 
 from cosmo_net.analysis.simulate import RunResult
-from cosmo_net.config import PROJECT_ROOT
+from cosmo_net.config import RUNS_DATABASE
 from cosmo_net.scenario.io import dump_scenario
 from cosmo_net.scenario.schema import Scenario, parse_scenario
 
-DEFAULT_DATABASE = PROJECT_ROOT / "runs.sqlite3"
+DEFAULT_DATABASE = RUNS_DATABASE
 
 # Enough runs for a comparison view and the last few things the user looked at.
 # Each is a few hundred kilobytes of Python objects, so this is a handful of megabytes.
@@ -35,8 +35,9 @@ MAX_CACHED_RUNS = 32
 class VariantStore:
     """Saved designs, by identifier. Thread-safe because uvicorn serves requests from a pool."""
 
-    def __init__(self, path: Path | str = DEFAULT_DATABASE) -> None:
-        self._path = Path(path)
+    def __init__(self, path: Path | str | None = None) -> None:
+        self._path = Path(path) if path is not None else DEFAULT_DATABASE
+        self._path.parent.mkdir(parents=True, exist_ok=True)
         self._lock = threading.Lock()
         self._connection = sqlite3.connect(self._path, check_same_thread=False)
         self._connection.row_factory = sqlite3.Row
