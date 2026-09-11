@@ -1,9 +1,9 @@
 /**
- * The shapes the API returns. Kept in step with docs/api.md by hand.
+ * Формы данных, которые возвращает API. Сверяются с docs/api.md вручную.
  *
- * Every per-step array in `ClientSeries` has the same length as `times_s` and is
- * indexed by the same step, which is what lets the time slider read a whole frame
- * out of memory with one index rather than assembling it from several lookups.
+ * Каждый массив «по отсчётам» в `ClientSeries` имеет ту же длину, что и `times_s`, и
+ * индексируется тем же номером отсчёта. Именно поэтому ползунок времени читает целый
+ * кадр из памяти одним индексом, а не собирает его из нескольких обращений.
  */
 
 export type Role = "client" | "gateway";
@@ -155,11 +155,12 @@ export interface Snapshot {
 }
 
 /**
- * Positions and links for the whole run, fetched once.
+ * Положения и связи на весь прогон, запрашиваемые один раз.
  *
- * Every outer array is indexed by step, in step with `Run.times_s`. `ecef_km` is
- * Earth-fixed and rounded to the kilometre, which is what lets the map interpolate
- * between steps without the date line and the poles needing special cases.
+ * Каждый внешний массив индексируется номером отсчёта, согласованно с `Run.times_s`.
+ * `ecef_km` — гринвичские координаты, округлённые до километра: именно это позволяет
+ * карте интерполировать между отсчётами без особых случаев на 180-м меридиане и у
+ * полюсов.
  */
 export interface Trajectory {
   times_s: number[];
@@ -205,7 +206,7 @@ export interface Candidate {
   worst_availability: number;
   worst_max_gap_s: number;
   availability: Record<string, number>;
-  /** Ranked on a sampled grid rather than measured. Never quote these as figures. */
+  /** Отранжировано по прореженной сетке, а не измерено. Показывать как число нельзя. */
   approximate: boolean;
 }
 

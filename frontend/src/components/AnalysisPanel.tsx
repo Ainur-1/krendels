@@ -1,16 +1,16 @@
 /**
- * The two studies that turn a calculation into a recommendation.
+ * Два исследования, которые превращают расчёт в рекомендацию.
  *
- * The sweep answers "is there a better configuration than this one" by trying about
- * a hundred and plotting all of them — availability against the longest single
- * interruption, with the ones not beaten on both counts marked. Its winner can be
- * applied to the working design in one click, which is the point: an optimiser
- * whose result you have to retype by hand is a report, not a tool.
+ * Перебор отвечает на вопрос «есть ли конфигурация лучше этой», пробуя около сотни и
+ * нанося их все на график: доступность против самого долгого непрерывного перерыва, с
+ * пометкой тех, кто не проигрывает сразу по обоим. Его победителя можно применить к
+ * рабочему проекту одним нажатием, и в этом весь смысл: подборщик, результат которого
+ * приходится перенабирать руками, — это отчёт, а не инструмент.
  *
- * The knockout answers "which satellite would be missed most" by removing each one
- * for a full day. On the supplied constellation the interesting finding is a
- * negative one — the bars come out almost level, so there is no single craft
- * holding the design up, and the vulnerability is somewhere else.
+ * Выбивание отвечает на вопрос «без какого аппарата хуже всего», убирая каждый на
+ * целые сутки. На выданной группировке интересный результат оказывается отрицательным:
+ * столбцы выходят почти вровень, то есть проект не держится ни на одном аппарате, и
+ * уязвимость находится в другом месте.
  */
 
 import { useState } from "react";
@@ -160,22 +160,22 @@ export function AnalysisPanel({
 }
 
 /**
- * Availability against the longest interruption, every candidate as a point.
+ * Доступность против самого долгого перерыва, каждый кандидат — точка.
  *
- * Drawn as SVG rather than canvas: a hundred points is nothing to lay out, and the
- * frontier needs to be hoverable to be useful.
+ * Рисуется как SVG, а не canvas: сотню точек разложить ничего не стоит, а фронт должен
+ * отзываться на наведение, иначе он бесполезен.
  *
- * The vertical axis does not start at the worst candidate. A spacing sweep always
- * contains a few collapsed designs — every plane at the same RAAN is one orbit
- * three times over — and on scenario 01 those score 12 %, which squeezes the
- * interesting band between 96 and 100 % into a few pixels. The axis is floored ten
- * points below whichever of the baseline and the best is lower, and what falls off
- * the bottom is counted rather than silently dropped.
+ * Вертикальная ось начинается не с худшего кандидата. В переборе разноса всегда есть
+ * несколько вырожденных проектов — все плоскости на одном RAAN это одна орбита трижды,
+ * — и на сценарии 01 они набирают 12 %, что сжимает интересную полосу между 96 и 100 %
+ * в несколько пикселей. Ось обрезается на десять пунктов ниже меньшего из двух —
+ * базовой конфигурации и лучшей, — а то, что ушло вниз, пересчитывается и называется, а
+ * не выбрасывается молча.
  *
- * Filled points were measured on the full grid; hollow ones were ranked on a
- * sampled one and are drawn faintly, because they are where the search looked
- * rather than what it found. The distinction is in the legend for the same reason
- * it is in the data: a percentage nobody measured should not look like one.
+ * Закрашенные точки измерены на полной сетке; полые отранжированы по прореженной и
+ * нарисованы бледно, потому что это места, куда поиск заглядывал, а не то, что он
+ * нашёл. Различие вынесено в подпись по той же причине, по которой оно есть в данных:
+ * процент, которого никто не мерил, не должен выглядеть как измеренный.
  */
 function ParetoPlot({ report }: { report: SweepReport }) {
   const width = 520;
@@ -281,12 +281,12 @@ function ParetoPlot({ report }: { report: SweepReport }) {
 }
 
 /**
- * The knockout ranking, most costly first.
+ * Список выбиваний, самые дорогие первыми.
  *
- * Shown a dozen at a time rather than in a nested scrolling box. Forty-eight rows
- * inside a 260-pixel window on a page that already scrolls is awkward to read, and
- * it scrolls itself to the middle the moment the button that produced it takes
- * focus — which is how this started.
+ * Показывается по дюжине, а не во вложенном прокручиваемом окне. Сорок восемь строк в
+ * окне высотой 260 пикселей на странице, которая и так прокручивается, читать неудобно,
+ * и оно само уезжает на середину, как только кнопка, его породившая, получает фокус, —
+ * с этого всё и началось.
  */
 function KnockoutChart({ report }: { report: CriticalityReport }) {
   const [all, setAll] = useState(false);

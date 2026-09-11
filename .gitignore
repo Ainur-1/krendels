@@ -1,8 +1,8 @@
-# uv builds the environment from pyproject.toml and uv.lock; the tree itself is
-# machine-specific and several hundred megabytes.
+# Окружение uv строит из pyproject.toml и uv.lock; само дерево привязано к машине и
+# весит несколько сотен мегабайт.
 .venv/
 
-# Build and cache output. None of it is an input to anything.
+# Результаты сборки и кеши. Ничто из этого ни для чего не является входными данными.
 __pycache__/
 *.py[cod]
 *.egg-info/
@@ -11,31 +11,31 @@ __pycache__/
 dist/
 build/
 
-# The compiled frontend. Rebuilt by `npm run build` and by the Docker build, so a
-# committed copy would only ever be a stale one that disagrees with frontend/src.
+# Собранный интерфейс. Пересобирается командой `npm run build` и при сборке образа,
+# поэтому в репозитории лежала бы только устаревшая копия, расходящаяся с frontend/src.
 src/cosmo_net/serving/static/
 frontend/node_modules/
 frontend/dist/
 frontend/tsconfig.tsbuildinfo
 
-# Runs are reproducible from the scenario that produced them: the store is a cache,
-# not a record. reports/metrics/ holds the numbers that README and the deck cite.
+# Прогоны воспроизводятся из породившего их сценария: хранилище — это кеш, а не
+# запись. Числа, на которые ссылаются README и защита, лежат в reports/metrics/.
 runs.sqlite3
 
-# Deployment target and key path. The playbook reads them; they are not ours to publish.
+# Адрес сервера и путь к ключу. Их читает деплой, и публиковать их мы не вправе.
 ansible/inventory.ini
 .env
 
-# Personal working files. CLAUDE.md describes how one person works with an assistant
-# and is not a statement about the project; the findings it carried live in
-# docs/findings.md, which is committed because the team and the defence need them.
+# Личные рабочие файлы. CLAUDE.md описывает, как один человек работает с ассистентом,
+# и ничего не утверждает о проекте; измеренные выводы, которые он нёс, лежат в
+# docs/findings.md — он в репозитории, потому что нужен команде и защите.
 CLAUDE.md
 .claude/
 .vscode/
 .idea/
 
-# Working notes, not deliverables. The defence script and anything else written to
-# explain the work to ourselves stays out of the repository.
+# Рабочие заметки, а не результат работы. Сценарий защиты и всё прочее, написанное,
+# чтобы объяснить работу самим себе, в репозиторий не попадает.
 docs/presentation.md
 docs/notes/
 

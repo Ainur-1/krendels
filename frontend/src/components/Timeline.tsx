@@ -1,14 +1,14 @@
 /**
- * The availability diagram: one band per terminal, coloured by why there was no route.
+ * Диаграмма доступности: по полосе на терминал, раскрашенной причиной отсутствия маршрута.
  *
- * This is the most useful picture in the service. A single availability figure says
- * 80 % and stops; the band says *when* and *why*, and on the supplied data the four
- * scenarios produce four visibly different pictures — a coverage problem, a network
- * problem, a mixture, and one bad window per day that a percentage hides completely.
+ * Это самая полезная картинка в сервисе. Одна цифра доступности говорит «80 %» и на
+ * этом заканчивается; полоса говорит **когда** и **почему**, и на выданных данных
+ * четыре сценария дают четыре заметно разных картины: нехватка покрытия, проблема
+ * сети, смесь и одно неудачное окно в сутки, которое процент прячет целиком.
  *
- * Drawn on canvas because it is 720 cells per terminal and they change on every
- * recalculation. Clicking anywhere moves the clock there and selects that terminal,
- * so reading the picture and inspecting the moment are the same gesture.
+ * Рисуется на canvas, потому что это 720 ячеек на терминал и они меняются при каждом
+ * пересчёте. Клик в любом месте переносит туда часы и выбирает этот терминал, так что
+ * прочитать картинку и рассмотреть момент — это одно движение.
  */
 
 import { useEffect, useRef, useState } from "react";
@@ -21,10 +21,11 @@ const BAND_GAP = 6;
 const LABEL_WIDTH = 54;
 const AXIS_HEIGHT = 18;
 
-// Wall-clock milliseconds per step of the calculation grid. A day at 120 s steps is
-// 720 of them, so 1x plays the whole horizon in about two minutes - slow enough to
-// watch a pattern form, fast enough not to be a waiting room. The map interpolates
-// between steps, so these are smooth rather than a slideshow.
+// Сколько реальных миллисекунд приходится на один отсчёт сетки. Сутки при шаге 120 с
+// — это 720 отсчётов, поэтому на скорости 1× весь горизонт проигрывается примерно за
+// две минуты: достаточно медленно, чтобы заметить закономерность, и достаточно
+// быстро, чтобы не быть залом ожидания. Карта интерполирует между отсчётами, поэтому
+// это плавное движение, а не показ слайдов.
 const SPEEDS: { label: string; stepMs: number }[] = [
   { label: "0.5×", stepMs: 320 },
   { label: "1×", stepMs: 160 },
@@ -71,9 +72,9 @@ export function Timeline({
     return () => observer.disconnect();
   }, []);
 
-  // Playback walks the grid at a fixed rate rather than in real time: a 24-hour run
-  // at 120 s steps would take a day to watch honestly, and what the user wants is to
-  // see the pattern move, not to wait for it.
+  // Проигрывание идёт по сетке с постоянной скоростью, а не в реальном времени:
+  // честно смотреть суточный прогон пришлось бы сутки, а нужно увидеть, как движется
+  // картина, а не дождаться её.
   useEffect(() => {
     if (!playing || !steps) return;
     const timer = window.setInterval(() => {
@@ -103,9 +104,10 @@ export function Timeline({
       context.font = `${clientId === client ? "600 " : ""}12px system-ui`;
       context.fillText(clientId, 0, top + BAND_HEIGHT / 2 + 4);
 
-      // Runs of the same cause are merged into one rectangle. At 720 steps over
-      // maybe 900 pixels a per-step fill leaves seams where cells fall between
-      // device pixels; a merged run is both faster and cleaner.
+      // Идущие подряд отсчёты с одной причиной сливаются в один прямоугольник. При
+      // 720 отсчётах на примерно 900 пикселей заливка по отсчёту оставляет швы там,
+      // где ячейка попадает между физическими пикселями; слитая полоса и быстрее, и
+      // чище.
       let runStart = 0;
       let runCause: OutageCause = series.cause[0];
       for (let index = 1; index <= steps; index += 1) {
@@ -127,8 +129,8 @@ export function Timeline({
       context.strokeRect(LABEL_WIDTH + 0.5, top + 0.5, plotWidth - 1, BAND_HEIGHT - 1);
     });
 
-    // Hour ticks, read from the grid rather than assumed: a judge's scenario may
-    // run for twelve hours on a 60 s step.
+    // Часовые засечки берутся из сетки, а не предполагаются: сценарий жюри может идти
+    // двенадцать часов с шагом 60 с.
     const axisTop = clients.length * (BAND_HEIGHT + BAND_GAP);
     context.fillStyle = "#6b7886";
     context.strokeStyle = "#2a3441";
@@ -203,8 +205,8 @@ export function Timeline({
           max={Math.max(0, steps - 1)}
           value={step}
           onChange={(event) => {
-            // Dragging the slider is navigation, not playback. Leaving it running
-            // would fight the hand that is moving it.
+            // Перетаскивание ползунка — это навигация, а не проигрывание. Оставить
+            // его запущенным значило бы бороться с рукой, которая его двигает.
             if (playing) onPlaying(false);
             onStep(Number(event.target.value));
           }}

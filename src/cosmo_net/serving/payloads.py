@@ -151,8 +151,8 @@ def export_payload(result: RunResult) -> dict[str, Any]:
         "schema_version": RESULT_SCHEMA_VERSION,
         "effective_scenario": dump_scenario(result.scenario),
         "routes": routes,
-        # Beyond the required fields, and allowed: "К результату можно добавить
-        # сводные показатели и пояснения."
+        # Сверх обязательных полей, и это разрешено: «К результату можно добавить
+        # сводные показатели и пояснения».
         "summary": result.summary(),
         "routing_strategy": str(result.strategy),
     }

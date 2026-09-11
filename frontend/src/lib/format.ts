@@ -1,13 +1,13 @@
-/** Formatting shared by every panel, so the same quantity never appears two ways. */
+/** Форматирование, общее для всех панелей, чтобы одна величина не выглядела по-разному. */
 
 import type { OutageCause } from "../types";
 
-/** Shares arrive from the API in fractions of one; percent is a presentation choice. */
+/** Доли приходят из API в долях единицы; проценты — это решение представления. */
 export function percent(share: number, digits = 1): string {
   return `${(share * 100).toFixed(digits)} %`;
 }
 
-/** A point on the calculation grid, as time of day from the start of the run. */
+/** Точка сетки расчёта как время от начала прогона. */
 export function clock(seconds: number): string {
   const whole = Math.round(seconds);
   const hh = Math.floor(whole / 3600);
@@ -17,7 +17,7 @@ export function clock(seconds: number): string {
   return `${pad(hh)}:${pad(mm)}:${pad(ss)}`;
 }
 
-/** A duration, in the largest unit that keeps it readable. */
+/** Длительность в самой крупной единице, при которой она ещё читается. */
 export function duration(seconds: number): string {
   if (seconds === 0) return "нет";
   if (seconds < 60) return `${seconds} с`;
@@ -44,7 +44,7 @@ export const CAUSE_LABEL: Record<OutageCause, string> = {
   network_split: "разрыв межспутниковой сети",
 };
 
-/** Short enough for a chart axis or a dense table cell. */
+/** Достаточно коротко для оси графика или плотной ячейки таблицы. */
 export const CAUSE_SHORT: Record<OutageCause, string> = {
   none: "связь",
   no_client_contact: "нет над пунктом",
@@ -62,10 +62,10 @@ export const CAUSE_COLOUR: Record<OutageCause, string> = {
 };
 
 /**
- * Resolved colours for canvas, which cannot read CSS variables.
+ * Готовые цвета для canvas, который не умеет читать переменные CSS.
  *
- * Duplicated from styles.css on purpose and deliberately kept in the same order:
- * the map and the timeline have to agree about what orange means.
+ * Продублированы из styles.css намеренно и намеренно в том же порядке: карта и
+ * временная шкала обязаны одинаково понимать, что означает оранжевый.
  */
 export const CAUSE_RGB: Record<OutageCause, string> = {
   none: "#2d7d3f",
@@ -75,7 +75,7 @@ export const CAUSE_RGB: Record<OutageCause, string> = {
   network_split: "#f85149",
 };
 
-/** Distinct colours for orbital planes, extended by rotation for larger designs. */
+/** Различимые цвета орбитальных плоскостей; для больших проектов список повторяется по кругу. */
 const PLANE_COLOURS = [
   "#4c9aff",
   "#3fb950",

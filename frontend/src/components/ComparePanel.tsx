@@ -1,11 +1,11 @@
 /**
- * Two or more runs side by side, and the parameters that differ between them.
+ * Два и более прогона рядом, и параметры, которыми они различаются.
  *
- * The table of numbers is the easy half. The harder and more useful half is the
- * list of changes underneath it: a run computed an hour ago differs from the
- * current one by some set of edits nobody wrote down, and a comparison that only
- * shows outcomes leaves the reader guessing which edit produced them. The service
- * diffs the two scenarios and names every field that moved.
+ * Таблица чисел — это простая половина. Сложнее и полезнее список изменений под ней:
+ * прогон, посчитанный час назад, отличается от текущего каким-то набором правок,
+ * который никто не записывал, и сравнение, показывающее одни исходы, оставляет
+ * читателя гадать, какая правка их дала. Сервис сравнивает два сценария и называет
+ * каждое сдвинувшееся поле.
  */
 
 import { useState } from "react";

@@ -1,5 +1,5 @@
-# test -> build. The tests gate everything: `needs` will not start a job whose
-# dependency failed, so nothing is published from a commit whose suite is red.
+# тесты -> сборка. Тесты пропускают всё остальное: `needs` не запустит задачу, чья
+# зависимость упала, поэтому из коммита с красными тестами ничего не публикуется.
 name: pipeline
 
 on:
@@ -12,8 +12,8 @@ permissions:
   contents: read
   packages: write
 
-# A second push to the same branch makes the first irrelevant, so it is cancelled
-# rather than left to finish and publish a stale image.
+# Второй пуш в ту же ветку делает первый неактуальным, поэтому он отменяется, а не
+# доходит до конца и публикует устаревший образ.
 concurrency:
   group: pipeline-${{ github.ref }}
   cancel-in-progress: true
@@ -26,17 +26,17 @@ jobs:
       matrix:
         python-version: ["3.11", "3.12"]
 
-    # Every uv call in this job, not only the first. A bare `uv run` otherwise
-    # reads .python-version, finds a different interpreter, rebuilds the
-    # environment without the dev extra, and the leg quietly stops testing the
-    # version it is named after.
+    # Для каждого вызова uv в этой задаче, а не только для первого. Иначе голый
+    # `uv run` прочитает .python-version, найдёт другой интерпретатор, пересоберёт
+    # окружение без набора для разработки, и ветка матрицы молча перестанет проверять
+    # ту версию, в честь которой названа.
     env:
       UV_PYTHON: ${{ matrix.python-version }}
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install uv
+      - name: Установка uv
         uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
@@ -45,13 +45,13 @@ jobs:
 
       - run: uv run ruff check src tests scripts
 
-      # The suite includes the comparison against reference/geometry.py, which is
-      # the check that matters: positions to 1e-13 km and link sets exactly.
+      # В набор входит сверка с reference/geometry.py — та самая проверка, которая
+      # имеет значение: положения до 1e-13 км и точное совпадение составов связей.
       - run: uv run pytest
 
-      # The reports the documents quote are regenerated and compared, so a change
-      # that silently moves a published figure fails here rather than at the defence.
-      - name: Reports still reproduce
+      # Отчёты, на которые ссылаются документы, пересчитываются и сравниваются:
+      # правка, молча сдвигающая опубликованное число, падает здесь, а не на защите.
+      - name: Отчёты воспроизводятся
         if: matrix.python-version == '3.12'
         run: |
           uv run python scripts/make_report.py --out /tmp/metrics --workers 2
@@ -105,15 +105,15 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # A Docker reference must be lowercase and this repository is Ainur-1/krendels,
-      # so ${{ github.repository }} cannot be used as a tag directly - buildx rejects
-      # it with "repository name must be lowercase".
-      - name: Lowercase the image name
+      # Имя образа Docker обязано быть в нижнем регистре, а репозиторий называется
+      # Ainur-1/krendels, поэтому ${{ github.repository }} нельзя подставить в тег
+      # напрямую: buildx отвергает такое с ошибкой про нижний регистр.
+      - name: Имя образа в нижний регистр
         id: image
         run: echo "name=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
 
-      # Tagged with the commit SHA as well as latest, so a deploy names exactly
-      # what it is deploying and a rollback has something to point at.
+      # Помечается и хешем коммита, и latest: выкладка называет ровно то, что
+      # выкладывает, а откату есть на что показать.
       - uses: docker/build-push-action@v6
         with:
           context: .

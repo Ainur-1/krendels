@@ -1,10 +1,10 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
-// The bundle is written straight into the Python package, which is what lets one
-// container serve the interface and the API from one process on one port. Nothing
-// is fetched from a CDN at runtime: the room this is defended in may have no route
-// to the internet, and a map that fails to load there is a map that does not exist.
+// Сборка пишется прямо в пакет Python — именно это позволяет одному контейнеру
+// отдавать интерфейс и API одним процессом на одном порту. Ничего не подтягивается с
+// CDN во время работы: в помещении, где это будут защищать, может не быть выхода в
+// интернет, а карта, которая там не загрузилась, — это карта, которой нет.
 export default defineConfig({
   plugins: [react()],
   build: {

@@ -1,15 +1,15 @@
 /**
- * The design, as forms: which scenario, how far deployed, where the planes point, what is broken.
+ * Проект в виде форм: какой сценарий, насколько развёрнут, куда смотрят плоскости, что сломано.
  *
- * Nothing here is hard-coded to the supplied data. Planes are rendered from the
- * scenario, satellites for the outage editor come from the scenario, and the launch
- * stages offered are the batches that actually appear in it — a judge's file with
- * four planes and batches that cut across them gets four rows and the right stages
- * without anything special happening.
+ * Ничто здесь не привязано к выданным данным. Плоскости рисуются из сценария,
+ * аппараты для редактора отказов берутся из сценария, а очереди запуска предлагаются
+ * те, которые в нём действительно встречаются. Файл жюри с четырьмя плоскостями и
+ * очередями поперёк них получит четыре строки и правильные очереди без всякой особой
+ * обработки.
  *
- * Angles are half-open at 360°: the reference validator rejects 360, so the inputs
- * stop at 359.9 rather than letting the user produce a file the organisers' own
- * tool would refuse.
+ * Углы задаются на полуоткрытом промежутке до 360°: эталонная проверка отвергает 360,
+ * поэтому поля останавливаются на 359.9, а не дают пользователю сделать файл, который
+ * инструмент организаторов забракует.
  */
 
 import { useMemo, useRef, useState } from "react";
@@ -261,11 +261,11 @@ export function ConfigPanel({
 }
 
 /**
- * A slider and a number that stay in step, bounded to [0, 360).
+ * Ползунок и число, идущие синхронно, в границах [0, 360).
  *
- * The text box is what makes a configuration reproducible — 65 typed exactly is
- * not the same as 65 found by dragging — and the slider is what makes the effect
- * of RAAN visible while looking at the map.
+ * Поле ввода делает конфигурацию воспроизводимой: набранные ровно 65 — это не то же
+ * самое, что 65, пойманные перетаскиванием. А ползунок делает действие RAAN видимым,
+ * пока смотришь на карту.
  */
 function AngleField({
   label,

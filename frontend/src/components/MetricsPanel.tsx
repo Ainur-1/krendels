@@ -1,10 +1,10 @@
 /**
- * The figures the case asks to be reported, per terminal, plus the route at the current step.
+ * Показатели, которые просит кейс, по каждому терминалу, плюс маршрут на текущем отсчёте.
  *
- * Availability and visibility are shown side by side on purpose: the gap between
- * them is the part of the day when a satellite is overhead and the data still
- * cannot get out, which is exactly the point the case makes about coverage not
- * being reachability. On scenario 04 that gap is thirty points.
+ * Доступность и видимость стоят рядом намеренно: промежуток между ними — это та часть
+ * суток, когда аппарат над головой есть, а данные всё равно не уходят. Ровно об этом
+ * кейс и говорит, различая покрытие и достижимость. На сценарии 04 этот промежуток —
+ * тридцать пунктов.
  */
 
 import { CAUSE_LABEL, CAUSE_RGB, decimal, duration, km, percent } from "../lib/format";

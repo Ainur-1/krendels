@@ -1,11 +1,10 @@
 /**
- * The typed client, and the one place validation failures are turned into something showable.
+ * Типизированный клиент и единственное место, где отказ проверки превращается в показуемое.
  *
- * A 422 from this service is not an error in the usual sense — it is the answer to
- * "what is wrong with my file", and the case scores the service on giving it
- * usefully. So it arrives as a `ScenarioInvalidError` carrying the whole list of
- * field problems rather than as a string, and the upload panel renders them against
- * the fields they name.
+ * Ответ 422 от этого сервиса — не ошибка в обычном смысле, а ответ на вопрос «что не
+ * так с моим файлом», и кейс оценивает сервис по тому, насколько внятно он этот ответ
+ * даёт. Поэтому он приходит как `ScenarioInvalidError` со всем списком проблем по
+ * полям, а не строкой, и панель загрузки показывает их против названных полей.
  */
 
 import type {
@@ -22,7 +21,7 @@ import type {
   VariantListing,
 } from "./types";
 
-/** Any of the three ways the API accepts a design. Exactly one must be set. */
+/** Любой из трёх способов, которыми API принимает проект. Задан должен быть ровно один. */
 export type DesignRef =
   | { scenario: Scenario }
   | { variant_id: string }
@@ -58,8 +57,8 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     if (body?.detail === "scenario_invalid" && Array.isArray(body.errors)) {
       throw new ScenarioInvalidError(body.errors);
     }
-    // FastAPI's own body validation also answers 422, in its own shape. It means a
-    // bug in this client rather than a bad file, so it is reported as such.
+    // Собственная проверка тела запроса в FastAPI тоже отвечает 422, но в своей форме.
+    // Это означает ошибку в этом клиенте, а не плохой файл, и сообщается именно так.
     const detail =
       typeof body?.detail === "string"
         ? body.detail
@@ -97,10 +96,10 @@ export const api = {
   snapshot: (runId: string, tSeconds: number) =>
     request<Snapshot>(`/runs/${runId}/snapshot?t_s=${tSeconds}`),
 
-  /** The whole run's geometry in one response - see MapView for why it is not per step. */
+  /** Вся геометрия прогона одним ответом — почему не по отсчётам, объяснено в MapView. */
   trajectory: (runId: string) => request<Trajectory>(`/runs/${runId}/trajectory`),
 
-  /** The export is a download, so it is fetched as a blob and handed to the browser. */
+  /** Выгрузка — это скачивание, поэтому ссылка отдаётся браузеру напрямую. */
   exportUrl: (runId: string) => `/api/runs/${runId}/export`,
 
   variants: () => request<VariantListing[]>("/variants"),
@@ -124,10 +123,10 @@ export const api = {
 };
 
 /**
- * Russian wording for the validation codes the service can produce.
+ * Формулировки для кодов проверки, которые может вернуть сервис.
  *
- * Anything not listed falls back to the English message from the API, which is
- * always present — an unfamiliar code should still tell the user something.
+ * Для кода, которого здесь нет, берётся сообщение из ответа API — оно есть всегда.
+ * Незнакомый код всё равно должен что-то сказать пользователю.
  */
 const ERROR_TEXT: Record<string, string> = {
   unsupported_schema: "Неподдерживаемая версия формата. Ожидается cosmo-A-1.0.",

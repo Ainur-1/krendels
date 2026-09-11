@@ -1,27 +1,27 @@
 /**
- * The network at the selected moment, drawn on a world map.
+ * Состояние сети в выбранный момент, нарисованное на карте мира.
  *
- * Three decisions worth stating.
+ * Три решения, которые стоит проговорить.
  *
- * Positions come from the server, not from a second copy of the orbital model in
- * JavaScript — that is how a picture starts disagreeing with the numbers under it.
- * But they arrive for the *whole run* in one response rather than one step at a
- * time. The per-step version was built first and was wrong: during playback the
- * fetches could not keep up and cancelled one another, so the satellites stood
- * still on a stale frame while the route line, which comes out of memory, had
- * already moved on. 247 kB once beats 20 kB seven hundred and twenty times.
+ * Положения приходят с сервера, а не из второй копии орбитальной модели на
+ * JavaScript: именно так картинка начинает расходиться с числами под ней. Но
+ * приходят они на **весь прогон** одним ответом, а не по отсчёту за раз. Вариант «по
+ * отсчёту» был сделан первым и оказался неверным: при проигрывании запросы не
+ * успевали и отменяли друг друга, поэтому аппараты стояли на устаревшем кадре, а
+ * линия маршрута, которая берётся из памяти, уже уехала вперёд. 247 КБ один раз
+ * лучше, чем 20 КБ семьсот двадцать раз.
  *
- * Between two steps the satellites are interpolated. A step is 120 s, which is
- * 908 km of travel — played back without interpolation that is a strobe, not
- * motion. Interpolating the Earth-fixed vectors and converting to latitude and
- * longitude at draw time avoids every special case that interpolating the angles
- * directly would need at the date line and over the poles; the chord-versus-arc
- * error is 15 km, about half a pixel here.
+ * Между двумя отсчётами положения интерполируются. Отсчёт — это 120 с, то есть 908 км
+ * пути; проигранное без интерполяции это стробоскоп, а не движение. Интерполяция
+ * гринвичских векторов с переводом в широту и долготу при отрисовке избавляет от всех
+ * особых случаев, которые понадобились бы при интерполяции самих углов на 180-м
+ * меридиане и у полюсов. Ошибка хорды против дуги — 15 км, здесь это около половины
+ * пикселя.
  *
- * The projection is plain equirectangular. A globe looks better in a screenshot and
- * is worse to work with: half the constellation is behind it, and the clients here
- * are at 65–72° north, where a rectangular map keeps every one of them and their
- * gateway visible at once.
+ * Проекция простая прямоугольная. Глобус лучше смотрится на скриншоте и хуже подходит
+ * для работы: половина группировки оказывается позади него, а клиенты здесь на
+ * 65–72° северной широты, где прямоугольная карта держит в поле зрения сразу всех и
+ * их шлюз.
  */
 
 import { geoEquirectangular, geoGraticule10, geoPath } from "d3-geo";
@@ -33,15 +33,15 @@ import { api } from "../api";
 import { clock, planeColour } from "../lib/format";
 import type { Run, Trajectory } from "../types";
 
-// Resolved once: topojson → GeoJSON is pure work that does not depend on anything
-// changing, and it is the most expensive thing on this path.
+// Считается один раз: перевод topojson → GeoJSON ни от чего не зависит, и это самая
+// дорогая операция на этом пути.
 const LAND = feature(
   landTopology as never,
   (landTopology as never as { objects: { land: never } }).objects.land,
 ) as never;
 
-// Beyond this the clock has been dragged rather than played, and following it
-// smoothly would mean animating across half a day. Jump instead.
+// Дальше этого расстояния часы перетащили рукой, а не проиграли, и плавно следовать
+// за ними значило бы анимировать полсуток. Вместо этого прыгаем сразу.
 const SNAP_DISTANCE_STEPS = 1.8;
 
 export function MapView({
@@ -101,8 +101,8 @@ export function MapView({
     return run.clients[client]?.path[step] ?? [];
   }, [run, client, step]);
 
-  // Everything the draw loop reads, kept in a ref so the animation frame does not
-  // depend on a React render having happened since the last one.
+  // Всё, что читает цикл отрисовки, лежит в ref: кадр анимации не должен зависеть от
+  // того, случилась ли с прошлого раза перерисовка React.
   const frame = useRef({
     trajectory,
     step,
@@ -130,10 +130,10 @@ export function MapView({
     const element = canvas.current;
     if (!element) return;
 
-    // The displayed position is a float that chases the integer step. During
-    // playback it lags by up to one step and interpolates the gap; when the slider
-    // is dragged it snaps, because following a jump smoothly would be a lie about
-    // where the constellation was.
+    // Показываемое положение — это дробное число, догоняющее целый номер отсчёта.
+    // При проигрывании оно отстаёт не больше чем на один отсчёт и заполняет разрыв
+    // интерполяцией; при перетаскивании ползунка оно прыгает, потому что плавно
+    // следовать за скачком значило бы соврать о том, где была группировка.
     let shown = frame.current.step;
     let previous = performance.now();
     let raf = 0;
@@ -149,8 +149,8 @@ export function MapView({
       if (Math.abs(gap) > SNAP_DISTANCE_STEPS || !state.playing) {
         shown = target;
       } else if (gap !== 0) {
-        // Cover one step in one step's worth of wall-clock time, so the motion runs
-        // at exactly the rate the timeline is advancing.
+        // Один отсчёт проходится ровно за столько реального времени, сколько длится
+        // отсчёт на шкале, — движение идёт с той же скоростью, что и часы.
         const move = (elapsed / Math.max(state.stepMs, 1)) * Math.sign(gap);
         shown = Math.abs(move) >= Math.abs(gap) ? target : shown + move;
       }
@@ -210,7 +210,7 @@ interface Frame {
   times: number[];
 }
 
-/** Latitude and longitude of an Earth-fixed vector. Only its direction matters. */
+/** Широта и долгота гринвичского вектора. Важно только его направление. */
 function toLonLat(x: number, y: number, z: number): [number, number] {
   const r = Math.hypot(x, y, z) || 1;
   return [(Math.atan2(y, x) * 180) / Math.PI, (Math.asin(z / r) * 180) / Math.PI];
@@ -264,9 +264,9 @@ function draw(element: HTMLCanvasElement, state: Frame, shown: number) {
   const upper = Math.min(lower + 1, last);
   const phase = position - lower;
 
-  // Discrete state — who is in service, which links are up, the route — belongs to
-  // the step the rest of the interface is reporting. Only the positions move
-  // between steps.
+  // Дискретное состояние — кто в строю, какие связи подняты, каков маршрут —
+  // принадлежит тому отсчёту, о котором говорит остальной интерфейс. Между отсчётами
+  // двигаются только положения.
   const discrete = state.step;
   const active = trajectory.active[discrete] ?? [];
   const links = trajectory.links[discrete] ?? [];
@@ -285,9 +285,9 @@ function draw(element: HTMLCanvasElement, state: Frame, shown: number) {
   const indexById = new Map(trajectory.satellite_ids.map((id, index) => [id, index]));
   const onRoute = new Set(state.routePath);
 
-  // Inter-satellite links first and dimmest: they are context for the route, and
-  // there are up to a few hundred. Segments that would wrap across the date line are
-  // dropped rather than drawn as a line across the whole map.
+  // Межспутниковые связи рисуются первыми и самыми тусклыми: они фон для маршрута, и
+  // их бывает несколько сотен. Отрезки, которые перешли бы через 180-й меридиан,
+  // отбрасываются, а не рисуются линией через всю карту.
   context.strokeStyle = "rgba(76,154,255,0.32)";
   context.lineWidth = 1;
   context.beginPath();
@@ -306,7 +306,7 @@ function draw(element: HTMLCanvasElement, state: Frame, shown: number) {
     sitePoint.set(site.id, place(site.lon_deg, site.lat_deg));
   }
 
-  // What the selected terminal could use, against what it does.
+  // Что выбранный терминал мог бы использовать — на фоне того, что он использует.
   if (state.client) {
     const visible = trajectory.ground_visible[state.client]?.[discrete] ?? [];
     const from = sitePoint.get(state.client);
@@ -325,7 +325,7 @@ function draw(element: HTMLCanvasElement, state: Frame, shown: number) {
     }
   }
 
-  // The route, drawn last and brightest — it is the answer the user asked for.
+  // Маршрут рисуется последним и самым ярким: это ответ, за которым пришли.
   if (state.routePath.length > 1) {
     context.strokeStyle = "#3fb950";
     context.lineWidth = 2.5;
@@ -349,8 +349,8 @@ function draw(element: HTMLCanvasElement, state: Frame, shown: number) {
     const [x, y] = point;
 
     if (!active[index]) {
-      // Out-of-service craft keep their computed position, as the case requires, so
-      // they are shown where they are and marked unusable rather than hidden.
+      // Аппараты вне строя сохраняют расчётное положение, как требует кейс, поэтому
+      // показываются там, где они есть, и помечаются как непригодные, а не прячутся.
       context.strokeStyle = "#4a5462";
       context.beginPath();
       context.moveTo(x - 3, y - 3);

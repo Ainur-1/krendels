@@ -1,10 +1,10 @@
 /**
- * What is wrong with the file that was just loaded, field by field.
+ * Что не так с только что загруженным файлом, поле за полем.
  *
- * The case asks the service to say which data needs correcting after a bad upload,
- * and the API answers with every problem at once rather than the first. Showing
- * them as a list addressed by path is the whole point: a user with three mistakes
- * fixes three, instead of discovering them one reload at a time.
+ * Кейс требует, чтобы после неудачной загрузки сервис сказал, какие данные надо
+ * исправить, и API отвечает всеми проблемами сразу, а не первой. Смысл в том, чтобы
+ * показать их списком с адресами: пользователь с тремя ошибками исправляет три, а не
+ * обнаруживает их по одной за перезагрузку.
  */
 
 import { describeError } from "../api";

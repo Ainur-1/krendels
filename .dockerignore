@@ -1,10 +1,10 @@
-# The build context is sent to the daemon before anything runs, so everything the
-# image cannot use is dead weight here.
+# Контекст сборки уходит демону до того, как что-либо начнёт выполняться, поэтому всё,
+# чем образ не может воспользоваться, здесь — мёртвый груз.
 
 .git/
 .github/
 
-# Environments and caches. The image builds its own from pyproject.toml and uv.lock.
+# Окружения и кеши. Образ строит своё из pyproject.toml и uv.lock.
 .venv/
 __pycache__/
 *.py[cod]
@@ -15,18 +15,18 @@ frontend/node_modules/
 frontend/dist/
 frontend/tsconfig.tsbuildinfo
 
-# Built by the frontend stage inside the image; a stale local copy must not win.
+# Собирается стадией интерфейса внутри образа; устаревшая локальная копия победить не должна.
 src/cosmo_net/serving/static/
 
-# Tests, reports and case material: none of it is reachable from a request. The
-# reference module stays out too - it exists to check the package, not to run it.
+# Тесты, отчёты и материалы кейса: из запроса ничто из этого недостижимо. Эталонный
+# модуль тоже остаётся снаружи — он существует, чтобы проверять пакет, а не работать.
 tests/
 reference/
 reports/
 docs/
 scripts/
 
-# Local state and personal files.
+# Локальное состояние и личные файлы.
 runs.sqlite3
 .env
 CLAUDE.md

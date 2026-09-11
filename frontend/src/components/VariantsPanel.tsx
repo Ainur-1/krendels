@@ -1,10 +1,10 @@
 /**
- * Saved designs: keep the one on screen, or go back to one kept earlier.
+ * Сохранённые проекты: оставить тот, что на экране, или вернуться к отложенному раньше.
  *
- * Variants live in the service's database rather than in this tab, so a design
- * saved before lunch is still there after a redeploy. The case asks for exactly
- * that — save a variant and return to it for comparison — and a browser tab is the
- * wrong place to promise it from.
+ * Варианты живут в базе сервиса, а не в этой вкладке, поэтому проект, сохранённый до
+ * обеда, остаётся на месте и после передеплоя. Кейс просит ровно этого — сохранить
+ * вариант и вернуться к нему для сравнения, — а вкладка браузера не то место, откуда
+ * такое можно обещать.
  */
 
 import { useCallback, useEffect, useState } from "react";

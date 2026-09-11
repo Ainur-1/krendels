@@ -1,11 +1,11 @@
 /*
- * One dark theme, committed to rather than made switchable.
+ * Одна тёмная тема, выбранная окончательно, а не сделанная переключаемой.
  *
- * The interface is read in two places: on a laptop while someone changes a design,
- * and on a projector while it is defended. A dark ground keeps the map legible in
- * both, and the four outage colours below are the load-bearing part of the palette
- * — they carry the answer to "why was there no route", so they are chosen to stay
- * apart from each other under projection and for the common colour deficiencies.
+ * Интерфейс читают в двух местах: на ноутбуке, когда меняют проект, и на проекторе,
+ * когда его защищают. Тёмный фон держит карту читаемой и там, и там. Четыре цвета
+ * причин ниже — несущая часть палитры: они несут ответ на вопрос «почему не было
+ * маршрута», поэтому подобраны так, чтобы различаться и под проектором, и при
+ * распространённых нарушениях цветовосприятия.
  */
 
 :root {
@@ -27,8 +27,8 @@
   --warn: #d29922;
   --bad: #f85149;
 
-  /* The four reasons a route can be missing. Kept distinct in hue and in
-     lightness, so the timeline still reads when the colours do not. */
+  /* Четыре причины, по которым маршрута может не быть. Различаются и тоном, и
+     светлотой, чтобы шкала читалась даже там, где цвета не различаются. */
   --cause-client: #f0883e;
   --cause-gateway-offline: #a371f7;
   --cause-gateway: #d29922;
@@ -135,7 +135,7 @@ a {
   color: var(--accent);
 }
 
-/* --- layout ------------------------------------------------------------ */
+/* --- раскладка --------------------------------------------------------- */
 
 .app {
   display: grid;
@@ -194,16 +194,17 @@ a {
   gap: 12px;
 }
 
-/* Flex items shrink by default, and a canvas has no intrinsic height to resist
-   it with: once the column overflows, the map collapses to its borders while
-   still reporting a canvas 491 px tall. The panels scroll, they do not squash. */
+/* Элементы flex по умолчанию сжимаются, а у canvas нет собственной высоты, чтобы
+   этому сопротивляться: как только колонка переполняется, карта схлопывается до
+   рамок, продолжая сообщать о холсте высотой 491 пиксель. Панели должны
+   прокручиваться, а не сплющиваться. */
 .main > * {
   flex-shrink: 0;
 }
 
-/* Below this the two columns stop fitting side by side and the sidebar becomes a
-   band above the work area. The judges will be on a laptop, but a narrow window
-   should look deliberate rather than broken. */
+/* Ниже этой ширины две колонки перестают помещаться рядом, и боковая панель
+   становится полосой над рабочей областью. Жюри будет на ноутбуке, но узкое окно
+   должно выглядеть задуманным, а не сломанным. */
 @media (max-width: 900px) {
   .body {
     grid-template-columns: 1fr;
@@ -259,7 +260,7 @@ a {
   color: var(--text-faint);
 }
 
-/* --- tables ------------------------------------------------------------ */
+/* --- таблицы ----------------------------------------------------------- */
 
 table {
   width: 100%;
@@ -298,7 +299,7 @@ tr.selected td {
   overflow-x: auto;
 }
 
-/* --- status ------------------------------------------------------------ */
+/* --- состояние --------------------------------------------------------- */
 
 .pill {
   display: inline-block;

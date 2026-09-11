@@ -1,13 +1,13 @@
 /**
- * The application shell: one working scenario, one run computed from it, one clock.
+ * Оболочка приложения: один рабочий сценарий, один посчитанный по нему прогон, одни часы.
  *
- * The state is deliberately small. `scenario` is the design the forms edit,
- * `baseline` is what it was when it was loaded — that pair is what makes "сбросить
- * изменения" possible and what the comparison diffs against. `run` is the result of
- * the last calculation, and it is never derived from `scenario` implicitly: the
- * user presses Рассчитать, and until they do, the panels keep showing the run that
- * actually exists rather than one that would exist. Showing numbers for a design
- * nobody computed is the failure mode this arrangement is built to avoid.
+ * Состояние намеренно маленькое. `scenario` — это проект, который правят формы,
+ * `baseline` — каким он был при загрузке. Именно эта пара делает возможным «сбросить
+ * изменения» и именно с ней сравнение считает дифф. `run` — результат последнего
+ * расчёта, и он никогда не выводится из `scenario` сам собой: пользователь нажимает
+ * «Рассчитать», а до этого панели показывают тот прогон, который действительно
+ * существует, а не тот, который получился бы. Показать числа для проекта, которого
+ * никто не считал, — это и есть отказ, от которого защищает такое устройство.
  */
 
 import { useCallback, useEffect, useMemo, useReducer } from "react";
@@ -89,9 +89,10 @@ function reducer(state: State, action: Action): State {
       return { ...state, catalogue: action.catalogue };
 
     case "load":
-      // A newly loaded design has no results yet, and the previous run belonged to
-      // a different scenario. Keeping it on screen would attach the old numbers to
-      // the new design, which is the one mistake this interface must not make.
+      // У только что загруженного проекта результатов ещё нет, а предыдущий прогон
+      // принадлежал другому сценарию. Оставить его на экране значило бы привязать
+      // старые числа к новому проекту — ошибка, которую этот интерфейс совершать не
+      // имеет права.
       return {
         ...state,
         scenario: action.scenario,
@@ -174,11 +175,11 @@ export default function App() {
         if (catalogue.length) void openBundled(catalogue[0].source);
       })
       .catch(() => dispatch({ type: "message", message: "Сервис недоступен" }));
-    // Loading the catalogue once on mount; `openBundled` closes over dispatch only.
+    // Каталог загружается один раз при монтировании; `openBundled` замыкает только dispatch.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  /** Every call to the API goes through here, so failures are reported one way. */
+  /** Все обращения к API идут через эту обёртку, поэтому об отказах сообщается единообразно. */
   const guard = useCallback(async (label: string, work: () => Promise<void>) => {
     dispatch({ type: "busy", busy: label });
     try {

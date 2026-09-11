@@ -5,15 +5,15 @@ description = "Designs a LEO constellation and measures end-to-end reachability 
 readme = "README.md"
 requires-python = ">=3.11,<3.14"
 
-# Core - exactly what the running service imports. The frontend is a static bundle
-# built ahead of time and served by FastAPI, so the container needs no Node runtime
-# and nothing here pulls one in.
+# Основной набор — ровно то, что импортирует работающий сервис. Интерфейс собирается
+# заранее в статические файлы и отдаётся через FastAPI, поэтому Node в контейнере не
+# нужен и ничто отсюда его не притягивает.
 #
-# numpy earns its place: a run is 720 time steps over 48 satellites, and the whole
-# trajectory is one (720, 48, 3) array rather than 34 560 scalar evaluations. The
-# pure-Python prototype that established the baseline figures took 0.2 s per run,
-# which is fast enough to be correct but not fast enough for the configuration
-# sweep, where 65 runs happen behind one button.
+# numpy своё место отрабатывает: прогон — это 720 отсчётов по 48 аппаратов, и вся
+# траектория считается одним массивом (720, 48, 3), а не 34 560 скалярными
+# вычислениями. Прототип на чистом Python, которым получены базовые числа, тратил
+# 0.2 с на прогон — этого достаточно, чтобы быть правым, но не достаточно для подбора
+# конфигурации, где за одним нажатием происходит сотня прогонов.
 dependencies = [
     "numpy>=1.26",
     "fastapi>=0.115",
@@ -45,8 +45,8 @@ select = ["E", "F", "I", "UP", "B"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q --strict-markers"
-# Both come from starlette's TestClient, not from anything this project does, and
-# neither is actionable here.
+# Оба приходят от TestClient из starlette, а не от чего-либо в этом проекте, и
+# сделать с ними здесь нечего.
 filterwarnings = [
     "ignore::DeprecationWarning",
     "ignore:Using `httpx` with `starlette.testclient`:UserWarning",
