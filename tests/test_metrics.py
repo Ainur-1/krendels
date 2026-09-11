@@ -1,12 +1,12 @@
 """
-The figures the case defines, and the measured baseline they have to reproduce.
+Показатели, которые определяет кейс, и измеренная базовая линия, которую они обязаны воспроизводить.
 
-The baseline test at the bottom is a regression lock, not a claim that these are
-good numbers. They came from an independent implementation written before this
-package existed — pure Python, no shared code, cross-checked against two
-alternative derivations of elevation and Earth blockage. Two implementations
-agreeing on twelve figures is the evidence that the model is right; this test is
-what stops a later change from quietly moving them.
+Тест базовой линии внизу — это замок от регрессии, а не утверждение, что эти числа
+хорошие. Получены они независимой реализацией, написанной до появления этого пакета:
+чистый Python, ни строчки общего кода, с перекрёстной проверкой двумя разными
+выводами угла места и перекрытия Землёй. Совпадение двух реализаций на двенадцати
+числах — это и есть доказательство, что модель верна; а тест не даёт поздней правке
+незаметно их сдвинуть.
 """
 
 from __future__ import annotations
@@ -22,7 +22,7 @@ OK = Outage.NONE
 
 
 def test_a_single_missed_step_lasts_one_step():
-    """A gap is measured by the interval it covers, not by the distance between its ends."""
+    """Перерыв измеряется промежутком, который он занимает, а не расстоянием между его концами."""
 
     gaps = collect_gaps([OK, GAP, OK], [0, 120, 240], 120)
     assert len(gaps) == 1
@@ -32,10 +32,10 @@ def test_a_single_missed_step_lasts_one_step():
 
 def test_gaps_touching_the_horizon_are_flagged():
     """
-    Their true length is unknown: the grid was cut, the outage was not.
+    Настоящая длительность неизвестна: обрезали сетку, а не связь.
 
-    The case asks for these to be reported apart from the rest, so both a leading
-    and a trailing run are marked and `max_interior_gap_s` excludes them.
+    Кейс просит показывать такие перерывы отдельно от остальных, поэтому помечаются
+    и начальный, и конечный, а `max_interior_gap_s` их не учитывает.
     """
 
     gaps = collect_gaps([GAP, GAP, OK, GAP], [0, 120, 240, 360], 120)
@@ -68,10 +68,10 @@ def test_max_gap_is_the_longest_run_times_the_step(full_constellation):
         assert metrics.max_gap_s == longest * 120
 
 
-# Availability per client and the worst max gap, measured 2026-09-11 by the
-# independent pure-Python implementation and reproduced by this package to the
-# tenth of a percent. Scenario 01 is the only one of the four that meets the 90 %
-# target on its default configuration.
+# Доступность по каждому клиенту и худший максимальный перерыв, измеренные
+# 2026-09-11 независимой реализацией на чистом Python и воспроизведённые этим
+# пакетом с точностью до десятой доли процента. Сценарий 01 — единственный из
+# четырёх, кто в своей базовой конфигурации дотягивает до цели 90 %.
 BASELINE = {
     "full_constellation": ({"C65": 96.7, "C70": 98.8, "C72": 98.9}, 480),
     "first_launch": ({"C65": 27.2, "C70": 15.8, "C72": 12.6}, 47_760),
@@ -96,7 +96,7 @@ def test_reproduces_the_measured_baseline(request, fixture_name):
 def test_only_the_full_constellation_meets_the_target(
     full_constellation, first_launch, satellite_outages, link_range
 ):
-    """The headline finding: three of the four supplied scenarios miss 90 %."""
+    """Главный вывод: три из четырёх выданных сценариев не дотягивают до 90 %."""
 
     assert simulate(full_constellation).meets_target
     assert not simulate(first_launch).meets_target

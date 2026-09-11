@@ -1,16 +1,16 @@
 """
-The geometry agrees with `reference/geometry.py`, which is the organisers' own module.
+Геометрия совпадает с `reference/geometry.py` — собственным модулем организаторов.
 
-This is the test that matters most in the whole suite. «Корректность расчётов» is
-15 points and is judged against exactly this module, so the package is not allowed
-to be *nearly* right: positions have to land in the same place and, more
-importantly, the link sets have to contain the same links. A difference of a metre
-in a position is invisible, but it moves a satellite across the elevation threshold
-at some step of some day and silently changes an availability figure.
+Это самый важный тест во всём наборе. «Корректность расчётов» — это 15 баллов, и
+проверяется она именно против этого модуля, поэтому пакету нельзя быть **почти**
+правым: положения должны попадать в ту же точку и, что важнее, составы связей должны
+содержать те же связи. Разница в метр в положении незаметна, но на каком-то отсчёте
+какого-то дня она переводит аппарат через порог угла места и молча меняет цифру
+доступности.
 
-The two implementations share no code. Ours computes the whole horizon as arrays;
-theirs computes one step at a time. They agree to 1e-13 km, which is floating-point
-noise and not a model difference.
+Две реализации не делят ни строчки кода. Наша считает весь горизонт массивами, их —
+по одному отсчёту. Совпадают они до 1e-13 км, то есть до шума чисел с плавающей
+точкой, а не до разницы в модели.
 """
 
 from __future__ import annotations
@@ -27,9 +27,9 @@ from cosmo_net.scenario.io import bundled_scenarios, load_scenario
 
 sys.path.insert(0, str(PROJECT_ROOT / "reference"))
 
-# Steps chosen to catch the things a single t = 0 comparison cannot: the first
-# outage boundary in scenario 03 (21 600 s, where craft drop out), a time that is
-# not a multiple of the step, and the last point on the grid.
+# Отсчёты выбраны так, чтобы поймать то, что сравнение в одной точке t = 0 поймать
+# не может: границу первого отказа в сценарии 03 (21 600 с, где выбывают аппараты),
+# момент, не кратный шагу, и последнюю точку сетки.
 SAMPLE_TIMES = [0, 120, 7_777, 21_600, 43_200, 60_000, 86_280]
 
 SCENARIOS = bundled_scenarios()
@@ -37,7 +37,7 @@ SCENARIOS = bundled_scenarios()
 
 @pytest.fixture(scope="module")
 def reference():
-    """The organisers' module, imported from `reference/` rather than installed."""
+    """Модуль организаторов, подключаемый из `reference/`, а не установленный пакетом."""
 
     import geometry
 
@@ -53,8 +53,8 @@ def test_positions_match_reference(reference, path):
     for k, t in enumerate(SAMPLE_TIMES):
         snapshot = reference.snapshot(raw, float(t))
         theirs = np.array([[s["x_km"], s["y_km"], s["z_km"]] for s in snapshot["satellites"]])
-        # 1e-6 km is a millimetre. The observed difference is 1e-13 km; the margin
-        # is here so a change of summation order does not fail the suite.
+        # 1e-6 км — это миллиметр. Наблюдаемая разница 1e-13 км; запас оставлен,
+        # чтобы смена порядка суммирования не роняла набор тестов.
         assert np.abs(trajectory.ecef_km[k] - theirs).max() < 1e-6
 
 
@@ -104,18 +104,18 @@ def test_elevations_match_reference(reference, path):
         for g, site_id in enumerate(contacts.ground_ids):
             theirs = snapshot["elevation_deg"][site_id]
             for n, satellite_id in enumerate(contacts.satellite_ids):
-                # The reference reports elevations for in-service craft only.
+                # Эталон сообщает углы места только для аппаратов в строю.
                 if satellite_id in theirs:
                     assert abs(contacts.elevation_deg[k, g, n] - theirs[satellite_id]) < 1e-9
 
 
 def test_grid_excludes_the_right_end():
     """
-    720 steps, not 721.
+    720 отсчётов, а не 721.
 
-    The last point is 86 280 s. Counting the horizon itself as a step would put every
-    share in the results out by one part in 720 and, worse, would make two runs on
-    different grids look comparable when they are not.
+    Последняя точка — 86 280 с. Если считать отсчётом сам горизонт, каждая доля в
+    результатах сместится на одну семьсот двадцатую, и, что хуже, два прогона на
+    разных сетках будут выглядеть сопоставимыми, не будучи таковыми.
     """
 
     scenario = load_scenario(SCENARIOS[0])

@@ -1,4 +1,4 @@
-"""Fixtures shared across the suite."""
+"""Фикстуры, общие для всего набора тестов."""
 
 from __future__ import annotations
 

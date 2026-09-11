@@ -1,11 +1,11 @@
 """
-Path search: what a route is allowed to be, and what each strategy is for.
+Поиск маршрута: каким маршрут имеет право быть и зачем нужна каждая стратегия.
 
-The first test in this file is the one that guards the rule most easily broken by
-accident — that a client terminal is an endpoint and never a relay. The reference
-module hands out ground edges for every site, so a graph assembled straight from
-its output would quietly let one northern terminal carry another's traffic and
-report a network healthier than the one being designed.
+Первый тест в этом файле стережёт правило, которое проще всего нарушить по
+недосмотру: клиентский терминал — это конец маршрута и никогда не ретранслятор.
+Эталонный модуль выдаёт наземные рёбра для всех пунктов, поэтому граф, собранный
+прямо из его вывода, молча позволил бы одному северному терминалу везти трафик
+другого и показал бы сеть здоровее проектируемой.
 """
 
 from __future__ import annotations
@@ -30,7 +30,7 @@ def slice_at(scenario, t_s: float):
 
 
 def test_clients_are_never_intermediate_nodes(full_constellation):
-    """Every interior node of every route is a satellite."""
+    """Каждый промежуточный узел каждого маршрута — это аппарат."""
 
     result = simulate(full_constellation)
     ground = {site.id for site in full_constellation.ground_sites}
@@ -43,11 +43,11 @@ def test_clients_are_never_intermediate_nodes(full_constellation):
             assert route.path[0] == client_id
             assert route.path[-1] not in clients
             interior = route.path[1:-1]
-            assert not (set(interior) & ground), f"{route.path} relays through a ground site"
+            assert not (set(interior) & ground), f"{route.path} идёт через наземный пункт"
 
 
 def test_hop_count_includes_both_ground_links(full_constellation):
-    """A route through one satellite is two hops, not one: up and down both count."""
+    """Маршрут через один аппарат — это два перехода, а не один: вверх и вниз считаются оба."""
 
     result = simulate(full_constellation)
     for routes in result.routes.values():
@@ -72,11 +72,11 @@ def test_route_endpoints_are_a_client_and_a_gateway(full_constellation):
 @pytest.mark.parametrize("strategy", list(Strategy))
 def test_strategies_agree_on_whether_a_route_exists(full_constellation, strategy):
     """
-    Availability is connectivity, not search.
+    Доступность — это связность, а не поиск.
 
-    Measured on the supplied scenarios: the three strategies pick different routes
-    and return the same availability to within a step. If this ever fails, one of
-    the searches is missing paths rather than merely preferring different ones.
+    Измерено на выданных сценариях: три стратегии выбирают разные маршруты и дают
+    одну и ту же доступность с точностью до отсчёта. Если этот тест когда-нибудь
+    упадёт, значит один из поисков теряет пути, а не просто предпочитает другие.
     """
 
     reference = simulate(full_constellation, Strategy.MIN_HOPS)
@@ -86,7 +86,7 @@ def test_strategies_agree_on_whether_a_route_exists(full_constellation, strategy
 
 
 def test_min_distance_is_not_longer_than_min_hops(full_constellation):
-    """Each strategy is at least as good as the others at the thing it optimises."""
+    """Каждая стратегия не хуже остальных в том, что она улучшает."""
 
     by_hops = simulate(full_constellation, Strategy.MIN_HOPS)
     by_distance = simulate(full_constellation, Strategy.MIN_DISTANCE)
@@ -114,17 +114,17 @@ def test_max_margin_does_not_weaken_the_weakest_link(full_constellation):
                 continue
             if b.min_elevation_margin_deg > a.min_elevation_margin_deg + 1e-9:
                 improved += 1
-    assert improved > 0, "widest-path search never found a better-conditioned route"
+    assert improved > 0, "широчайший путь ни разу не нашёл маршрут с лучшим запасом"
 
 
 def test_no_route_when_the_only_gateway_is_offline(full_constellation):
     """
-    A gateway outage is reported as such, and never as a broken network.
+    Отказ шлюза сообщается именно как отказ шлюза и никогда как разрыв сети.
 
-    The residue is `no_client_contact`: the causes are ordered so that the first
-    condition blocking the path is the one named, and at 16 of the 720 steps C65 has
-    nothing overhead to begin with. Diagnosing that as a gateway problem would send
-    an engineer to fix the wrong end of the link.
+    Остаток приходится на `no_client_contact`: причины упорядочены так, что называется
+    первое условие, блокирующее путь, а на 16 отсчётах из 720 над C65 и так никого
+    нет. Назвать это проблемой шлюза значило бы отправить инженера чинить не тот
+    конец линии.
     """
 
     scenario = full_constellation.model_copy(deep=True)
@@ -147,11 +147,12 @@ def test_no_route_when_the_only_gateway_is_offline(full_constellation):
 
 def test_diagnose_reports_a_split_network(link_range):
     """
-    Scenario 04 is the one where the network itself is the problem.
+    Сценарий 04 — тот, где проблема в самой сети.
 
-    In-plane neighbours are 2700 km apart and the range limit is 2000 km, so the
-    ring is gone and only incidental crossings between planes remain. The gaps that
-    follow are splits, and 33.8 % of C72's steps are diagnosed that way.
+    Соседи внутри плоскости разнесены на 2700 км, а предел дальности 2000 км, поэтому
+    кольцо распадается и остаются только случайные пересечения плоскостей. Перерывы,
+    которые из этого следуют, — это разрывы сети, и так диагностируются 33.8 %
+    отсчётов у C72.
     """
 
     result = simulate(link_range)
@@ -160,7 +161,7 @@ def test_diagnose_reports_a_split_network(link_range):
 
 
 def test_diagnose_reports_missing_coverage_on_the_first_launch(first_launch):
-    """Scenario 02 is the opposite case: one plane, and mostly nothing overhead at all."""
+    """Сценарий 02 — обратный случай: одна плоскость, и над пунктом чаще всего вообще никого."""
 
     result = simulate(first_launch)
     causes = result.metrics["C65"].causes
@@ -173,7 +174,7 @@ def test_find_route_returns_none_without_a_gateway(full_constellation):
 
 
 def test_diagnose_without_client_contact(first_launch):
-    """At a step where nothing is overhead, the cause is the client's own horizon."""
+    """На отсчёте, где над пунктом никого нет, причина — собственный горизонт клиента."""
 
     result = simulate(first_launch)
     step = result.causes["C65"].index(Outage.NO_CLIENT_CONTACT)

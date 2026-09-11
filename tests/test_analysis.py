@@ -1,10 +1,11 @@
 """
-The studies built on repeated runs: fast reachability, criticality, sweeps, comparison.
+Исследования поверх повторных прогонов: достижимость, критичность, перебор, сравнение.
 
-The first test is the one holding the rest up. Three of the four studies here skip
-routing entirely and answer the availability question through connected components
-instead, which is only legitimate if it gives the same answer — so it is checked
-against the full run on every supplied scenario rather than argued for.
+Первый тест держит на себе все остальные. Три исследования из четырёх обходят
+маршрутизацию стороной и отвечают на вопрос о доступности через связные компоненты.
+Это законно ровно настолько, насколько ответ совпадает с полным расчётом, — поэтому
+он проверяется против полного прогона на каждом выданном сценарии, а не
+обосновывается словами.
 """
 
 from __future__ import annotations
@@ -23,7 +24,7 @@ from cosmo_net.analysis.simulate import simulate
     ["full_constellation", "first_launch", "satellite_outages", "link_range"],
 )
 def test_reachability_agrees_with_full_routing(request, fixture_name):
-    """Connected components and path search answer the same question, step for step."""
+    """Связные компоненты и поиск маршрута отвечают на один вопрос, отсчёт в отсчёт."""
 
     scenario = request.getfixturevalue(fixture_name)
     fast = availability_series(scenario)
@@ -43,12 +44,12 @@ def test_longest_gap_counts_the_run_not_the_ends():
 
 def test_no_single_satellite_holds_up_the_full_constellation(full_constellation):
     """
-    The headline resilience finding, locked in as a test.
+    Главный вывод об устойчивости, закреплённый тестом.
 
-    Every one of the 48 costs the worst-served client between 1.4 and 2.4 points, so
-    the spread across the fleet is under a point. There is no craft whose loss is
-    categorically worse than another's — which is why the recommendation that came
-    out of this analysis is about the ground segment and not about sparing satellites.
+    Каждый из 48 аппаратов стоит худшему пункту от 1.4 до 2.4 пункта, то есть разброс
+    по всей группировке меньше одного. Аппарата, потеря которого была бы принципиально
+    хуже потери любого другого, нет — поэтому вывод из этого анализа получился про
+    наземный сегмент, а не про резервирование аппаратов.
     """
 
     report = rank_satellites(full_constellation)
@@ -59,7 +60,7 @@ def test_no_single_satellite_holds_up_the_full_constellation(full_constellation)
 
 
 def test_knockouts_skip_craft_that_never_fly(first_launch):
-    """At stage 1 only the first batch is up, so there are 16 satellites to knock out."""
+    """На первой очереди в строю только первая партия, поэтому выключать можно 16 аппаратов."""
 
     report = rank_satellites(first_launch)
     assert len(report.knockouts) == 16
@@ -68,11 +69,11 @@ def test_knockouts_skip_craft_that_never_fly(first_launch):
 
 def test_sweep_finds_a_configuration_better_than_the_supplied_one(full_constellation):
     """
-    The supplied design is not the best one in its own family.
+    Выданный проект — не лучший в своём же семействе.
 
-    Measured: RAAN 0/65/130 with a 5.625° phase step takes the worst-served client
-    from 96.67 % to 99.58 % and the longest gap from 480 s to 120 s — one step, the
-    shortest an interruption can be on this grid.
+    Измерено: RAAN 0/65/130 при шаге фазы 5.625° поднимает худший пункт с 96.67 % до
+    99.58 %, а самый долгий перерыв сокращает с 480 с до 120 с — это один отсчёт,
+    короче перерыв на этой сетке невозможен.
     """
 
     report = sweep_spacing(full_constellation)
@@ -85,7 +86,7 @@ def test_sweep_finds_a_configuration_better_than_the_supplied_one(full_constella
 
 
 def test_the_sweep_includes_the_scenario_it_started_from(full_constellation):
-    """Otherwise "best" could be worse than doing nothing and nobody would see it."""
+    """Иначе «лучший» мог бы оказаться хуже, чем ничего не менять, и этого никто бы не заметил."""
 
     report = sweep_spacing(full_constellation)
     baseline = evaluate(full_constellation)
@@ -114,7 +115,7 @@ def test_diff_reports_only_what_moved(full_constellation):
 
 
 def test_diff_matches_list_entries_by_identity(full_constellation):
-    """Reordering the satellite list is not a design change."""
+    """Перестановка списка аппаратов — это не изменение проекта."""
 
     reordered = full_constellation.model_copy(deep=True)
     reordered.design.satellites.reverse()
@@ -146,12 +147,12 @@ def test_comparison_tabulates_every_client(full_constellation):
 
 def test_the_sweep_never_reports_a_sampled_figure(full_constellation):
     """
-    Stage one ranks on a sampled grid; stage two measures. Only stage two is quoted.
+    Первая стадия ранжирует по прореженной сетке, вторая измеряет. Показывается только вторая.
 
-    The sampled pass exists because a hundred exact evaluations is two minutes on the
-    deployed instance. It is a search, not a measurement, and a percentage that came
-    out of it must never reach the interface — so `best` and every point on the
-    frontier is checked to have been measured on the full grid.
+    Прореженный проход существует потому, что сотня точных оценок на развёрнутом
+    сервере занимает две минуты. Это поиск, а не измерение, и процент, полученный
+    таким способом, не должен попадать в интерфейс — поэтому проверяется, что и
+    `best`, и каждая точка фронта измерены на полной сетке.
     """
 
     report = sweep_spacing(full_constellation)
@@ -159,17 +160,17 @@ def test_the_sweep_never_reports_a_sampled_figure(full_constellation):
     assert report.best.approximate is False
     assert all(not candidate.approximate for candidate in report.frontier)
     assert any(candidate.approximate for candidate in report.candidates), (
-        "nothing was sampled, so this test is not exercising the two-stage path"
+        "ничего не прорежено — значит тест не проверяет двухстадийный путь"
     )
 
 
 def test_the_sampled_search_finds_the_same_winner(full_constellation):
     """
-    The shortcut does not cost the answer.
+    Срезанный угол не стоит нам ответа.
 
-    Measured on all four supplied scenarios: ranking on a sampled grid and then
-    measuring the shortlist picks the same configuration as evaluating every
-    candidate exactly. Here that is RAAN 0/65/130 at a 5.625° phase step, 99.58 %.
+    Измерено на всех четырёх выданных сценариях: ранжирование по прореженной сетке с
+    последующим измерением короткого списка выбирает ту же конфигурацию, что и точная
+    оценка каждого кандидата. Здесь это RAAN 0/65/130 при шаге фазы 5.625°, 99.58 %.
     """
 
     report = sweep_spacing(full_constellation)
@@ -182,7 +183,7 @@ def test_the_sampled_search_finds_the_same_winner(full_constellation):
 
 
 def test_a_sampled_series_may_not_reuse_full_grid_contacts(full_constellation):
-    """Mixing the two would silently score a candidate on the wrong number of steps."""
+    """Смешать их значило бы молча оценить кандидата на неверном числе отсчётов."""
 
     from cosmo_net.analysis.reachability import availability_series
     from cosmo_net.geometry.contacts import compute_contacts
@@ -198,12 +199,12 @@ def test_a_sampled_series_may_not_reuse_full_grid_contacts(full_constellation):
 
 def test_workers_never_exceed_what_memory_holds(monkeypatch):
     """
-    The bug this guards is not hypothetical.
+    Ошибка, от которой это защищает, не гипотетическая.
 
-    `os.cpu_count()` inside a 512 MB container reports the cores of the host, so the
-    sweep started eight workers, each with its own NumPy and its own copy of the run.
-    The kernel killed the service mid-request and took every cached run with it —
-    a judge who pressed the button lost the service, not just the answer.
+    `os.cpu_count()` внутри контейнера с 512 МБ показывает ядра хоста, поэтому перебор
+    запустил восемь процессов, каждый со своим numpy и своей копией прогона. Ядро
+    убило сервис прямо во время запроса и унесло с собой весь кеш прогонов: жюри,
+    нажавшее кнопку, потеряло бы сервис, а не только ответ.
     """
 
     from cosmo_net.analysis import resources
@@ -211,7 +212,7 @@ def test_workers_never_exceed_what_memory_holds(monkeypatch):
     monkeypatch.setattr(resources, "available_cpus", lambda: 16)
     monkeypatch.setattr(resources, "available_memory_mb", lambda: 512)
 
-    # (512 - 180) / 220 is one worker, and an explicit request for eight is refused.
+    # (512 - 180) / 220 — это один процесс, и явный запрос на восемь отклоняется.
     assert resources.usable_workers() == 1
     assert resources.usable_workers(8) == 1
 

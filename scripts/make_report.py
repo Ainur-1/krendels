@@ -1,9 +1,9 @@
 """
-Run every study over every supplied scenario and write the numbers to reports/metrics/.
+Прогнать все исследования по всем выданным сценариям и записать числа в reports/metrics/.
 
-This is where the figures in the README and the presentation come from. Nothing is
-quoted anywhere in this repository that is not written by this script, or by a test,
-and re-running it is how a reader checks any of it:
+Отсюда берутся все цифры в README и в защите. Ни одно число в этом репозитории не
+приводится, если его не пишет этот скрипт или тест, и перезапуск — это способ для
+читателя проверить любое из них:
 
     uv run python scripts/make_report.py
 """
@@ -24,9 +24,10 @@ from cosmo_net.routing.strategies import Strategy
 from cosmo_net.scenario.io import bundled_scenarios, load_scenario
 from cosmo_net.scenario.schema import GroundSite, Scenario
 
-# A second landing point for the traffic, roughly under the middle client. It is
-# not part of the case: it is the cheapest intervention this analysis found, and
-# the study exists to put a number on it rather than to propose it in the abstract.
+# Вторая точка приземления трафика, примерно под средним клиентом. Частью кейса она
+# не является, и менять выданные данные нельзя: это самое дешёвое вмешательство,
+# которое нашёл анализ, и исследование существует, чтобы поставить ему число, а не
+# чтобы предложить правку сценария.
 SECOND_GATEWAY = GroundSite(
     id="G_NOR",
     name="Второй шлюз (Норильск)",
@@ -49,7 +50,7 @@ def with_elevation(scenario: Scenario, min_elevation_deg: float) -> Scenario:
 
 
 def study_scenario(path: Path, workers: int) -> dict[str, object]:
-    """Baseline, strategies, criticality, the sweep, and the ground-segment what-ifs."""
+    """Базовая линия, стратегии, критичность, перебор и проверки по наземному сегменту."""
 
     scenario = load_scenario(path)
     started = time.perf_counter()
@@ -62,9 +63,9 @@ def study_scenario(path: Path, workers: int) -> dict[str, object]:
     sweep = sweep_spacing(scenario, workers=workers)
     tuned = variant(scenario, sweep.best.raan_deg, sweep.best.phase_deg)
 
-    # Each what-if changes exactly one thing against the same grid, so the lines can
-    # be read against each other. The orbital row and the ground rows are the two
-    # families of intervention the analysis compares.
+    # Каждая проверка меняет ровно одну вещь на той же сетке времени, поэтому строки
+    # можно читать друг против друга. Орбитальная строка и наземные — это два
+    # семейства вмешательств, которые анализ и сравнивает.
     what_if = {
         "baseline": baseline.summary(),
         "tuned_planes": simulate(tuned).summary(),
@@ -107,7 +108,7 @@ def main() -> None:
         "--workers",
         type=int,
         default=8,
-        help="processes for the configuration sweep (1 disables parallelism)",
+        help="число процессов для перебора конфигураций (1 отключает параллельность)",
     )
     parser.add_argument("--out", type=Path, default=METRICS_DIR)
     arguments = parser.parse_args()
@@ -143,7 +144,7 @@ def main() -> None:
     (arguments.out / "index.json").write_text(
         json.dumps(index, ensure_ascii=False, indent=2), encoding="utf-8"
     )
-    print(f"written to {arguments.out}")
+    print(f"записано в {arguments.out}")
 
 
 if __name__ == "__main__":

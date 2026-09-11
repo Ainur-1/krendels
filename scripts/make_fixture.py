@@ -1,19 +1,19 @@
 """
-Generate a scenario deliberately unlike the four supplied ones.
+Сгенерировать сценарий, намеренно непохожий на четыре выданных.
 
-The case says the judges will upload another scenario in the same format and change
-parameters through the interface, and «работа с входными данными» is scored on what
-happens then. Every assumption the supplied files would let you get away with is
-broken here on purpose:
+Кейс прямо говорит, что жюри загрузит другой сценарий того же формата и поменяет
+параметры через интерфейс, и «работа с входными данными» оценивается по тому, что
+тогда произойдёт. Здесь специально нарушено каждое предположение, на которое
+выданные файлы могли бы навести:
 
-- four planes, not three, so nothing may index planes as a fixed triple;
-- ten satellites per plane, so the 22.5° in-plane spacing is not a constant;
-- launch batches that cut across planes, so `launch_batch == plane` is false;
-- two gateways, so a route has a choice of destination;
-- a gateway outage, the one branch no supplied file exercises at all;
-- a different altitude, inclination, range limit, elevation threshold and target;
-- a 12-hour horizon on a 60 s step, so the grid is 720 steps for different reasons;
-- identifiers in a different shape, so nothing may parse meaning out of an id.
+- четыре плоскости, а не три, поэтому нельзя обращаться к плоскостям как к тройке;
+- по десять аппаратов в плоскости, поэтому шаг 22.5° внутри плоскости не константа;
+- очереди запуска идут поперёк плоскостей, поэтому «очередь = плоскость» неверно;
+- два шлюза, поэтому у маршрута есть выбор, куда приземляться;
+- отказ шлюза — единственная ветка, которую ни один выданный файл не задействует;
+- другая высота, наклонение, предел дальности, порог угла места и целевой уровень;
+- горизонт 12 часов при шаге 60 с, поэтому 720 отсчётов получаются по другой причине;
+- идентификаторы другой формы, поэтому нельзя вычитывать смысл из самого имени.
 
     uv run python scripts/make_fixture.py --out data/scenarios/90_judge_fixture.json
 """
@@ -46,8 +46,8 @@ def build() -> dict[str, object]:
                     "id": f"SAT-{index + 101}",
                     "plane_id": plane["id"],
                     "slot_deg": round(slot * 360.0 / PER_PLANE, 4),
-                    # Batches run across the planes rather than along them, so a
-                    # stage change thins every plane instead of removing one.
+                    # Очереди идут поперёк плоскостей, а не вдоль, поэтому смена
+                    # очереди прореживает каждую плоскость, а не убирает одну целиком.
                     "launch_batch": (index % 3) + 1,
                 }
             )
@@ -100,8 +100,9 @@ def build() -> dict[str, object]:
             {"satellite_id": "SAT-104", "start_s": 3_600, "end_s": 18_000},
             {"satellite_id": "SAT-127", "start_s": 0, "end_s": 43_200},
         ],
-        # The branch no supplied scenario reaches: one of the two gateways goes down
-        # for four hours, and traffic has to leave through the other one or not at all.
+        # Ветка, до которой не доходит ни один выданный сценарий: один из двух шлюзов
+        # выключается на четыре часа, и трафику приходится уходить через второй — или
+        # не уходить вовсе.
         "gateway_outages": [{"gateway_id": "GW-WEST", "start_s": 7_200, "end_s": 21_600}],
     }
 
@@ -117,17 +118,17 @@ def main() -> None:
 
     text = json.dumps(build(), ensure_ascii=False, indent=2)
 
-    # Written only after it parses, so the file on disk is never one the service
-    # would reject: a broken fixture would make every test using it fail for the
-    # wrong reason.
+    # Записывается только после успешного разбора, чтобы на диске никогда не лежал
+    # файл, который сервис забраковал бы: сломанная фикстура завалила бы все
+    # использующие её тесты по неправильной причине.
     scenario = loads_scenario(text)
     arguments.out.parent.mkdir(parents=True, exist_ok=True)
     arguments.out.write_text(text + "\n", encoding="utf-8")
 
     print(
-        f"{arguments.out}: {len(scenario.design.satellites)} satellites, "
-        f"{len(scenario.design.planes)} planes, {len(scenario.gateways)} gateways, "
-        f"{len(scenario.times)} steps"
+        f"{arguments.out}: аппаратов {len(scenario.design.satellites)}, "
+        f"плоскостей {len(scenario.design.planes)}, шлюзов {len(scenario.gateways)}, "
+        f"отсчётов {len(scenario.times)}"
     )
 
 

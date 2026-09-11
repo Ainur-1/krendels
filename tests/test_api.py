@@ -1,11 +1,10 @@
 """
-The HTTP surface: the three ways to name a design, the run payload, and the export format.
+Внешняя граница сервиса: три способа назвать проект, ответ с прогоном и формат выгрузки.
 
-The export test is the one with a number in it. The case specifies one record per
-(step, client) pair with an empty path where no route existed, which for a default
-run is 720 × 3 = 2160 records — not 2160 minus the ones that failed. A reader has
-to be able to count availability straight out of the file, and that only works if
-the failures are in it.
+Тест выгрузки — тот, в котором есть число. Кейс задаёт по одной записи на пару
+«отсчёт — клиент», с пустым путём там, где маршрута не было, то есть для базового
+прогона 720 × 3 = 2160 записей, а не 2160 минус неудавшиеся. Читатель должен уметь
+посчитать доступность прямо из файла, а это работает, только если неудачи в нём есть.
 """
 
 from __future__ import annotations
@@ -23,7 +22,7 @@ from cosmo_net.serving.store import RunCache, VariantStore
 
 @pytest.fixture()
 def client(tmp_path, monkeypatch):
-    """A service with its own empty database, so tests never see each other's variants."""
+    """Сервис со своей пустой базой, чтобы тесты не видели вариантов друг друга."""
 
     monkeypatch.setattr(api_module, "variants", VariantStore(tmp_path / "test.sqlite3"))
     monkeypatch.setattr(api_module, "runs", RunCache())
@@ -88,8 +87,8 @@ def test_a_run_carries_a_full_series_per_client(client):
         assert len(series["reachable"]) == 720
         assert len(series["cause"]) == 720
         assert len(series["path"]) == 720
-        # Where there is no route the path is empty rather than absent, so the
-        # frontend can index by step without checking two things.
+        # Там, где маршрута нет, путь пустой, а не отсутствующий, чтобы интерфейс
+        # мог обращаться по номеру отсчёта, не проверяя две вещи сразу.
         for reachable, path in zip(series["reachable"], series["path"], strict=True):
             assert bool(path) == reachable
 
@@ -129,12 +128,12 @@ def test_the_export_has_one_record_per_step_and_client(client):
     assert len(pairs) == 720 * 3
 
     missing = [r for r in export["routes"] if not r["path"]]
-    assert missing, "scenario 03 has outages; some steps must have no route"
+    assert missing, "в сценарии 03 есть отказы: на части отсчётов маршрута быть не должно"
     assert all(r["path"][0] == r["client_id"] for r in export["routes"] if r["path"])
 
 
 def test_the_export_carries_the_scenario_that_was_actually_run(client, raw):
-    """`effective_scenario` has to include the user's edits, or the run is not reproducible."""
+    """В `effective_scenario` должны быть правки пользователя, иначе прогон невоспроизводим."""
 
     edited = copy.deepcopy(raw)
     edited["design"]["planes"][1]["raan_deg"] = 65.0
@@ -230,11 +229,11 @@ def test_the_sweep_returns_a_frontier(client):
 
 def test_the_root_page_works_in_both_states(client):
     """
-    The bundle is gitignored, so the root route has two legitimate answers.
+    Сборка интерфейса не хранится в гите, поэтому у корня два законных ответа.
 
-    On a machine where `npm run build` has run, `/` is the interface. On a fresh
-    clone and in CI it is a page saying how to build it — which beats a bare 404,
-    because a missing bundle is the normal state of a checkout, not a fault.
+    На машине, где выполнили `npm run build`, `/` — это интерфейс. В свежей копии и в
+    CI — страница с объяснением, как его собрать. Это лучше голого 404: отсутствие
+    сборки — обычное состояние копии репозитория, а не неисправность.
     """
 
     response = client.get("/")
