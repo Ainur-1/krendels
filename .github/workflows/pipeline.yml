@@ -1,0 +1,118 @@
+# test -> build. The tests gate everything: `needs` will not start a job whose
+# dependency failed, so nothing is published from a commit whose suite is red.
+name: pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+# A second push to the same branch makes the first irrelevant, so it is cancelled
+# rather than left to finish and publish a stale image.
+concurrency:
+  group: pipeline-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12"]
+
+    # Every uv call in this job, not only the first. A bare `uv run` otherwise
+    # reads .python-version, finds a different interpreter, rebuilds the
+    # environment without the dev extra, and the leg quietly stops testing the
+    # version it is named after.
+    env:
+      UV_PYTHON: ${{ matrix.python-version }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - run: uv sync --locked --extra dev
+
+      - run: uv run ruff check src tests scripts
+
+      # The suite includes the comparison against reference/geometry.py, which is
+      # the check that matters: positions to 1e-13 km and link sets exactly.
+      - run: uv run pytest
+
+      # The reports the documents quote are regenerated and compared, so a change
+      # that silently moves a published figure fails here rather than at the defence.
+      - name: Reports still reproduce
+        if: matrix.python-version == '3.12'
+        run: |
+          uv run python scripts/make_report.py --out /tmp/metrics --workers 2
+          uv run python - <<'PY'
+          import json, pathlib, sys
+          bad = []
+          for fresh in sorted(pathlib.Path("/tmp/metrics").glob("0*.json")):
+              stored = pathlib.Path("reports/metrics") / fresh.name
+              a = json.loads(fresh.read_text(encoding="utf-8"))["baseline"]
+              b = json.loads(stored.read_text(encoding="utf-8"))["baseline"]
+              if abs(a["worst_availability"] - b["worst_availability"]) > 1e-9:
+                  bad.append(f"{fresh.stem}: {b['worst_availability']} -> {a['worst_availability']}")
+          if bad:
+              print("committed reports disagree with a fresh run:", *bad, sep="\n  ")
+              sys.exit(1)
+          print("reports reproduce")
+          PY
+
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - run: npm ci
+        working-directory: frontend
+
+      - run: npm run typecheck
+        working-directory: frontend
+
+      - run: npm run build
+        working-directory: frontend
+
+  image:
+    needs: [backend, frontend]
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Tagged with the commit SHA as well as latest, so a deploy names exactly
+      # what it is deploying and a rollback has something to point at.
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}:latest
+            ghcr.io/${{ github.repository }}:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
