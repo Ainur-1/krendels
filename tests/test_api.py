@@ -302,6 +302,12 @@ def test_placement_endpoint_takes_its_own_grid(client):
     )
     assert bad.status_code == 422
 
+    # Сетка по умолчанию прорежена вдвое против отчётной, но максимум находит тот же:
+    # 90° кратно и пятнадцати градусам, и тридцати.
+    default = client.post("/api/analysis/placement", json={"bundled": "04_link_range"}).json()
+    assert len(default["points"]) == 96
+    assert (default["best"]["lat_deg"], default["best"]["lon_deg"]) == (70.0, 90.0)
+
 
 def test_families_endpoint_names_the_family_of_the_supplied_design(client):
     """Выданный проект — звезда, и ручка это говорит, а не оставляет читателю."""
