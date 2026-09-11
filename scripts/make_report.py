@@ -20,6 +20,7 @@ from cosmo_net.analysis.criticality import rank_satellites
 from cosmo_net.analysis.degradation import degradation_curve
 from cosmo_net.analysis.delivery import delivery_report
 from cosmo_net.analysis.optimise import sweep_spacing, variant
+from cosmo_net.analysis.placement import placement_grid
 from cosmo_net.analysis.redundancy import redundancy_report
 from cosmo_net.analysis.simulate import simulate
 from cosmo_net.config import METRICS_DIR
@@ -99,6 +100,7 @@ def study_scenario(path: Path, workers: int) -> dict[str, object]:
         "delivery": delivery_report(scenario).to_dict(),
         "degradation": degradation_curve(scenario).to_dict(),
         "redundancy": redundancy_report(scenario).to_dict(),
+        "placement": placement_grid(scenario, workers=workers).to_dict(),
         "sweep": sweep.to_dict(),
         "what_if": what_if,
         "tuned_vs_baseline": compare_runs(

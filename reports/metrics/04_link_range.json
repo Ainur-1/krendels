@@ -902,6 +902,1205 @@
       }
     ]
   },
+  "placement": {
+    "baseline_worst_availability": 0.6222222222222222,
+    "lat_deg": [
+      50.0,
+      55.0,
+      60.0,
+      65.0,
+      70.0,
+      75.0,
+      80.0,
+      85.0
+    ],
+    "lon_deg": [
+      -180.0,
+      -165.0,
+      -150.0,
+      -135.0,
+      -120.0,
+      -105.0,
+      -90.0,
+      -75.0,
+      -60.0,
+      -45.0,
+      -30.0,
+      -15.0,
+      0.0,
+      15.0,
+      30.0,
+      45.0,
+      60.0,
+      75.0,
+      90.0,
+      105.0,
+      120.0,
+      135.0,
+      150.0,
+      165.0
+    ],
+    "best": {
+      "lat_deg": 70.0,
+      "lon_deg": 90.0,
+      "worst_availability": 0.9444444444444444,
+      "gain_pp": 32.22222222222222
+    },
+    "points": [
+      {
+        "lat_deg": 50.0,
+        "lon_deg": -180.0,
+        "worst_availability": 0.6222222222222222,
+        "gain_pp": 0.0
+      },
+      {
+        "lat_deg": 50.0,
+        "lon_deg": -165.0,
+        "worst_availability": 0.6222222222222222,
+        "gain_pp": 0.0
+      },
+      {
+        "lat_deg": 50.0,
+        "lon_deg": -150.0,
+        "worst_availability": 0.6222222222222222,
+        "gain_pp": 0.0
+      },
+      {
+        "lat_deg": 50.0,
+        "lon_deg": -135.0,
+        "worst_availability": 0.6222222222222222,
+        "gain_pp": 0.0
+      },
+      {
+        "lat_deg": 50.0,
+        "lon_deg": -120.0,
+        "worst_availability": 0.6222222222222222,
+        "gain_pp": 0.0
+      },
+      {
+        "lat_deg": 50.0,
+        "lon_deg": -105.0,
+        "worst_availability": 0.6222222222222222,
+        "gain_pp": 0.0
+      },
+      {
+        "lat_deg": 50.0,
+        "lon_deg": -90.0,
+        "worst_availability": 0.6222222222222222,
+        "gain_pp": 0.0
+      },
+      {
+        "lat_deg": 50.0,
+        "lon_deg": -75.0,
+        "worst_availability": 0.6222222222222222,
+        "gain_pp": 0.0
+      },
+      {
+        "lat_deg": 50.0,
+        "lon_deg": -60.0,
+        "worst_availability": 0.6222222222222222,
+        "gain_pp": 0.0
+      },
+      {
+        "lat_deg": 50.0,
+        "lon_deg": -45.0,
+        "worst_availability": 0.6222222222222222,
+        "gain_pp": 0.0
+      },
+      {
+        "lat_deg": 50.0,
+        "lon_deg": -30.0,
+        "worst_availability": 0.6222222222222222,
+        "gain_pp": 0.0
+      },
+      {
+        "lat_deg": 50.0,
+        "lon_deg": -15.0,
+        "worst_availability": 0.6222222222222222,
+        "gain_pp": 0.0
+      },
+      {
+        "lat_deg": 50.0,
+        "lon_deg": 0.0,
+        "worst_availability": 0.6222222222222222,
+        "gain_pp": 0.0
+      },
+      {
+        "lat_deg": 50.0,
+        "lon_deg": 15.0,
+        "worst_availability": 0.6222222222222222,
+        "gain_pp": 0.0
+      },
+      {
+        "lat_deg": 50.0,
+        "lon_deg": 30.0,
+        "worst_availability": 0.6222222222222222,
+        "gain_pp": 0.0
+      },
+      {
+        "lat_deg": 50.0,
+        "lon_deg": 45.0,
+        "worst_availability": 0.6236111111111111,
+        "gain_pp": 0.1388888888888884
+      },
+      {
+        "lat_deg": 50.0,
+        "lon_deg": 60.0,
+        "worst_availability": 0.6486111111111111,
+        "gain_pp": 2.6388888888888906
+      },
+      {
+        "lat_deg": 50.0,
+        "lon_deg": 75.0,
+        "worst_availability": 0.6513888888888889,
+        "gain_pp": 2.9166666666666674
+      },
+      {
+        "lat_deg": 50.0,
+        "lon_deg": 90.0,
+        "worst_availability": 0.6541666666666667,
+        "gain_pp": 3.194444444444444
+      },
+      {
+        "lat_deg": 50.0,
+        "lon_deg": 105.0,
+        "worst_availability": 0.6583333333333333,
+        "gain_pp": 3.6111111111111094
+      },
+      {
+        "lat_deg": 50.0,
+        "lon_deg": 120.0,
+        "worst_availability": 0.6569444444444444,
+        "gain_pp": 3.472222222222221
+      },
+      {
+        "lat_deg": 50.0,
+        "lon_deg": 135.0,
+        "worst_availability": 0.6236111111111111,
+        "gain_pp": 0.1388888888888884
+      },
+      {
+        "lat_deg": 50.0,
+        "lon_deg": 150.0,
+        "worst_availability": 0.6222222222222222,
+        "gain_pp": 0.0
+      },
+      {
+        "lat_deg": 50.0,
+        "lon_deg": 165.0,
+        "worst_availability": 0.6222222222222222,
+        "gain_pp": 0.0
+      },
+      {
+        "lat_deg": 55.0,
+        "lon_deg": -180.0,
+        "worst_availability": 0.6222222222222222,
+        "gain_pp": 0.0
+      },
+      {
+        "lat_deg": 55.0,
+        "lon_deg": -165.0,
+        "worst_availability": 0.6222222222222222,
+        "gain_pp": 0.0
+      },
+      {
+        "lat_deg": 55.0,
+        "lon_deg": -150.0,
+        "worst_availability": 0.6222222222222222,
+        "gain_pp": 0.0
+      },
+      {
+        "lat_deg": 55.0,
+        "lon_deg": -135.0,
+        "worst_availability": 0.6222222222222222,
+        "gain_pp": 0.0
+      },
+      {
+        "lat_deg": 55.0,
+        "lon_deg": -120.0,
+        "worst_availability": 0.6222222222222222,
+        "gain_pp": 0.0
+      },
+      {
+        "lat_deg": 55.0,
+        "lon_deg": -105.0,
+        "worst_availability": 0.6222222222222222,
+        "gain_pp": 0.0
+      },
+      {
+        "lat_deg": 55.0,
+        "lon_deg": -90.0,
+        "worst_availability": 0.6222222222222222,
+        "gain_pp": 0.0
+      },
+      {
+        "lat_deg": 55.0,
+        "lon_deg": -75.0,
+        "worst_availability": 0.6222222222222222,
+        "gain_pp": 0.0
+      },
+      {
+        "lat_deg": 55.0,
+        "lon_deg": -60.0,
+        "worst_availability": 0.6222222222222222,
+        "gain_pp": 0.0
+      },
+      {
+        "lat_deg": 55.0,
+        "lon_deg": -45.0,
+        "worst_availability": 0.6319444444444444,
+        "gain_pp": 0.9722222222222188
+      },
+      {
+        "lat_deg": 55.0,
+        "lon_deg": -30.0,
+        "worst_availability": 0.6222222222222222,
+        "gain_pp": 0.0
+      },
+      {
+        "lat_deg": 55.0,
+        "lon_deg": -15.0,
+        "worst_availability": 0.6222222222222222,
+        "gain_pp": 0.0
+      },
+      {
+        "lat_deg": 55.0,
+        "lon_deg": 0.0,
+        "worst_availability": 0.6222222222222222,
+        "gain_pp": 0.0
+      },
+      {
+        "lat_deg": 55.0,
+        "lon_deg": 15.0,
+        "worst_availability": 0.6222222222222222,
+        "gain_pp": 0.0
+      },
+      {
+        "lat_deg": 55.0,
+        "lon_deg": 30.0,
+        "worst_availability": 0.6222222222222222,
+        "gain_pp": 0.0
+      },
+      {
+        "lat_deg": 55.0,
+        "lon_deg": 45.0,
+        "worst_availability": 0.6319444444444444,
+        "gain_pp": 0.9722222222222188
+      },
+      {
+        "lat_deg": 55.0,
+        "lon_deg": 60.0,
+        "worst_availability": 0.6513888888888889,
+        "gain_pp": 2.9166666666666674
+      },
+      {
+        "lat_deg": 55.0,
+        "lon_deg": 75.0,
+        "worst_availability": 0.6513888888888889,
+        "gain_pp": 2.9166666666666674
+      },
+      {
+        "lat_deg": 55.0,
+        "lon_deg": 90.0,
+        "worst_availability": 0.675,
+        "gain_pp": 5.277777777777781
+      },
+      {
+        "lat_deg": 55.0,
+        "lon_deg": 105.0,
+        "worst_availability": 0.7055555555555556,
+        "gain_pp": 8.333333333333337
+      },
+      {
+        "lat_deg": 55.0,
+        "lon_deg": 120.0,
+        "worst_availability": 0.7152777777777778,
+        "gain_pp": 9.305555555555555
+      },
+      {
+        "lat_deg": 55.0,
+        "lon_deg": 135.0,
+        "worst_availability": 0.6472222222222223,
+        "gain_pp": 2.500000000000002
+      },
+      {
+        "lat_deg": 55.0,
+        "lon_deg": 150.0,
+        "worst_availability": 0.6222222222222222,
+        "gain_pp": 0.0
+      },
+      {
+        "lat_deg": 55.0,
+        "lon_deg": 165.0,
+        "worst_availability": 0.6222222222222222,
+        "gain_pp": 0.0
+      },
+      {
+        "lat_deg": 60.0,
+        "lon_deg": -180.0,
+        "worst_availability": 0.6597222222222222,
+        "gain_pp": 3.749999999999998
+      },
+      {
+        "lat_deg": 60.0,
+        "lon_deg": -165.0,
+        "worst_availability": 0.7027777777777777,
+        "gain_pp": 8.05555555555555
+      },
+      {
+        "lat_deg": 60.0,
+        "lon_deg": -150.0,
+        "worst_availability": 0.7097222222222223,
+        "gain_pp": 8.750000000000002
+      },
+      {
+        "lat_deg": 60.0,
+        "lon_deg": -135.0,
+        "worst_availability": 0.6847222222222222,
+        "gain_pp": 6.25
+      },
+      {
+        "lat_deg": 60.0,
+        "lon_deg": -120.0,
+        "worst_availability": 0.6486111111111111,
+        "gain_pp": 2.6388888888888906
+      },
+      {
+        "lat_deg": 60.0,
+        "lon_deg": -105.0,
+        "worst_availability": 0.6375,
+        "gain_pp": 1.5277777777777724
+      },
+      {
+        "lat_deg": 60.0,
+        "lon_deg": -90.0,
+        "worst_availability": 0.6347222222222222,
+        "gain_pp": 1.2499999999999956
+      },
+      {
+        "lat_deg": 60.0,
+        "lon_deg": -75.0,
+        "worst_availability": 0.6527777777777778,
+        "gain_pp": 3.055555555555556
+      },
+      {
+        "lat_deg": 60.0,
+        "lon_deg": -60.0,
+        "worst_availability": 0.6555555555555556,
+        "gain_pp": 3.3333333333333326
+      },
+      {
+        "lat_deg": 60.0,
+        "lon_deg": -45.0,
+        "worst_availability": 0.6680555555555555,
+        "gain_pp": 4.583333333333329
+      },
+      {
+        "lat_deg": 60.0,
+        "lon_deg": -30.0,
+        "worst_availability": 0.675,
+        "gain_pp": 5.277777777777781
+      },
+      {
+        "lat_deg": 60.0,
+        "lon_deg": -15.0,
+        "worst_availability": 0.6569444444444444,
+        "gain_pp": 3.472222222222221
+      },
+      {
+        "lat_deg": 60.0,
+        "lon_deg": 0.0,
+        "worst_availability": 0.6361111111111111,
+        "gain_pp": 1.388888888888884
+      },
+      {
+        "lat_deg": 60.0,
+        "lon_deg": 15.0,
+        "worst_availability": 0.6222222222222222,
+        "gain_pp": 0.0
+      },
+      {
+        "lat_deg": 60.0,
+        "lon_deg": 30.0,
+        "worst_availability": 0.6222222222222222,
+        "gain_pp": 0.0
+      },
+      {
+        "lat_deg": 60.0,
+        "lon_deg": 45.0,
+        "worst_availability": 0.6430555555555556,
+        "gain_pp": 2.083333333333337
+      },
+      {
+        "lat_deg": 60.0,
+        "lon_deg": 60.0,
+        "worst_availability": 0.6694444444444444,
+        "gain_pp": 4.722222222222216
+      },
+      {
+        "lat_deg": 60.0,
+        "lon_deg": 75.0,
+        "worst_availability": 0.7166666666666667,
+        "gain_pp": 9.444444444444445
+      },
+      {
+        "lat_deg": 60.0,
+        "lon_deg": 90.0,
+        "worst_availability": 0.7680555555555556,
+        "gain_pp": 14.583333333333337
+      },
+      {
+        "lat_deg": 60.0,
+        "lon_deg": 105.0,
+        "worst_availability": 0.8125,
+        "gain_pp": 19.02777777777778
+      },
+      {
+        "lat_deg": 60.0,
+        "lon_deg": 120.0,
+        "worst_availability": 0.7819444444444444,
+        "gain_pp": 15.972222222222221
+      },
+      {
+        "lat_deg": 60.0,
+        "lon_deg": 135.0,
+        "worst_availability": 0.6972222222222222,
+        "gain_pp": 7.499999999999996
+      },
+      {
+        "lat_deg": 60.0,
+        "lon_deg": 150.0,
+        "worst_availability": 0.6569444444444444,
+        "gain_pp": 3.472222222222221
+      },
+      {
+        "lat_deg": 60.0,
+        "lon_deg": 165.0,
+        "worst_availability": 0.6458333333333334,
+        "gain_pp": 2.361111111111114
+      },
+      {
+        "lat_deg": 65.0,
+        "lon_deg": -180.0,
+        "worst_availability": 0.7319444444444444,
+        "gain_pp": 10.972222222222216
+      },
+      {
+        "lat_deg": 65.0,
+        "lon_deg": -165.0,
+        "worst_availability": 0.7333333333333333,
+        "gain_pp": 11.111111111111105
+      },
+      {
+        "lat_deg": 65.0,
+        "lon_deg": -150.0,
+        "worst_availability": 0.7541666666666667,
+        "gain_pp": 13.194444444444443
+      },
+      {
+        "lat_deg": 65.0,
+        "lon_deg": -135.0,
+        "worst_availability": 0.7486111111111111,
+        "gain_pp": 12.63888888888889
+      },
+      {
+        "lat_deg": 65.0,
+        "lon_deg": -120.0,
+        "worst_availability": 0.7277777777777777,
+        "gain_pp": 10.555555555555552
+      },
+      {
+        "lat_deg": 65.0,
+        "lon_deg": -105.0,
+        "worst_availability": 0.7305555555555555,
+        "gain_pp": 10.833333333333329
+      },
+      {
+        "lat_deg": 65.0,
+        "lon_deg": -90.0,
+        "worst_availability": 0.7194444444444444,
+        "gain_pp": 9.722222222222221
+      },
+      {
+        "lat_deg": 65.0,
+        "lon_deg": -75.0,
+        "worst_availability": 0.7347222222222223,
+        "gain_pp": 11.250000000000004
+      },
+      {
+        "lat_deg": 65.0,
+        "lon_deg": -60.0,
+        "worst_availability": 0.7472222222222222,
+        "gain_pp": 12.5
+      },
+      {
+        "lat_deg": 65.0,
+        "lon_deg": -45.0,
+        "worst_availability": 0.775,
+        "gain_pp": 15.277777777777779
+      },
+      {
+        "lat_deg": 65.0,
+        "lon_deg": -30.0,
+        "worst_availability": 0.7347222222222223,
+        "gain_pp": 11.250000000000004
+      },
+      {
+        "lat_deg": 65.0,
+        "lon_deg": -15.0,
+        "worst_availability": 0.7152777777777778,
+        "gain_pp": 9.305555555555555
+      },
+      {
+        "lat_deg": 65.0,
+        "lon_deg": 0.0,
+        "worst_availability": 0.6847222222222222,
+        "gain_pp": 6.25
+      },
+      {
+        "lat_deg": 65.0,
+        "lon_deg": 15.0,
+        "worst_availability": 0.6375,
+        "gain_pp": 1.5277777777777724
+      },
+      {
+        "lat_deg": 65.0,
+        "lon_deg": 30.0,
+        "worst_availability": 0.6222222222222222,
+        "gain_pp": 0.0
+      },
+      {
+        "lat_deg": 65.0,
+        "lon_deg": 45.0,
+        "worst_availability": 0.6625,
+        "gain_pp": 4.027777777777775
+      },
+      {
+        "lat_deg": 65.0,
+        "lon_deg": 60.0,
+        "worst_availability": 0.7097222222222223,
+        "gain_pp": 8.750000000000002
+      },
+      {
+        "lat_deg": 65.0,
+        "lon_deg": 75.0,
+        "worst_availability": 0.7972222222222223,
+        "gain_pp": 17.500000000000004
+      },
+      {
+        "lat_deg": 65.0,
+        "lon_deg": 90.0,
+        "worst_availability": 0.8708333333333333,
+        "gain_pp": 24.86111111111111
+      },
+      {
+        "lat_deg": 65.0,
+        "lon_deg": 105.0,
+        "worst_availability": 0.9111111111111111,
+        "gain_pp": 28.888888888888886
+      },
+      {
+        "lat_deg": 65.0,
+        "lon_deg": 120.0,
+        "worst_availability": 0.8208333333333333,
+        "gain_pp": 19.861111111111107
+      },
+      {
+        "lat_deg": 65.0,
+        "lon_deg": 135.0,
+        "worst_availability": 0.7847222222222222,
+        "gain_pp": 16.249999999999996
+      },
+      {
+        "lat_deg": 65.0,
+        "lon_deg": 150.0,
+        "worst_availability": 0.7333333333333333,
+        "gain_pp": 11.111111111111105
+      },
+      {
+        "lat_deg": 65.0,
+        "lon_deg": 165.0,
+        "worst_availability": 0.7333333333333333,
+        "gain_pp": 11.111111111111105
+      },
+      {
+        "lat_deg": 70.0,
+        "lon_deg": -180.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 70.0,
+        "lon_deg": -165.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 70.0,
+        "lon_deg": -150.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 70.0,
+        "lon_deg": -135.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 70.0,
+        "lon_deg": -120.0,
+        "worst_availability": 0.7944444444444444,
+        "gain_pp": 17.222222222222218
+      },
+      {
+        "lat_deg": 70.0,
+        "lon_deg": -105.0,
+        "worst_availability": 0.8027777777777778,
+        "gain_pp": 18.055555555555557
+      },
+      {
+        "lat_deg": 70.0,
+        "lon_deg": -90.0,
+        "worst_availability": 0.8041666666666667,
+        "gain_pp": 18.194444444444446
+      },
+      {
+        "lat_deg": 70.0,
+        "lon_deg": -75.0,
+        "worst_availability": 0.8125,
+        "gain_pp": 19.02777777777778
+      },
+      {
+        "lat_deg": 70.0,
+        "lon_deg": -60.0,
+        "worst_availability": 0.8125,
+        "gain_pp": 19.02777777777778
+      },
+      {
+        "lat_deg": 70.0,
+        "lon_deg": -45.0,
+        "worst_availability": 0.8125,
+        "gain_pp": 19.02777777777778
+      },
+      {
+        "lat_deg": 70.0,
+        "lon_deg": -30.0,
+        "worst_availability": 0.8125,
+        "gain_pp": 19.02777777777778
+      },
+      {
+        "lat_deg": 70.0,
+        "lon_deg": -15.0,
+        "worst_availability": 0.8111111111111111,
+        "gain_pp": 18.88888888888889
+      },
+      {
+        "lat_deg": 70.0,
+        "lon_deg": 0.0,
+        "worst_availability": 0.7888888888888889,
+        "gain_pp": 16.666666666666664
+      },
+      {
+        "lat_deg": 70.0,
+        "lon_deg": 15.0,
+        "worst_availability": 0.7583333333333333,
+        "gain_pp": 13.611111111111107
+      },
+      {
+        "lat_deg": 70.0,
+        "lon_deg": 30.0,
+        "worst_availability": 0.6916666666666667,
+        "gain_pp": 6.944444444444442
+      },
+      {
+        "lat_deg": 70.0,
+        "lon_deg": 45.0,
+        "worst_availability": 0.8027777777777778,
+        "gain_pp": 18.055555555555557
+      },
+      {
+        "lat_deg": 70.0,
+        "lon_deg": 60.0,
+        "worst_availability": 0.8694444444444445,
+        "gain_pp": 24.72222222222222
+      },
+      {
+        "lat_deg": 70.0,
+        "lon_deg": 75.0,
+        "worst_availability": 0.9333333333333333,
+        "gain_pp": 31.11111111111111
+      },
+      {
+        "lat_deg": 70.0,
+        "lon_deg": 90.0,
+        "worst_availability": 0.9444444444444444,
+        "gain_pp": 32.22222222222222
+      },
+      {
+        "lat_deg": 70.0,
+        "lon_deg": 105.0,
+        "worst_availability": 0.9041666666666667,
+        "gain_pp": 28.194444444444443
+      },
+      {
+        "lat_deg": 70.0,
+        "lon_deg": 120.0,
+        "worst_availability": 0.8416666666666667,
+        "gain_pp": 21.944444444444443
+      },
+      {
+        "lat_deg": 70.0,
+        "lon_deg": 135.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 70.0,
+        "lon_deg": 150.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 70.0,
+        "lon_deg": 165.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 75.0,
+        "lon_deg": -180.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 75.0,
+        "lon_deg": -165.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 75.0,
+        "lon_deg": -150.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 75.0,
+        "lon_deg": -135.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 75.0,
+        "lon_deg": -120.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 75.0,
+        "lon_deg": -105.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 75.0,
+        "lon_deg": -90.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 75.0,
+        "lon_deg": -75.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 75.0,
+        "lon_deg": -60.0,
+        "worst_availability": 0.8125,
+        "gain_pp": 19.02777777777778
+      },
+      {
+        "lat_deg": 75.0,
+        "lon_deg": -45.0,
+        "worst_availability": 0.8125,
+        "gain_pp": 19.02777777777778
+      },
+      {
+        "lat_deg": 75.0,
+        "lon_deg": -30.0,
+        "worst_availability": 0.8125,
+        "gain_pp": 19.02777777777778
+      },
+      {
+        "lat_deg": 75.0,
+        "lon_deg": -15.0,
+        "worst_availability": 0.8125,
+        "gain_pp": 19.02777777777778
+      },
+      {
+        "lat_deg": 75.0,
+        "lon_deg": 0.0,
+        "worst_availability": 0.8111111111111111,
+        "gain_pp": 18.88888888888889
+      },
+      {
+        "lat_deg": 75.0,
+        "lon_deg": 15.0,
+        "worst_availability": 0.8013888888888889,
+        "gain_pp": 17.91666666666667
+      },
+      {
+        "lat_deg": 75.0,
+        "lon_deg": 30.0,
+        "worst_availability": 0.8055555555555556,
+        "gain_pp": 18.333333333333336
+      },
+      {
+        "lat_deg": 75.0,
+        "lon_deg": 45.0,
+        "worst_availability": 0.8486111111111111,
+        "gain_pp": 22.638888888888886
+      },
+      {
+        "lat_deg": 75.0,
+        "lon_deg": 60.0,
+        "worst_availability": 0.9,
+        "gain_pp": 27.77777777777778
+      },
+      {
+        "lat_deg": 75.0,
+        "lon_deg": 75.0,
+        "worst_availability": 0.9,
+        "gain_pp": 27.77777777777778
+      },
+      {
+        "lat_deg": 75.0,
+        "lon_deg": 90.0,
+        "worst_availability": 0.9,
+        "gain_pp": 27.77777777777778
+      },
+      {
+        "lat_deg": 75.0,
+        "lon_deg": 105.0,
+        "worst_availability": 0.8736111111111111,
+        "gain_pp": 25.13888888888889
+      },
+      {
+        "lat_deg": 75.0,
+        "lon_deg": 120.0,
+        "worst_availability": 0.8375,
+        "gain_pp": 21.52777777777778
+      },
+      {
+        "lat_deg": 75.0,
+        "lon_deg": 135.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 75.0,
+        "lon_deg": 150.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 75.0,
+        "lon_deg": 165.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 80.0,
+        "lon_deg": -180.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 80.0,
+        "lon_deg": -165.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 80.0,
+        "lon_deg": -150.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 80.0,
+        "lon_deg": -135.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 80.0,
+        "lon_deg": -120.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 80.0,
+        "lon_deg": -105.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 80.0,
+        "lon_deg": -90.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 80.0,
+        "lon_deg": -75.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 80.0,
+        "lon_deg": -60.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 80.0,
+        "lon_deg": -45.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 80.0,
+        "lon_deg": -30.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 80.0,
+        "lon_deg": -15.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 80.0,
+        "lon_deg": 0.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 80.0,
+        "lon_deg": 15.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 80.0,
+        "lon_deg": 30.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 80.0,
+        "lon_deg": 45.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 80.0,
+        "lon_deg": 60.0,
+        "worst_availability": 0.8402777777777778,
+        "gain_pp": 21.805555555555557
+      },
+      {
+        "lat_deg": 80.0,
+        "lon_deg": 75.0,
+        "worst_availability": 0.8472222222222222,
+        "gain_pp": 22.499999999999996
+      },
+      {
+        "lat_deg": 80.0,
+        "lon_deg": 90.0,
+        "worst_availability": 0.8527777777777777,
+        "gain_pp": 23.05555555555555
+      },
+      {
+        "lat_deg": 80.0,
+        "lon_deg": 105.0,
+        "worst_availability": 0.825,
+        "gain_pp": 20.27777777777777
+      },
+      {
+        "lat_deg": 80.0,
+        "lon_deg": 120.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 80.0,
+        "lon_deg": 135.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 80.0,
+        "lon_deg": 150.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 80.0,
+        "lon_deg": 165.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 85.0,
+        "lon_deg": -180.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 85.0,
+        "lon_deg": -165.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 85.0,
+        "lon_deg": -150.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 85.0,
+        "lon_deg": -135.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 85.0,
+        "lon_deg": -120.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 85.0,
+        "lon_deg": -105.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 85.0,
+        "lon_deg": -90.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 85.0,
+        "lon_deg": -75.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 85.0,
+        "lon_deg": -60.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 85.0,
+        "lon_deg": -45.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 85.0,
+        "lon_deg": -30.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 85.0,
+        "lon_deg": -15.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 85.0,
+        "lon_deg": 0.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 85.0,
+        "lon_deg": 15.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 85.0,
+        "lon_deg": 30.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 85.0,
+        "lon_deg": 45.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 85.0,
+        "lon_deg": 60.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 85.0,
+        "lon_deg": 75.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 85.0,
+        "lon_deg": 90.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 85.0,
+        "lon_deg": 105.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 85.0,
+        "lon_deg": 120.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 85.0,
+        "lon_deg": 135.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 85.0,
+        "lon_deg": 150.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      },
+      {
+        "lat_deg": 85.0,
+        "lon_deg": 165.0,
+        "worst_availability": 0.8152777777777778,
+        "gain_pp": 19.305555555555554
+      }
+    ]
+  },
   "sweep": {
     "baseline": {
       "raan_deg": [
@@ -3567,5 +4766,5 @@
       }
     ]
   },
-  "elapsed_s": 7.9
+  "elapsed_s": 10.28
 }
