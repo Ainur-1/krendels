@@ -14,7 +14,6 @@ from __future__ import annotations
 
 import copy
 import json
-from pathlib import Path
 
 import pytest
 
@@ -24,8 +23,6 @@ from cosmo_net.analysis.simulate import simulate, snapshot_at
 from cosmo_net.config import SCENARIOS_DIR
 from cosmo_net.scenario.io import dump_scenario, load_scenario, loads_scenario
 from cosmo_net.scenario.schema import ScenarioInvalid, parse_scenario
-
-FIXTURE = Path(__file__).parent / "fixtures" / "judge_fixture.json"
 
 
 @pytest.fixture(scope="module")
@@ -162,13 +159,6 @@ def test_unknown_fields_survive_a_round_trip(raw):
 
 
 # --- сценарий совершенно другой формы --------------------------------------------
-
-
-@pytest.fixture(scope="module")
-def judge_fixture():
-    if not FIXTURE.exists():
-        pytest.skip("сначала выполните: uv run python scripts/make_fixture.py")
-    return load_scenario(FIXTURE)
 
 
 def test_the_fixture_is_not_shaped_like_the_supplied_scenarios(judge_fixture):
