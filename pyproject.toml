@@ -1,0 +1,54 @@
+[project]
+name = "cosmo-net"
+version = "0.1.0"
+description = "Designs a LEO constellation and measures end-to-end reachability from northern ground terminals to a gateway"
+readme = "README.md"
+requires-python = ">=3.11,<3.14"
+
+# Core - exactly what the running service imports. The frontend is a static bundle
+# built ahead of time and served by FastAPI, so the container needs no Node runtime
+# and nothing here pulls one in.
+#
+# numpy earns its place: a run is 720 time steps over 48 satellites, and the whole
+# trajectory is one (720, 48, 3) array rather than 34 560 scalar evaluations. The
+# pure-Python prototype that established the baseline figures took 0.2 s per run,
+# which is fast enough to be correct but not fast enough for the configuration
+# sweep, where 65 runs happen behind one button.
+dependencies = [
+    "numpy>=1.26",
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.32",
+    "pydantic>=2.9",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3",
+    "httpx>=0.27",
+    "ruff>=0.6",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/cosmo_net"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q --strict-markers"
+# Both come from starlette's TestClient, not from anything this project does, and
+# neither is actionable here.
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore:Using `httpx` with `starlette.testclient`:UserWarning",
+    "ignore::UserWarning",
+]

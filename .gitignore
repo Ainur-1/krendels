@@ -1,0 +1,36 @@
+# uv builds the environment from pyproject.toml and uv.lock; the tree itself is
+# machine-specific and several hundred megabytes.
+.venv/
+
+# Build and cache output. None of it is an input to anything.
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+dist/
+build/
+
+# The compiled frontend. Rebuilt by `npm run build` and by the Docker build, so a
+# committed copy would only ever be a stale one that disagrees with frontend/src.
+src/cosmo_net/serving/static/
+frontend/node_modules/
+frontend/dist/
+
+# Runs are reproducible from the scenario that produced them: the store is a cache,
+# not a record. reports/metrics/ holds the numbers that README and the deck cite.
+runs.sqlite3
+
+# Deployment target and key path. The playbook reads them; they are not ours to publish.
+ansible/inventory.ini
+.env
+
+# Personal working files. CLAUDE.md describes how one person works with an assistant
+# and is not a statement about the project; the findings it carried live in
+# docs/findings.md, which is committed because the team and the defence need them.
+CLAUDE.md
+.claude/
+.vscode/
+.idea/
+
+.DS_Store
