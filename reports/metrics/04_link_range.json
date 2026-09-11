@@ -16,7 +16,9 @@
     ],
     "isl_range_km": 2000.0,
     "min_elevation_deg": 10.0,
-    "steps": 720
+    "steps": 720,
+    "nodal_precession_deg_per_day": -0.3909305814166791,
+    "nodal_drift_over_horizon_deg": -0.3909305814166791
   },
   "baseline": {
     "scenario_id": "04_link_range",
@@ -2098,6 +2100,387 @@
         "lon_deg": 165.0,
         "worst_availability": 0.8152777777777778,
         "gain_pp": 19.305555555555554
+      }
+    ]
+  },
+  "families": {
+    "planes": 3,
+    "supplied_spacing_deg": 60.0,
+    "supplied_family": "star",
+    "star_spacing_deg": 60.0,
+    "delta_spacing_deg": 120.0,
+    "star_best": {
+      "spacing_deg": 48.0,
+      "worst_availability": 0.7194444444444444
+    },
+    "delta_best": {
+      "spacing_deg": 120.0,
+      "worst_availability": 0.5805555555555556
+    },
+    "points": [
+      {
+        "spacing_deg": 0.0,
+        "worst_availability": 0.21944444444444444
+      },
+      {
+        "spacing_deg": 2.0,
+        "worst_availability": 0.22083333333333333
+      },
+      {
+        "spacing_deg": 4.0,
+        "worst_availability": 0.225
+      },
+      {
+        "spacing_deg": 6.0,
+        "worst_availability": 0.24444444444444444
+      },
+      {
+        "spacing_deg": 8.0,
+        "worst_availability": 0.2722222222222222
+      },
+      {
+        "spacing_deg": 10.0,
+        "worst_availability": 0.3013888888888889
+      },
+      {
+        "spacing_deg": 12.0,
+        "worst_availability": 0.32916666666666666
+      },
+      {
+        "spacing_deg": 14.0,
+        "worst_availability": 0.35833333333333334
+      },
+      {
+        "spacing_deg": 16.0,
+        "worst_availability": 0.3875
+      },
+      {
+        "spacing_deg": 18.0,
+        "worst_availability": 0.4166666666666667
+      },
+      {
+        "spacing_deg": 20.0,
+        "worst_availability": 0.4486111111111111
+      },
+      {
+        "spacing_deg": 22.0,
+        "worst_availability": 0.4791666666666667
+      },
+      {
+        "spacing_deg": 24.0,
+        "worst_availability": 0.5180555555555556
+      },
+      {
+        "spacing_deg": 26.0,
+        "worst_availability": 0.5513888888888889
+      },
+      {
+        "spacing_deg": 28.0,
+        "worst_availability": 0.5847222222222223
+      },
+      {
+        "spacing_deg": 30.0,
+        "worst_availability": 0.6125
+      },
+      {
+        "spacing_deg": 32.0,
+        "worst_availability": 0.6416666666666667
+      },
+      {
+        "spacing_deg": 34.0,
+        "worst_availability": 0.6652777777777777
+      },
+      {
+        "spacing_deg": 36.0,
+        "worst_availability": 0.6805555555555556
+      },
+      {
+        "spacing_deg": 38.0,
+        "worst_availability": 0.6791666666666667
+      },
+      {
+        "spacing_deg": 40.0,
+        "worst_availability": 0.6777777777777778
+      },
+      {
+        "spacing_deg": 42.0,
+        "worst_availability": 0.6847222222222222
+      },
+      {
+        "spacing_deg": 44.0,
+        "worst_availability": 0.7055555555555556
+      },
+      {
+        "spacing_deg": 46.0,
+        "worst_availability": 0.7180555555555556
+      },
+      {
+        "spacing_deg": 48.0,
+        "worst_availability": 0.7194444444444444
+      },
+      {
+        "spacing_deg": 50.0,
+        "worst_availability": 0.6986111111111111
+      },
+      {
+        "spacing_deg": 52.0,
+        "worst_availability": 0.7055555555555556
+      },
+      {
+        "spacing_deg": 54.0,
+        "worst_availability": 0.6875
+      },
+      {
+        "spacing_deg": 56.0,
+        "worst_availability": 0.6680555555555555
+      },
+      {
+        "spacing_deg": 58.0,
+        "worst_availability": 0.6458333333333334
+      },
+      {
+        "spacing_deg": 60.0,
+        "worst_availability": 0.6222222222222222
+      },
+      {
+        "spacing_deg": 62.0,
+        "worst_availability": 0.6027777777777777
+      },
+      {
+        "spacing_deg": 64.0,
+        "worst_availability": 0.5902777777777778
+      },
+      {
+        "spacing_deg": 66.0,
+        "worst_availability": 0.5777777777777777
+      },
+      {
+        "spacing_deg": 68.0,
+        "worst_availability": 0.5694444444444444
+      },
+      {
+        "spacing_deg": 70.0,
+        "worst_availability": 0.5763888888888888
+      },
+      {
+        "spacing_deg": 72.0,
+        "worst_availability": 0.5833333333333334
+      },
+      {
+        "spacing_deg": 74.0,
+        "worst_availability": 0.5944444444444444
+      },
+      {
+        "spacing_deg": 76.0,
+        "worst_availability": 0.5763888888888888
+      },
+      {
+        "spacing_deg": 78.0,
+        "worst_availability": 0.5388888888888889
+      },
+      {
+        "spacing_deg": 80.0,
+        "worst_availability": 0.5277777777777778
+      },
+      {
+        "spacing_deg": 82.0,
+        "worst_availability": 0.5263888888888889
+      },
+      {
+        "spacing_deg": 84.0,
+        "worst_availability": 0.5291666666666667
+      },
+      {
+        "spacing_deg": 86.0,
+        "worst_availability": 0.5277777777777778
+      },
+      {
+        "spacing_deg": 88.0,
+        "worst_availability": 0.5208333333333334
+      },
+      {
+        "spacing_deg": 90.0,
+        "worst_availability": 0.5138888888888888
+      },
+      {
+        "spacing_deg": 92.0,
+        "worst_availability": 0.5083333333333333
+      },
+      {
+        "spacing_deg": 94.0,
+        "worst_availability": 0.5027777777777778
+      },
+      {
+        "spacing_deg": 96.0,
+        "worst_availability": 0.48333333333333334
+      },
+      {
+        "spacing_deg": 98.0,
+        "worst_availability": 0.45694444444444443
+      },
+      {
+        "spacing_deg": 100.0,
+        "worst_availability": 0.44166666666666665
+      },
+      {
+        "spacing_deg": 102.0,
+        "worst_availability": 0.45
+      },
+      {
+        "spacing_deg": 104.0,
+        "worst_availability": 0.45416666666666666
+      },
+      {
+        "spacing_deg": 106.0,
+        "worst_availability": 0.4527777777777778
+      },
+      {
+        "spacing_deg": 108.0,
+        "worst_availability": 0.4513888888888889
+      },
+      {
+        "spacing_deg": 110.0,
+        "worst_availability": 0.4986111111111111
+      },
+      {
+        "spacing_deg": 112.0,
+        "worst_availability": 0.5541666666666667
+      },
+      {
+        "spacing_deg": 114.0,
+        "worst_availability": 0.5611111111111111
+      },
+      {
+        "spacing_deg": 116.0,
+        "worst_availability": 0.5652777777777778
+      },
+      {
+        "spacing_deg": 118.0,
+        "worst_availability": 0.5708333333333333
+      },
+      {
+        "spacing_deg": 120.0,
+        "worst_availability": 0.5805555555555556
+      },
+      {
+        "spacing_deg": 122.0,
+        "worst_availability": 0.5638888888888889
+      },
+      {
+        "spacing_deg": 124.0,
+        "worst_availability": 0.5097222222222222
+      },
+      {
+        "spacing_deg": 126.0,
+        "worst_availability": 0.4652777777777778
+      },
+      {
+        "spacing_deg": 128.0,
+        "worst_availability": 0.4666666666666667
+      },
+      {
+        "spacing_deg": 130.0,
+        "worst_availability": 0.4583333333333333
+      },
+      {
+        "spacing_deg": 132.0,
+        "worst_availability": 0.45
+      },
+      {
+        "spacing_deg": 134.0,
+        "worst_availability": 0.4388888888888889
+      },
+      {
+        "spacing_deg": 136.0,
+        "worst_availability": 0.42916666666666664
+      },
+      {
+        "spacing_deg": 138.0,
+        "worst_availability": 0.44722222222222224
+      },
+      {
+        "spacing_deg": 140.0,
+        "worst_availability": 0.46805555555555556
+      },
+      {
+        "spacing_deg": 142.0,
+        "worst_availability": 0.4888888888888889
+      },
+      {
+        "spacing_deg": 144.0,
+        "worst_availability": 0.5111111111111111
+      },
+      {
+        "spacing_deg": 146.0,
+        "worst_availability": 0.5208333333333334
+      },
+      {
+        "spacing_deg": 148.0,
+        "worst_availability": 0.525
+      },
+      {
+        "spacing_deg": 150.0,
+        "worst_availability": 0.5263888888888889
+      },
+      {
+        "spacing_deg": 152.0,
+        "worst_availability": 0.5041666666666667
+      },
+      {
+        "spacing_deg": 154.0,
+        "worst_availability": 0.4888888888888889
+      },
+      {
+        "spacing_deg": 156.0,
+        "worst_availability": 0.5138888888888888
+      },
+      {
+        "spacing_deg": 158.0,
+        "worst_availability": 0.5041666666666667
+      },
+      {
+        "spacing_deg": 160.0,
+        "worst_availability": 0.47638888888888886
+      },
+      {
+        "spacing_deg": 162.0,
+        "worst_availability": 0.4583333333333333
+      },
+      {
+        "spacing_deg": 164.0,
+        "worst_availability": 0.4263888888888889
+      },
+      {
+        "spacing_deg": 166.0,
+        "worst_availability": 0.39861111111111114
+      },
+      {
+        "spacing_deg": 168.0,
+        "worst_availability": 0.3763888888888889
+      },
+      {
+        "spacing_deg": 170.0,
+        "worst_availability": 0.35694444444444445
+      },
+      {
+        "spacing_deg": 172.0,
+        "worst_availability": 0.3375
+      },
+      {
+        "spacing_deg": 174.0,
+        "worst_availability": 0.325
+      },
+      {
+        "spacing_deg": 176.0,
+        "worst_availability": 0.31527777777777777
+      },
+      {
+        "spacing_deg": 178.0,
+        "worst_availability": 0.30972222222222223
+      },
+      {
+        "spacing_deg": 180.0,
+        "worst_availability": 0.30833333333333335
       }
     ]
   },
@@ -4766,5 +5149,5 @@
       }
     ]
   },
-  "elapsed_s": 10.28
+  "elapsed_s": 11.56
 }

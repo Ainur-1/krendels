@@ -19,11 +19,16 @@ from cosmo_net.analysis.compare import compare_runs
 from cosmo_net.analysis.criticality import rank_satellites
 from cosmo_net.analysis.degradation import degradation_curve
 from cosmo_net.analysis.delivery import delivery_report
+from cosmo_net.analysis.families import spacing_curve
 from cosmo_net.analysis.optimise import sweep_spacing, variant
 from cosmo_net.analysis.placement import placement_grid
 from cosmo_net.analysis.redundancy import redundancy_report
 from cosmo_net.analysis.simulate import simulate
 from cosmo_net.config import METRICS_DIR
+from cosmo_net.geometry.precession import (
+    drift_over_horizon_deg,
+    nodal_precession_deg_per_day,
+)
 from cosmo_net.routing.strategies import Strategy
 from cosmo_net.scenario.io import bundled_scenarios, load_scenario
 from cosmo_net.scenario.schema import GroundSite, Scenario
@@ -93,6 +98,14 @@ def study_scenario(path: Path, workers: int) -> dict[str, object]:
             "isl_range_km": scenario.environment.isl_range_km,
             "min_elevation_deg": scenario.environment.min_elevation_deg,
             "steps": len(scenario.times),
+            "nodal_precession_deg_per_day": nodal_precession_deg_per_day(
+                scenario.environment.altitude_km, scenario.environment.inclination_deg
+            ),
+            "nodal_drift_over_horizon_deg": drift_over_horizon_deg(
+                scenario.environment.altitude_km,
+                scenario.environment.inclination_deg,
+                scenario.environment.horizon_s,
+            ),
         },
         "baseline": baseline.summary(),
         "strategies": strategies,
@@ -101,6 +114,7 @@ def study_scenario(path: Path, workers: int) -> dict[str, object]:
         "degradation": degradation_curve(scenario).to_dict(),
         "redundancy": redundancy_report(scenario).to_dict(),
         "placement": placement_grid(scenario, workers=workers).to_dict(),
+        "families": spacing_curve(scenario, workers=workers).to_dict(),
         "sweep": sweep.to_dict(),
         "what_if": what_if,
         "tuned_vs_baseline": compare_runs(
