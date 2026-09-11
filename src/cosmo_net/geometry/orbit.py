@@ -1,11 +1,11 @@
 """
-Where every satellite is, at every step of the grid, in one array.
+Где находится каждый аппарат в каждый отсчёт сетки — одним массивом.
 
-The whole horizon is computed at once rather than a step at a time. A default run
-is 720 steps over 48 satellites: as a loop that is 34 560 evaluations of the same
-six trigonometric functions, and as an array it is six calls. The configuration
-sweep runs 65 of these behind one button press, which is what makes the difference
-worth having rather than merely tidy.
+Горизонт считается целиком, а не по шагу за раз. Базовый прогон — это 720
+отсчётов по 48 аппаратов: циклом получилось бы 34 560 вычислений одних и тех же
+шести тригонометрических функций, массивом — шесть вызовов. Подбор конфигурации
+запускает сотню таких прогонов по одному нажатию, и ради этого разница стоит того,
+а не ради аккуратности как таковой.
 """
 
 from __future__ import annotations
@@ -25,45 +25,49 @@ from cosmo_net.scenario.schema import GroundSite, Scenario
 
 @dataclass(frozen=True)
 class Trajectory:
-    """Satellite positions over the calculation grid, in both frames the model needs."""
+    """Положения аппаратов на сетке расчёта, в обеих системах координат, нужных модели."""
 
     times_s: np.ndarray
-    """(T,) the grid, in seconds from the start of the run."""
+    """(T,) сетка отсчётов, секунды от начала расчёта."""
 
     satellite_ids: list[str]
-    """(N,) satellite identifiers, in the order the scenario declares them."""
+    """(N,) идентификаторы аппаратов в том порядке, в каком их объявляет сценарий."""
 
     eci_km: np.ndarray
-    """(T, N, 3) inertial frame. Orbits are circles here; the Earth is what turns."""
+    """(T, N, 3) инерциальная система. Орбиты здесь — окружности, вращается Земля."""
 
     ecef_km: np.ndarray
-    """(T, N, 3) Earth-fixed frame. Ground sites are fixed here, so links live here."""
+    """(T, N, 3) система, связанная с Землёй. Наземные пункты в ней неподвижны, поэтому
+    связи считаются именно здесь."""
 
     @property
     def orbital_period_s(self) -> float:
-        """One revolution. 5730 s at 550 km, so 15.08 revolutions in a 24-hour horizon."""
+        """Период обращения. На высоте 550 км это 5730 с, то есть 15.08 витка за сутки."""
 
         r = float(np.linalg.norm(self.eci_km[0, 0]))
         return 2 * math.pi * math.sqrt(r**3 / MU_KM3_S2)
 
 
 def orbit_radius_km(altitude_km: float) -> float:
+    """Радиус орбиты: радиус Земли плюс высота."""
+
     return EARTH_RADIUS_KM + altitude_km
 
 
 def mean_motion_rad_s(altitude_km: float) -> float:
-    """Angular rate along a circular orbit, √(μ/r³)."""
+    """Угловая скорость движения по круговой орбите, √(μ/r³)."""
 
     return math.sqrt(MU_KM3_S2 / orbit_radius_km(altitude_km) ** 3)
 
 
 def compute_trajectory(scenario: Scenario, times_s: np.ndarray | None = None) -> Trajectory:
     """
-    Positions of every satellite over the grid, whether or not it is in service.
+    Положения всех аппаратов на сетке — независимо от того, в строю аппарат или нет.
 
-    A satellite that has not launched yet, or is in an outage, still has a position:
-    the case is explicit that a failed craft keeps its computed place and only drops
-    out of the link set. Which of them count is decided in `contacts`, not here.
+    У аппарата, который ещё не запущен или находится в отказе, положение всё равно
+    есть: кейс прямо говорит, что отказавший аппарат сохраняет расчётное положение и
+    выбывает только из состава связей. Кто из них участвует в связях, решается в
+    модуле contacts, а не здесь.
     """
 
     env = scenario.environment
@@ -76,9 +80,10 @@ def compute_trajectory(scenario: Scenario, times_s: np.ndarray | None = None) ->
     cos_i = math.cos(math.radians(env.inclination_deg))
     sin_i = math.sin(math.radians(env.inclination_deg))
 
-    # Argument of latitude at t = 0, one per satellite: its own slot plus the shift
-    # applied to its whole plane. Phasing moves satellites along the orbit; RAAN,
-    # below, turns the orbit itself. They are the two levers the interface exposes.
+    # Аргумент широты в нулевой момент, свой у каждого аппарата: его собственное
+    # место в плоскости плюс общий сдвиг всей плоскости. Фазирование двигает
+    # аппараты вдоль орбиты, RAAN ниже поворачивает саму орбиту. Это и есть два
+    # рычага, которые интерфейс отдаёт пользователю.
     u0 = np.array(
         [
             math.radians(sat.slot_deg + planes[sat.plane_id].phase_deg)
@@ -98,9 +103,9 @@ def compute_trajectory(scenario: Scenario, times_s: np.ndarray | None = None) ->
         axis=-1,
     )
 
-    # The Earth has turned by θ since the start of the run, so the same point in
-    # inertial space is at a different longitude. Rotating the satellites by −θ is
-    # the cheaper half of the equivalent pair, and it leaves ground sites fixed.
+    # С начала расчёта Земля повернулась на угол θ, поэтому одна и та же точка
+    # инерциального пространства оказывается над другой долготой. Повернуть на −θ
+    # аппараты дешевле, чем всё остальное, и наземные пункты остаются неподвижными.
     theta = math.radians(env.earth_angle0_deg) + EARTH_ANGULAR_RATE_RAD_S * t
     ct, st = np.cos(theta)[:, None], np.sin(theta)[:, None]
     ecef = np.stack(
@@ -121,7 +126,7 @@ def compute_trajectory(scenario: Scenario, times_s: np.ndarray | None = None) ->
 
 
 def ground_position_km(site: GroundSite) -> np.ndarray:
-    """A ground site in the Earth-fixed frame. Spherical Earth, so latitude is geocentric."""
+    """Наземный пункт в системе, связанной с Землёй. Земля сферическая — широта геоцентрическая."""
 
     lat, lon = math.radians(site.lat_deg), math.radians(site.lon_deg)
     return EARTH_RADIUS_KM * np.array(
@@ -130,7 +135,7 @@ def ground_position_km(site: GroundSite) -> np.ndarray:
 
 
 def ground_positions_km(sites: list[GroundSite]) -> np.ndarray:
-    """(G, 3) for a list of sites, in the order given."""
+    """(G, 3) для списка пунктов, в том же порядке."""
 
     if not sites:
         return np.zeros((0, 3))

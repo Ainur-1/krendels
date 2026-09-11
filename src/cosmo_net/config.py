@@ -1,10 +1,9 @@
 """
-Physical constants, schema identifiers and the paths every other module resolves against.
+Физические постоянные, версии форматов и пути, от которых считаются все остальные модули.
 
-The constants are fixed by the case description rather than chosen here, so they
-carry the value the scenarios were generated with and nothing may override them:
-a run computed against a different Earth radius is not comparable with the
-reference module's output.
+Постоянные заданы описанием кейса, а не выбраны здесь: в них те же значения, с
+которыми были сгенерированы сценарии, и переопределять их нельзя. Расчёт с другим
+радиусом Земли просто несопоставим с выводом эталонного модуля организаторов.
 """
 
 from __future__ import annotations
@@ -13,21 +12,21 @@ import math
 import os
 from pathlib import Path
 
-# Earth radius, km. Spherical Earth throughout - the model has no oblateness and
-# therefore no J2, so orbital planes do not precess over the 24-hour horizon.
+# Радиус Земли, км. Земля везде сферическая: сжатия в модели нет, а значит нет и
+# влияния J2, поэтому за сутки орбитальные плоскости никуда не смещаются.
 EARTH_RADIUS_KM = 6371.0
 
-# Standard gravitational parameter, km^3/s^2.
+# Гравитационный параметр, км³/с².
 MU_KM3_S2 = 398600.435507
 
-# Sidereal rotation period, s. The Earth turns by this much in one revolution, and
-# it is what makes a ground site sweep under a fixed orbital plane.
+# Период вращения Земли (звёздные сутки), с. Именно из-за него наземный пункт
+# проезжает под неподвижной орбитальной плоскостью.
 EARTH_ROTATION_PERIOD_S = 86164.09054
 
 EARTH_ANGULAR_RATE_RAD_S = 2 * math.pi / EARTH_ROTATION_PERIOD_S
 
-# The scenario format this service reads, and the result format it writes. Both are
-# fixed by the case: a file announcing anything else is rejected rather than guessed at.
+# Формат сценария, который сервис читает, и формат результата, который он пишет.
+# Оба заданы кейсом: файл с другой версией отклоняется, а не разбирается наугад.
 SCENARIO_SCHEMA_VERSION = "cosmo-A-1.0"
 RESULT_SCHEMA_VERSION = "cosmo-A-result-1.0"
 
@@ -36,13 +35,15 @@ SCENARIOS_DIR = PROJECT_ROOT / "data" / "scenarios"
 REPORTS_DIR = PROJECT_ROOT / "reports"
 METRICS_DIR = REPORTS_DIR / "metrics"
 
-# Where saved variants live. Overridable because the container puts it on a mounted
-# volume: a design someone kept has to survive a redeploy, and the default sits
-# inside the source tree, which in the image is read-only to the service user.
+# Где лежат сохранённые варианты. Путь переопределяется, потому что в контейнере он
+# указывает на примонтированный том: сохранённый вариант должен пережить
+# передеплой, а значение по умолчанию лежит внутри исходников, куда сервис в
+# образе писать не может.
 RUNS_DATABASE = Path(os.environ.get("COSMO_NET_DB", ""))
 if not RUNS_DATABASE.name:
     RUNS_DATABASE = Path(__file__).resolve().parents[2] / "runs.sqlite3"
 
-# The compiled frontend. Written by `npm run build`, absent in a fresh clone, and the
-# service reports that plainly instead of failing to start - the API is useful on its own.
+# Собранный интерфейс. Появляется после `npm run build`, в свежей копии
+# репозитория его нет — сервис честно говорит об этом на главной странице, а не
+# падает при запуске: API полезен и сам по себе.
 STATIC_DIR = Path(__file__).resolve().parent / "serving" / "static"

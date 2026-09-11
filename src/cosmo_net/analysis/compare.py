@@ -1,13 +1,13 @@
 """
-Putting two saved variants side by side: what was changed, and what it bought.
+Два сохранённых варианта рядом: что изменили и что это дало.
 
-The case asks for both halves and they are easy to separate in practice. The
-difference in results is a table of numbers. The difference in *inputs* is harder:
-a variant saved an hour earlier differs from the current one by some set of edits
-nobody wrote down, and a comparison that only shows outcomes leaves the reader
-guessing which edit produced them. So the diff walks the two scenarios and reports
-every field that moved, matching list entries by identifier rather than by position
-— a satellite that moved down the list has not changed.
+Кейс просит и то, и другое, и на практике это разные задачи. Разница в результатах —
+это таблица чисел. Разница во **входных данных** сложнее: вариант, сохранённый час
+назад, отличается от текущего каким-то набором правок, который никто не записывал, и
+сравнение, показывающее только исходы, оставляет читателя гадать, какая правка их
+вызвала. Поэтому дифф проходит по обоим сценариям и называет каждое изменившееся
+поле, сопоставляя элементы списков по идентификатору, а не по позиции: аппарат,
+съехавший вниз по списку, не изменился.
 """
 
 from __future__ import annotations
@@ -19,7 +19,7 @@ from cosmo_net.analysis.simulate import RunResult
 from cosmo_net.scenario.io import dump_scenario
 from cosmo_net.scenario.schema import Scenario
 
-# Lists whose entries carry their own identity. Anything else is compared as a whole.
+# Списки, элементы которых имеют собственный идентификатор. Всё остальное сравнивается целиком.
 _KEYED = {
     "design.planes": "id",
     "design.satellites": "id",
@@ -29,7 +29,7 @@ _KEYED = {
 
 @dataclass(frozen=True)
 class Change:
-    """One field that differs between two scenarios."""
+    """Одно поле, различающееся между двумя сценариями."""
 
     path: str
     before: Any
@@ -40,7 +40,7 @@ class Change:
 
 
 def diff_scenarios(before: Scenario, after: Scenario) -> list[Change]:
-    """Every field that differs, addressed the same way validation errors are."""
+    """Все различающиеся поля, адресованные так же, как ошибки проверки."""
 
     changes: list[Change] = []
     _walk(dump_scenario(before), dump_scenario(after), "", changes)
@@ -49,12 +49,12 @@ def diff_scenarios(before: Scenario, after: Scenario) -> list[Change]:
 
 def compare_runs(runs: list[RunResult], labels: list[str] | None = None) -> dict[str, Any]:
     """
-    A comparison table over two or more completed runs.
+    Таблица сравнения по двум и более законченным прогонам.
 
-    Every run has to be on the same grid for the numbers to mean anything together,
-    so a mismatch is reported rather than quietly tabulated: comparing a 24-hour run
-    against a 12-hour one would make the shorter one look better for no reason
-    connected to the design.
+    Чтобы числа что-то значили вместе, у прогонов должна быть одна сетка времени,
+    поэтому расхождение сообщается, а не сводится молча в таблицу: сравнение
+    суточного прогона с двенадцатичасовым выставит короткий в выгодном свете по
+    причине, никак не связанной с проектом.
     """
 
     if not runs:
@@ -131,7 +131,7 @@ def _walk(before: Any, after: Any, path: str, changes: list[Change]) -> None:
 def _walk_keyed(
     before: list[Any], after: list[Any], path: str, key: str, changes: list[Change]
 ) -> None:
-    """Match entries by their identifier, so reordering a list is not a change."""
+    """Сопоставить элементы по идентификатору: перестановка списка изменением не считается."""
 
     old = {entry.get(key): entry for entry in before if isinstance(entry, dict)}
     new = {entry.get(key): entry for entry in after if isinstance(entry, dict)}

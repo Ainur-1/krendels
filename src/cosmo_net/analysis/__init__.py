@@ -1,3 +1,3 @@
-"""Metrics over a horizon, and the studies built on top of repeated runs."""
+"""Показатели за горизонт расчёта и исследования поверх повторных прогонов."""
 
 from __future__ import annotations

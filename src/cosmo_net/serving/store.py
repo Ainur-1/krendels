@@ -1,12 +1,12 @@
 """
-Saved variants, and the runs computed from them.
+Сохранённые варианты и посчитанные по ним прогоны.
 
-The two are kept differently on purpose. A variant is a design someone decided to
-keep and expects to find again, so it goes to SQLite and survives a restart — the
-case asks for a variant to be saved and returned to for comparison, and losing the
-morning's work because a container was redeployed would be the wrong kind of
-surprise on demo day. A run is the output of 124 ms of arithmetic over a variant
-that is already stored, so it lives in memory and the oldest ones are dropped.
+Хранятся они по-разному, и намеренно. Вариант — это проект, который человек решил
+оставить и рассчитывает найти снова, поэтому он уходит в SQLite и переживает
+перезапуск: кейс требует сохранять вариант и возвращаться к нему для сравнения, а
+потерять утреннюю работу из-за передеплоя — неподходящий сюрприз в день защиты.
+Прогон же — это результат 124 мс арифметики над уже сохранённым вариантом, поэтому
+он живёт в памяти, и самые старые вытесняются.
 """
 
 from __future__ import annotations
@@ -27,13 +27,13 @@ from cosmo_net.scenario.schema import Scenario, parse_scenario
 
 DEFAULT_DATABASE = RUNS_DATABASE
 
-# Enough runs for a comparison view and the last few things the user looked at.
-# Each is a few hundred kilobytes of Python objects, so this is a handful of megabytes.
+# Достаточно для экрана сравнения и нескольких последних просмотренных прогонов.
+# Каждый весит несколько сотен килобайт объектов Python, то есть это единицы мегабайт.
 MAX_CACHED_RUNS = 32
 
 
 class VariantStore:
-    """Saved designs, by identifier. Thread-safe because uvicorn serves requests from a pool."""
+    """Сохранённые проекты по идентификатору. Потокобезопасно: uvicorn отвечает из пула потоков."""
 
     def __init__(self, path: Path | str | None = None) -> None:
         self._path = Path(path) if path is not None else DEFAULT_DATABASE
@@ -54,7 +54,7 @@ class VariantStore:
         self._connection.commit()
 
     def save(self, label: str, scenario: Scenario, variant_id: str | None = None) -> str:
-        """Store a design under a readable label and return its identifier."""
+        """Сохранить проект под читаемым названием и вернуть его идентификатор."""
 
         identifier = variant_id or uuid.uuid4().hex[:12]
         payload = json.dumps(dump_scenario(scenario), ensure_ascii=False)
@@ -77,7 +77,7 @@ class VariantStore:
         return row["label"], parse_scenario(json.loads(row["scenario"]))
 
     def list(self) -> list[dict[str, Any]]:
-        """Newest first, without the scenario bodies — the list view does not need them."""
+        """Новые первыми, без тел сценариев: списку они не нужны."""
 
         with self._lock:
             rows = self._connection.execute(
@@ -115,7 +115,7 @@ class VariantStore:
 
 
 class RunCache:
-    """The last few computed runs, so a time slider does not recompute the horizon per frame."""
+    """Последние посчитанные прогоны, чтобы ползунок времени не считал горизонт заново."""
 
     def __init__(self, capacity: int = MAX_CACHED_RUNS) -> None:
         self._capacity = capacity

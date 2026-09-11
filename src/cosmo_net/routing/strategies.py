@@ -1,13 +1,14 @@
 """
-Three ways to get from a client terminal to a gateway, and what each one optimises.
+Три способа дойти от клиентского терминала до шлюза и то, что каждый из них улучшает.
 
-They exist because the case asks the team to explain its routing approach and show
-it working, and one search presented on its own says nothing about why it was
-chosen. What they do *not* do is change availability: whether a path exists at a
-given step is a property of the graph, not of the search over it, and all three
-agree to 0.1 pp on every supplied scenario. They differ in the route they pick —
-relay count, signal path length, how close the weakest link sits to its limit — and
-that is the honest claim to make about them.
+Они существуют потому, что кейс просит объяснить выбранный подход к маршрутизации и
+показать его работу, а один-единственный поиск сам по себе ничего не говорит о том,
+почему выбрали именно его. Чего они **не** делают — так это не меняют доступность:
+есть ли путь на данном отсчёте, определяется графом, а не поиском по нему, и все три
+дают одинаковый результат с точностью до 0.1 п.п. на каждом выданном сценарии.
+Различаются они выбранным маршрутом — числом ретрансляций, длиной трассы, тем,
+насколько близко слабейшее звено подошло к своему пределу. Вот это про них и честно
+утверждать.
 """
 
 from __future__ import annotations
@@ -19,45 +20,47 @@ from enum import StrEnum
 
 from cosmo_net.routing.graph import SliceGraph
 
-# Ground margin is degrees above the threshold, range margin is kilometres to
-# spare. To compare the two on one route both are expressed as a fraction of what
-# was available: an elevation margin against the span from the threshold to the
-# zenith, a range margin against the range limit itself.
+# Наземный запас измеряется в градусах над порогом, запас по дальности — в
+# километрах. Чтобы сравнить их на одном маршруте, оба выражаются долей от того,
+# что было доступно: запас по углу места — от промежутка между порогом и зенитом,
+# запас по дальности — от самого предела дальности.
 _ZENITH_DEG = 90.0
 
 
 class Strategy(StrEnum):
-    """Which route to prefer when several exist."""
+    """Какой маршрут предпочесть, когда их несколько."""
 
     MIN_HOPS = "min_hops"
-    """Fewest relays. The default: every hop is a transponder that can fail."""
+    """Минимум ретрансляций. Вариант по умолчанию: каждый переход — это ретранслятор,
+    который может отказать."""
 
     MIN_DISTANCE = "min_distance"
-    """Shortest signal path in kilometres, which is the propagation delay."""
+    """Кратчайшая трасса в километрах, то есть наименьшая задержка распространения."""
 
     MAX_MARGIN = "max_margin"
-    """Widest path: the route whose weakest link sits furthest from its limit."""
+    """Широчайший путь: маршрут, у которого слабейшее звено дальше всего от своего предела."""
 
 
 @dataclass(frozen=True)
 class Route:
-    """A path that existed at one step, and the properties that make it worth comparing."""
+    """Маршрут, существовавший на одном отсчёте, и то, по чему его имеет смысл сравнивать."""
 
     path: list[str]
-    """Client id, then satellite ids, then gateway id."""
+    """Идентификатор клиента, затем идентификаторы аппаратов, затем идентификатор шлюза."""
 
     gateway_id: str
 
     hops: int
-    """Edges, both ground links included, so the shortest possible route has 2."""
+    """Число рёбер, обе наземные линии включены, поэтому самый короткий маршрут — это 2."""
 
     length_km: float
 
     min_elevation_margin_deg: float
-    """Degrees above the threshold on the worse of the two ground links."""
+    """Превышение угла места над порогом на худшей из двух наземных линий, градусы."""
 
     min_range_margin_km: float
-    """Kilometres to spare on the tightest inter-satellite link. Infinite when there is none."""
+    """Запас по дальности на самой напряжённой межспутниковой связи.
+    Бесконечность, если таких связей нет."""
 
 
 def find_route(
@@ -67,11 +70,11 @@ def find_route(
     strategy: Strategy = Strategy.MIN_HOPS,
 ) -> Route | None:
     """
-    The best route from `client_id` to any of `gateway_ids`, or None when there is none.
+    Лучший маршрут от `client_id` до любого из `gateway_ids`, либо None, если маршрута нет.
 
-    Every gateway is a valid destination and the search treats them as one: an
-    operator does not care which ground station the traffic leaves through, only
-    that it leaves.
+    Любой шлюз — допустимая цель, и поиск считает их одним пунктом назначения:
+    оператору всё равно, через какую наземную станцию уходит трафик, важно, что он
+    уходит.
     """
 
     uplinks = graph.uplink.get(client_id, [])
@@ -97,10 +100,10 @@ def find_route(
 
 def _downlinks(graph: SliceGraph, gateway_ids: list[str]) -> dict[int, tuple[str, float]]:
     """
-    Satellite index → the gateway it should hand traffic to, and the slant range there.
+    Индекс аппарата → шлюз, которому он передаёт трафик, и наклонная дальность до него.
 
-    A satellite over two reachable gateways uses the nearer one; the identifier
-    breaks a tie, so the same network always produces the same route.
+    Аппарат, видящий сразу два доступных шлюза, выбирает ближний; при равенстве
+    решает идентификатор, поэтому одна и та же сеть всегда даёт один и тот же маршрут.
     """
 
     best: dict[int, tuple[str, float]] = {}
@@ -117,7 +120,8 @@ def _downlinks(graph: SliceGraph, gateway_ids: list[str]) -> dict[int, tuple[str
 def _search_min_hops(
     graph: SliceGraph, client_id: str, downlink: dict[int, tuple[str, float]]
 ) -> tuple[list[int], str] | None:
-    """Breadth-first, so the first satellite reached that can hand off is on a shortest route."""
+    """Поиск в ширину: первый же найденный аппарат, способный передать трафик на
+    землю, лежит на кратчайшем маршруте."""
 
     previous: dict[int, int | None] = {}
     queue: deque[int] = deque()
@@ -141,11 +145,11 @@ def _search_min_distance(
     graph: SliceGraph, client_id: str, downlink: dict[int, tuple[str, float]]
 ) -> tuple[list[int], str] | None:
     """
-    Dijkstra over kilometres, with the final ground link priced into the search.
+    Дейкстра по километрам, причём последняя наземная линия входит в стоимость поиска.
 
-    Leaving the downlink out and picking the nearest gateway afterwards would give a
-    route that is shortest to some satellite rather than shortest to the ground, and
-    the two are not the same once a longer chain ends closer to a station.
+    Если не учитывать её и выбирать ближайший шлюз уже потом, получится маршрут,
+    кратчайший до какого-то аппарата, а не до земли. А это не одно и то же, как только
+    более длинная цепочка заканчивается ближе к станции.
     """
 
     uplink_distance = graph.uplink_distance_km[client_id]
@@ -169,9 +173,9 @@ def _search_min_distance(
             if finished is None or total < finished[0]:
                 finished = (total, _unwind(previous, node), gateway_id)
 
-        # Anything still queued already costs at least `cost`, so once the best
-        # complete route is shorter than the cheapest remaining satellite it cannot
-        # be beaten and the search stops.
+        # Всё, что ещё в очереди, стоит уже не меньше `cost`. Поэтому как только
+        # лучший законченный маршрут оказывается короче самого дешёвого из
+        # оставшихся аппаратов, побить его нечем и поиск останавливается.
         if finished is not None and finished[0] <= cost:
             break
 
@@ -188,12 +192,12 @@ def _search_max_margin(
     graph: SliceGraph, client_id: str, downlink: dict[int, tuple[str, float]]
 ) -> tuple[list[int], str] | None:
     """
-    Widest path: maximise the smallest margin along the route.
+    Широчайший путь: максимизировать наименьший запас вдоль маршрута.
 
-    The quantity being maximised is a fraction rather than a physical unit, because
-    the route mixes two kinds of headroom — degrees of elevation on the ground links
-    and kilometres of range between craft — and they have to be comparable to have a
-    weakest link at all.
+    Максимизируется доля, а не физическая величина, потому что на маршруте
+    смешаны два вида запаса — градусы угла места на наземных линиях и километры
+    дальности между аппаратами. Чтобы вообще говорить о слабейшем звене, их надо
+    привести к сопоставимому виду.
     """
 
     best: dict[int, float] = {}
@@ -234,13 +238,13 @@ def _search_max_margin(
 
 
 def _elevation_fraction(margin_deg: float) -> float:
-    """Elevation headroom as a share of the span between the threshold and the zenith."""
+    """Запас по углу места как доля промежутка между порогом и зенитом."""
 
     return max(margin_deg, 0.0) / _ZENITH_DEG
 
 
 def _unwind(previous: dict[int, int | None], node: int) -> list[int]:
-    """Walk the parent chain back to the first satellite and return it front to back."""
+    """Пройти по цепочке предков до первого аппарата и вернуть её от начала к концу."""
 
     chain = [node]
     while previous[chain[-1]] is not None:
@@ -252,7 +256,7 @@ def _unwind(previous: dict[int, int | None], node: int) -> list[int]:
 def _describe(
     graph: SliceGraph, client_id: str, satellites: list[int], gateway_id: str
 ) -> Route:
-    """Measure a route that has already been found."""
+    """Измерить уже найденный маршрут."""
 
     uplink_slot = graph.uplink[client_id].index(satellites[0])
     downlink_slot = graph.uplink[gateway_id].index(satellites[-1])

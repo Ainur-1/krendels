@@ -54,7 +54,7 @@ def test_malformed_json_is_reported_with_a_position():
         loads_scenario('{"schema_version": "cosmo-A-1.0",,}')
     error = caught.value.errors[0]
     assert error.code == "malformed_json"
-    assert "line" in error.message
+    assert "строка" in error.message
 
 
 def test_another_schema_version_is_refused(raw):

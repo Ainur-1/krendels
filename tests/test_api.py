@@ -103,7 +103,7 @@ def test_a_run_can_be_fetched_again_by_id(client):
 def test_an_expired_run_says_so_rather_than_crashing(client):
     response = client.get("/api/runs/deadbeef0000")
     assert response.status_code == 404
-    assert "recompute" in response.json()["detail"]
+    assert "запустите расчёт заново" in response.json()["detail"]
 
 
 def test_a_snapshot_matches_the_scenario_it_came_from(client):

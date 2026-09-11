@@ -1,12 +1,12 @@
 """
-The cosmo-A-1.0 scenario, as typed objects, and the rules a file has to satisfy to be one.
+Сценарий cosmo-A-1.0 как типизированные объекты и правила, которым файл обязан отвечать.
 
-Every rule here is one the reference module `reference/geometry.py` enforces, with
-one difference that matters for the interface: `validate()` there raises on the
-first problem it meets, and the case asks the service to tell the user *which*
-field or object is wrong. So parsing collects every problem it can find and
-reports them together, addressed by path — `design.satellites[12].plane_id`
-rather than "Invalid satellite".
+Каждое правило здесь — это правило, которое проверяет эталонный модуль
+`reference/geometry.py`. Отличие одно, и оно важно для интерфейса: тамошняя
+`validate()` останавливается на первой же проблеме, а кейс требует сказать
+пользователю, **какое именно** поле или объект неверен. Поэтому разбор собирает все
+найденные проблемы и сообщает их вместе, адресуя путём —
+`design.satellites[12].plane_id`, а не «неверный аппарат».
 """
 
 from __future__ import annotations
@@ -18,16 +18,16 @@ from pydantic import BaseModel, ConfigDict, Field, StrictInt, ValidationError
 
 from cosmo_net.config import SCENARIO_SCHEMA_VERSION
 
-# Extra keys are kept rather than rejected: a scenario "может содержать другие
-# названия и идентификаторы", and a judge's file carrying an extra annotation is
-# still a valid scenario. Non-finite floats are refused everywhere, which is what
-# the reference module's `finite()` check amounts to.
+# Лишние ключи сохраняются, а не отвергаются: сценарий «может содержать другие
+# названия и идентификаторы», и файл жюри с дополнительной пометкой остаётся
+# корректным сценарием. Нечисловые значения (бесконечность, NaN) отвергаются везде —
+# это ровно то, что делает проверка `finite()` в эталонном модуле.
 _MODEL = ConfigDict(allow_inf_nan=False, extra="allow", populate_by_name=True)
 
 
 @dataclass(frozen=True)
 class ScenarioError:
-    """One problem with an uploaded file, addressed by the path of the field that carries it."""
+    """Одна проблема в загруженном файле, адресованная путём до поля, в котором она лежит."""
 
     field: str
     code: str
@@ -35,7 +35,7 @@ class ScenarioError:
 
 
 class ScenarioInvalid(Exception):
-    """Raised when a file is not a usable scenario. Carries every problem found, not the first."""
+    """Файл не является пригодным сценарием. Несёт все найденные проблемы, а не первую."""
 
     def __init__(self, errors: list[ScenarioError]) -> None:
         self.errors = errors
@@ -52,15 +52,16 @@ class Meta(BaseModel):
 class Environment(BaseModel):
     model_config = _MODEL
 
-    # Bounds are the reference module's, not physics': it refuses anything outside
-    # them, so a file it would reject must not be accepted here either.
+    # Границы взяты у эталонного модуля, а не из физики: он отвергает всё, что вне
+    # них, поэтому файл, который он забраковал бы, не должен приниматься и здесь.
     altitude_km: float = Field(ge=200, le=1200)
     inclination_deg: float = Field(gt=0, le=180)
     earth_angle0_deg: float
 
-    # Strict integers. `"horizon_s": 86400.0` is a float in JSON and the reference
-    # module rejects it on `isinstance(..., int)`; accepting it here would mean a
-    # file that works in the service and fails against the organisers' own tool.
+    # Строго целые. `"horizon_s": 86400.0` в JSON — это число с плавающей точкой, и
+    # эталонный модуль отвергает его на проверке `isinstance(..., int)`. Принять его
+    # здесь значило бы получить файл, который работает в сервисе и не работает в
+    # инструменте организаторов.
     horizon_s: StrictInt = Field(gt=0, le=172_800)
     step_s: StrictInt = Field(gt=0)
 
@@ -73,8 +74,9 @@ class Plane(BaseModel):
     model_config = _MODEL
 
     id: str
-    # Half-open on purpose: 360° is the same orientation as 0° and the reference
-    # module rejects it, so a slider in the interface stops at 359.9.
+    # Промежуток намеренно полуоткрытый: 360° — это та же ориентация, что и 0°, и
+    # эталонный модуль такое значение отвергает, поэтому ползунок в интерфейсе
+    # останавливается на 359.9.
     raan_deg: float = Field(ge=0, lt=360)
     phase_deg: float = Field(ge=0, lt=360)
 
@@ -84,8 +86,8 @@ class Satellite(BaseModel):
 
     id: str
     plane_id: str
-    # Unconstrained beyond being finite, matching the reference module: a slot of
-    # 370° or -20° is a legal way to write a position and wraps on its own.
+    # Кроме конечности, ничем не ограничено — как и в эталонном модуле: место в
+    # 370° или -20° это допустимая запись положения, которая сворачивается сама.
     slot_deg: float
     launch_batch: Literal[1, 2, 3]
 
@@ -109,7 +111,7 @@ class GroundSite(BaseModel):
 
 
 class Failure(BaseModel):
-    """Off the air over `[start_s, end_s)`. The craft keeps its position and loses its links."""
+    """Не в эфире на промежутке `[start_s, end_s)`. Аппарат сохраняет положение и теряет связи."""
 
     model_config = _MODEL
 
@@ -119,7 +121,7 @@ class Failure(BaseModel):
 
 
 class GatewayOutage(BaseModel):
-    """A gateway is unreachable over `[start_s, end_s)`, so no ground link lands on it."""
+    """Шлюз недоступен на `[start_s, end_s)`: на него не садится ни одна наземная линия."""
 
     model_config = _MODEL
 
@@ -150,10 +152,11 @@ class Scenario(BaseModel):
     @property
     def times(self) -> list[int]:
         """
-        The calculation grid: 0, step, …, horizon − step.
+        Сетка расчёта: 0, шаг, …, горизонт − шаг.
 
-        The right end is excluded, so a 86 400 s horizon at 120 s is 720 steps and
-        not 721. Every share in the results is a count of these divided by their number.
+        Правый конец не включается, поэтому горизонт 86 400 с при шаге 120 с — это
+        720 отсчётов, а не 721. Любая доля в результатах — это их количество,
+        делённое на общее число.
         """
 
         env = self.environment
@@ -162,21 +165,22 @@ class Scenario(BaseModel):
 
 def parse_scenario(data: Any) -> Scenario:
     """
-    Turn parsed JSON into a `Scenario`, or raise `ScenarioInvalid` listing everything wrong with it.
+    Превратить JSON в `Scenario` либо бросить `ScenarioInvalid` со списком неверного.
 
-    Shape problems come from pydantic and arrive addressed by path already. The
-    checks that follow are the ones no single field can make on its own: references
-    that have to resolve, identifiers that have to be unique across two different
-    lists, intervals that have to sit inside a horizon declared elsewhere in the file.
+    Проблемы формы приходят от pydantic и уже адресованы путём. Проверки ниже — это
+    те, которые ни одно поле не может сделать в одиночку: ссылки, которые должны
+    разрешаться, идентификаторы, которые должны быть уникальны сразу в двух списках,
+    интервалы, которые должны лежать внутри горизонта, объявленного в другом месте
+    файла.
     """
 
     if not isinstance(data, dict):
         raise ScenarioInvalid(
-            [ScenarioError("", "not_an_object", "Scenario must be a JSON object")]
+            [ScenarioError("", "not_an_object", "Сценарий должен быть объектом JSON")]
         )
 
-    # Checked before anything else: a file announcing another version may use the
-    # same field names for different things, and guessing at that is worse than refusing.
+    # Проверяется раньше всего: файл, объявляющий другую версию, может использовать
+    # те же имена полей для другого смысла, а гадать об этом хуже, чем отказать.
     version = data.get("schema_version")
     if version != SCENARIO_SCHEMA_VERSION:
         raise ScenarioInvalid(
@@ -184,7 +188,7 @@ def parse_scenario(data: Any) -> Scenario:
                 ScenarioError(
                     "schema_version",
                     "unsupported_schema",
-                    f"Expected {SCENARIO_SCHEMA_VERSION}, got {version!r}",
+                    f"Ожидается {SCENARIO_SCHEMA_VERSION}, получено {version!r}",
                 )
             ]
         )
@@ -201,7 +205,7 @@ def parse_scenario(data: Any) -> Scenario:
 
 
 def cross_check(scenario: Scenario) -> list[ScenarioError]:
-    """Every rule that needs more than one part of the file to state."""
+    """Все правила, для формулировки которых нужна больше чем одна часть файла."""
 
     errors: list[ScenarioError] = []
     env, design = scenario.environment, scenario.design
@@ -211,7 +215,7 @@ def cross_check(scenario: Scenario) -> list[ScenarioError]:
             ScenarioError(
                 "environment.step_s",
                 "step_exceeds_horizon",
-                f"Step {env.step_s} s is longer than the horizon {env.horizon_s} s",
+                f"Шаг {env.step_s} с больше горизонта {env.horizon_s} с",
             )
         )
     elif env.horizon_s % env.step_s:
@@ -219,15 +223,15 @@ def cross_check(scenario: Scenario) -> list[ScenarioError]:
             ScenarioError(
                 "environment.horizon_s",
                 "horizon_not_multiple_of_step",
-                f"Horizon {env.horizon_s} s is not a whole number of {env.step_s} s steps",
+                f"Горизонт {env.horizon_s} с не кратен шагу {env.step_s} с",
             )
         )
 
-    plane_ids = _duplicates(errors, [p.id for p in design.planes], "design.planes", "plane")
+    plane_ids = _duplicates(errors, [p.id for p in design.planes], "design.planes", "плоскость")
     sat_ids = _duplicates(
-        errors, [s.id for s in design.satellites], "design.satellites", "satellite"
+        errors, [s.id for s in design.satellites], "design.satellites", "аппарат"
     )
-    _duplicates(errors, [g.id for g in scenario.ground_sites], "ground_sites", "site")
+    _duplicates(errors, [g.id for g in scenario.ground_sites], "ground_sites", "пункт")
 
     for index, sat in enumerate(design.satellites):
         if sat.plane_id not in plane_ids:
@@ -235,30 +239,31 @@ def cross_check(scenario: Scenario) -> list[ScenarioError]:
                 ScenarioError(
                     f"design.satellites[{index}].plane_id",
                     "unknown_plane",
-                    f"Satellite {sat.id} refers to plane {sat.plane_id!r}, which is not declared",
+                    f"Аппарат {sat.id} ссылается на плоскость {sat.plane_id!r}, которой нет",
                 )
             )
 
-    # Satellites and ground sites share one identifier space because a route is a
-    # list of ids running through both, and a collision would make a path ambiguous.
+    # У аппаратов и наземных пунктов общее пространство идентификаторов, потому что
+    # маршрут — это список идентификаторов, проходящий через тех и других, и
+    # совпадение сделало бы путь неоднозначным.
     for index, site in enumerate(scenario.ground_sites):
         if site.id in sat_ids:
             errors.append(
                 ScenarioError(
                     f"ground_sites[{index}].id",
                     "id_collides_with_satellite",
-                    f"{site.id!r} is used by a satellite as well as a ground site",
+                    f"Идентификатор {site.id!r} занят и аппаратом, и наземным пунктом",
                 )
             )
 
     if not scenario.clients:
         errors.append(
-            ScenarioError("ground_sites", "no_client", "At least one site must have role 'client'")
+            ScenarioError("ground_sites", "no_client", "Нужен хотя бы один пункт с ролью client")
         )
     if not scenario.gateways:
         errors.append(
             ScenarioError(
-                "ground_sites", "no_gateway", "At least one site must have role 'gateway'"
+                "ground_sites", "no_gateway", "Нужен хотя бы один пункт с ролью gateway"
             )
         )
 
@@ -269,7 +274,7 @@ def cross_check(scenario: Scenario) -> list[ScenarioError]:
                 ScenarioError(
                     f"failures[{index}].satellite_id",
                     "unknown_satellite",
-                    f"No satellite {failure.satellite_id!r} to take out of service",
+                    f"Нет аппарата {failure.satellite_id!r}, который можно вывести из строя",
                 )
             )
         errors += _interval(failure.start_s, failure.end_s, env.horizon_s, f"failures[{index}]")
@@ -280,7 +285,7 @@ def cross_check(scenario: Scenario) -> list[ScenarioError]:
                 ScenarioError(
                     f"gateway_outages[{index}].gateway_id",
                     "unknown_gateway",
-                    f"No gateway {outage.gateway_id!r} to take out of service",
+                    f"Нет шлюза {outage.gateway_id!r}, который можно вывести из строя",
                 )
             )
         errors += _interval(
@@ -291,16 +296,16 @@ def cross_check(scenario: Scenario) -> list[ScenarioError]:
 
 
 def _interval(start: float, end: float, horizon: int, where: str) -> list[ScenarioError]:
-    """An outage runs over `[start, end)`, has a positive length and sits inside the horizon."""
+    """Отказ идёт на `[start, end)`, имеет положительную длину и лежит внутри горизонта."""
 
     if not 0 <= start:
-        return [ScenarioError(f"{where}.start_s", "interval_before_zero", "Start is before 0 s")]
+        return [ScenarioError(f"{where}.start_s", "interval_before_zero", "Начало раньше 0 с")]
     if not start < end:
         return [
             ScenarioError(
                 f"{where}.end_s",
                 "interval_not_positive",
-                f"End {end} s is not after start {start} s",
+                f"Конец {end} с не позже начала {start} с",
             )
         ]
     if end > horizon:
@@ -308,7 +313,7 @@ def _interval(start: float, end: float, horizon: int, where: str) -> list[Scenar
             ScenarioError(
                 f"{where}.end_s",
                 "interval_past_horizon",
-                f"End {end} s is past the horizon {horizon} s",
+                f"Конец {end} с выходит за горизонт {horizon} с",
             )
         ]
     return []
@@ -317,7 +322,7 @@ def _interval(start: float, end: float, horizon: int, where: str) -> list[Scenar
 def _duplicates(
     errors: list[ScenarioError], ids: list[str], where: str, kind: str
 ) -> set[str]:
-    """Record every repeated identifier and return the set of distinct ones."""
+    """Записать каждый повторяющийся идентификатор и вернуть множество различных."""
 
     seen: set[str] = set()
     for index, value in enumerate(ids):
@@ -326,7 +331,7 @@ def _duplicates(
                 ScenarioError(
                     f"{where}[{index}].id",
                     "duplicate_id",
-                    f"{value!r} is used by more than one {kind}",
+                    f"{value!r} встречается больше одного раза ({kind})",
                 )
             )
         seen.add(value)
@@ -334,7 +339,7 @@ def _duplicates(
 
 
 def _from_pydantic(error: dict[str, Any]) -> ScenarioError:
-    """Re-address a pydantic error as a dotted path the interface can point at."""
+    """Переадресовать ошибку pydantic путём, на который интерфейс может показать."""
 
     path = ""
     for part in error["loc"]:

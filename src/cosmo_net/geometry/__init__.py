@@ -1,3 +1,3 @@
-"""Satellite positions and the link geometry derived from them."""
+"""Положения аппаратов и геометрия связей, которая из них следует."""
 
 from __future__ import annotations

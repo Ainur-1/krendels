@@ -1,18 +1,20 @@
 """
-Whether a route exists, without finding one.
+Есть ли маршрут — без того, чтобы его искать.
 
-Availability is a connectivity question: a path from a client to a gateway exists
-exactly when some satellite the client can see sits in the same connected component
-as some satellite a gateway can see. Answering it that way costs one pass of
-union-find per step instead of one search per client per step, and it gives the
-same answer — which the tests check against the full run rather than assume.
+Доступность — это вопрос о связности: путь от клиента до шлюза существует ровно
+тогда, когда какой-нибудь аппарат, видимый клиенту, лежит в той же связной
+компоненте, что и какой-нибудь аппарат, видимый шлюзу. Такой ответ стоит одного
+прохода системы непересекающихся множеств на отсчёт вместо отдельного поиска для
+каждого клиента, и он совпадает с полным расчётом — что тесты проверяют на полном
+прогоне, а не принимают на веру.
 
-It exists because two studies call it in bulk: satellite criticality runs the
-horizon once per satellite, and the configuration sweep runs it once per candidate
-design. Measured on scenario 01, a full run with routing is 124 ms and this is
-68 ms. The remainder is `compute_contacts`, which both share — so the knockout
-study also hands in a contact series built once and re-masked through
-`ContactSeries.with_service`, and pays the 45 ms only on its first run.
+Модуль нужен потому, что два исследования вызывают его массово: анализ критичности
+прогоняет горизонт по разу на каждый аппарат, а подбор конфигурации — по разу на
+каждого кандидата. Измерено на сценарии 01: полный прогон с маршрутизацией — 124 мс,
+этот путь — 68 мс. Остаток приходится на `compute_contacts`, общий для обоих, —
+поэтому анализ критичности передаёт сюда состав связей, построенный один раз и
+перемаскированный через `ContactSeries.with_service`, и платит 45 мс только на
+первом прогоне.
 """
 
 from __future__ import annotations
@@ -28,16 +30,17 @@ def availability_series(
     scenario: Scenario, contacts: ContactSeries | None = None, stride: int = 1
 ) -> dict[str, np.ndarray]:
     """
-    (T,) booleans per client: was there a path to some reachable gateway at this step.
+    (T,) по флагу на отсчёт для каждого клиента: был ли путь до доступного шлюза.
 
-    Passing `contacts` in lets a caller that already built them — the criticality
-    study rebuilds only the service mask between runs — skip the expensive half.
+    Передача готовых `contacts` позволяет вызывающей стороне пропустить дорогую
+    половину работы — анализ критичности между прогонами меняет только маску
+    состава в строю.
 
-    `stride` samples every nth step instead of all of them, which is what the
-    configuration sweep uses to rank a hundred candidates against each other. It
-    makes the result an estimate rather than a measurement, so nothing computed this
-    way may be reported as a figure: the sweep re-measures its shortlist on the full
-    grid before showing a number.
+    `stride` берёт каждый n-й отсчёт вместо всех. Так работает подбор конфигурации,
+    когда ранжирует сотню кандидатов между собой. Результат при этом становится
+    оценкой, а не измерением, поэтому ничего посчитанного таким способом нельзя
+    показывать как число: подбор перемеряет короткий список на полной сетке, прежде
+    чем что-то вывести.
     """
 
     if stride > 1 and contacts is not None:
@@ -63,8 +66,8 @@ def availability_series(
     pairs = contacts.pair_index
 
     for step in range(steps):
-        # Only gateways that are up can terminate a path, so an offline station
-        # contributes none of its visible craft to the landing set.
+        # Завершить путь может только работающий шлюз, поэтому станция в отказе не
+        # добавляет ни одного своего видимого аппарата в множество точек приземления.
         landing: set[int] = set()
         for g in gateway_slots:
             if offline[step, g]:
@@ -88,10 +91,10 @@ def availability_series(
 
 def worst_availability(scenario: Scenario, contacts: ContactSeries | None = None) -> float:
     """
-    The share of steps reachable for the client served worst.
+    Доля достижимых отсчётов у клиента, обслуженного хуже всех.
 
-    The target is stated per terminal, so this — not the mean across sites — is what
-    a configuration has to be judged on.
+    Целевой ориентир задан на каждый терминал, поэтому судить о конфигурации надо
+    именно по этому числу, а не по среднему по пунктам.
     """
 
     series = availability_series(scenario, contacts)
@@ -101,7 +104,7 @@ def worst_availability(scenario: Scenario, contacts: ContactSeries | None = None
 
 
 def longest_gap_steps(reachable: np.ndarray) -> int:
-    """The longest run of consecutive unreachable steps."""
+    """Самая длинная череда идущих подряд недостижимых отсчётов."""
 
     longest = current = 0
     for value in reachable:

@@ -1,11 +1,11 @@
 """
-Which links exist, at every step: satellite to satellite, and satellite to ground.
+Какие связи существуют в каждый отсчёт: между аппаратами и между аппаратом и землёй.
 
-Two rules, both from the case description. A ground link needs the satellite at or
-above the elevation threshold. An inter-satellite link needs the two craft closer
-than the range limit *and* the segment between them clear of the Earth — being in
-range is not enough when the planet is in the way, which is exactly what happens
-to craft on opposite sides of a polar orbit.
+Два правила, оба из описания кейса. Наземная связь требует, чтобы аппарат был не
+ниже порогового угла места. Межспутниковая связь требует, чтобы аппараты были ближе
+предельной дальности **и** чтобы отрезок между ними не пересекал Землю: попасть в
+дальность мало, если планета стоит на пути — а именно это и происходит с
+аппаратами по разные стороны полярной орбиты.
 """
 
 from __future__ import annotations
@@ -21,7 +21,7 @@ from cosmo_net.scenario.schema import Scenario
 
 @dataclass(frozen=True)
 class ContactSeries:
-    """Every link in the network, for every step of the grid."""
+    """Все связи сети, на каждом отсчёте сетки."""
 
     times_s: np.ndarray
     satellite_ids: list[str]
@@ -29,40 +29,41 @@ class ContactSeries:
     ground_roles: list[str]
 
     active: np.ndarray
-    """(T, N) in service: launched by this stage and not inside an outage."""
+    """(T, N) в строю: запущен на выбранной очереди и не находится в отказе."""
 
     pair_index: np.ndarray
-    """(P, 2) the satellite pairs, i < j, fixed for the whole run."""
+    """(P, 2) пары аппаратов, i < j, одни и те же на весь прогон."""
 
     isl_geometric: np.ndarray
-    """(T, P) in range and not looking through the Earth. Says nothing about service."""
+    """(T, P) в дальности и не сквозь Землю. О том, кто в строю, ничего не говорит."""
 
     isl_open: np.ndarray
-    """(T, P) usable: geometric, and both ends in service."""
+    """(T, P) пригодна к работе: геометрия позволяет и оба конца в строю."""
 
     isl_distance_km: np.ndarray
-    """(T, P) separation, whether or not the link is usable."""
+    """(T, P) расстояние между аппаратами, независимо от того, работает связь или нет."""
 
     elevation_deg: np.ndarray
-    """(T, G, N) elevation of each satellite over each ground site, in degrees."""
+    """(T, G, N) угол места каждого аппарата над каждым наземным пунктом, градусы."""
 
     elevation_ok: np.ndarray
-    """(T, G, N) at or above the threshold. Again independent of who is in service."""
+    """(T, G, N) не ниже порога. Тоже не зависит от того, кто в строю."""
 
     ground_open: np.ndarray
-    """(T, G, N) the ground link is usable: high enough, in service, site reachable."""
+    """(T, G, N) наземная связь работает: аппарат достаточно высоко, в строю, пункт доступен."""
 
     ground_distance_km: np.ndarray
-    """(T, G, N) slant range from the site to the satellite."""
+    """(T, G, N) наклонная дальность от пункта до аппарата."""
 
     def with_service(self, active: np.ndarray, offline: np.ndarray) -> ContactSeries:
         """
-        The same geometry with a different set of craft and stations in service.
+        Та же геометрия при другом составе аппаратов и станций в строю.
 
-        Positions, distances and elevations depend only on the orbits, so a study
-        that changes nothing but who is switched on — the satellite knockout does
-        exactly that, 48 times — can reuse them and redo the boolean masks alone.
-        That is the 45 ms half of a run; what is left is a few hundred microseconds.
+        Положения, расстояния и углы места зависят только от орбит. Поэтому
+        исследование, которое меняет лишь состав включённых аппаратов — а анализ
+        критичности делает ровно это, 48 раз подряд, — переиспользует их и
+        пересчитывает только булевы маски. Геометрия занимает 45 мс из прогона,
+        маски — несколько сотен микросекунд.
         """
 
         i, j = self.pair_index[:, 0], self.pair_index[:, 1]
@@ -85,11 +86,12 @@ class ContactSeries:
 
 def active_mask(scenario: Scenario, times_s: np.ndarray) -> np.ndarray:
     """
-    (T, N) which satellites are in service at each step.
+    (T, N) какие аппараты в строю на каждом отсчёте.
 
-    Two independent reasons to be out: not launched yet at the selected stage, or
-    inside a declared outage. Outage intervals are half-open — `[start_s, end_s)` —
-    so a craft down from 21 600 s is already down at 21 600 and back at `end_s`.
+    Две независимые причины выбыть: аппарат ещё не запущен на выбранной очереди
+    или находится в объявленном отказе. Интервалы отказа полуоткрытые —
+    `[start_s, end_s)`, — поэтому аппарат, выключенный с 21 600 с, уже выключен в
+    момент 21 600 и снова в строю в момент `end_s`.
     """
 
     design = scenario.design
@@ -109,7 +111,7 @@ def active_mask(scenario: Scenario, times_s: np.ndarray) -> np.ndarray:
 
 
 def gateway_offline_mask(scenario: Scenario, times_s: np.ndarray) -> np.ndarray:
-    """(T, G) which ground sites are unreachable at each step. Only gateways can be."""
+    """(T, G) какие наземные пункты недоступны на каждом отсчёте. Недоступным бывает только шлюз."""
 
     offline = np.zeros((len(times_s), len(scenario.ground_sites)), dtype=bool)
     index = {site.id: g for g, site in enumerate(scenario.ground_sites)}
@@ -123,7 +125,7 @@ def gateway_offline_mask(scenario: Scenario, times_s: np.ndarray) -> np.ndarray:
 
 
 def compute_contacts(scenario: Scenario, trajectory: Trajectory) -> ContactSeries:
-    """Build the full link set for the run from positions the trajectory already holds."""
+    """Собрать полный состав связей прогона из положений, которые уже посчитаны в траектории."""
 
     env = scenario.environment
     times = trajectory.times_s
@@ -139,10 +141,10 @@ def compute_contacts(scenario: Scenario, trajectory: Trajectory) -> ContactSerie
     delta = b - a
     distance = np.linalg.norm(delta, axis=-1)
 
-    # Closest approach of the segment to the centre of the Earth. Clipping the
-    # projection to [0, 1] keeps it on the segment: without it a pair whose infinite
-    # line passes through the planet would be rejected even when both craft sit on
-    # the same side of it and see each other perfectly well.
+    # Ближайшее расстояние от отрезка до центра Земли. Ограничение проекции
+    # отрезком [0, 1] удерживает точку на самом отрезке: без него пара, у которой
+    # через планету проходит бесконечная прямая, была бы отвергнута даже когда оба
+    # аппарата находятся по одну сторону от Земли и прекрасно видят друг друга.
     denominator = np.maximum(np.sum(delta * delta, axis=-1), 1e-12)
     lam = np.clip(-np.sum(a * delta, axis=-1) / denominator, 0.0, 1.0)
     closest = np.linalg.norm(a + lam[..., None] * delta, axis=-1)
@@ -154,10 +156,10 @@ def compute_contacts(scenario: Scenario, trajectory: Trajectory) -> ContactSerie
     difference = ecef[:, None, :, :] - ground[None, :, None, :]
     slant = np.linalg.norm(difference, axis=-1)
 
-    # Elevation above the local horizon: the angle between the line to the satellite
-    # and the plane perpendicular to the site's own radius vector. On a spherical
-    # Earth that radius vector is the local vertical, which is what makes the
-    # one-line form below equal to the usual up/horizontal arctangent.
+    # Угол места над местным горизонтом: угол между направлением на аппарат и
+    # плоскостью, перпендикулярной радиус-вектору самого пункта. На сферической
+    # Земле этот радиус-вектор и есть местная вертикаль — поэтому запись ниже в одну
+    # строку равна привычному арктангенсу «вверх к горизонтали».
     up = ground / EARTH_RADIUS_KM
     sine = np.sum(difference * up[None, :, None, :], axis=-1) / np.maximum(slant, 1e-12)
     elevation = np.degrees(np.arcsin(np.clip(sine, -1.0, 1.0)))

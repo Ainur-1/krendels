@@ -1,13 +1,13 @@
 """
-Which satellite would be missed most: take each one out for the whole horizon and re-measure.
+Без какого аппарата хуже всего: выключаем каждый на весь горизонт и меряем заново.
 
-The case asks the team to name the vulnerabilities it found. On the supplied full
-constellation the honest answer turns out to be that there are none of this kind —
-every one of the 48 costs the worst-served client between 2.2 and 2.4 percentage
-points, so the design degrades gracefully and has no single satellite holding it
-up. That is a result worth showing rather than an absence of one, and it is what
-points the same question at the ground segment, where there *is* a single point of
-failure: one gateway, blind 1.1 % of the day, and every client loses it at once.
+Кейс просит назвать найденные уязвимости. На выданной полной группировке честный
+ответ оказывается таким: уязвимостей этого рода нет. Каждый из 48 аппаратов стоит
+худшему пункту от 2.2 до 2.4 процентного пункта, то есть проект деградирует плавно
+и ни на одном аппарате не держится. Это результат, который стоит показать, а не
+отсутствие результата, — и именно он разворачивает тот же вопрос к наземному
+сегменту, где единая точка отказа как раз **есть**: один шлюз, слепой 1.1 % суток,
+и теряют его сразу все клиенты.
 """
 
 from __future__ import annotations
@@ -24,14 +24,14 @@ from cosmo_net.scenario.schema import Scenario
 
 @dataclass(frozen=True)
 class Knockout:
-    """What removing one satellite for the whole horizon does to the worst-served client."""
+    """Что даёт удаление одного аппарата на весь горизонт для худшего пункта."""
 
     satellite_id: str
     plane_id: str
 
     worst_availability: float
     drop_pp: float
-    """Percentage points lost against the same scenario with this craft in service."""
+    """Сколько процентных пунктов потеряно против того же сценария с этим аппаратом в строю."""
 
     worst_max_gap_s: int
 
@@ -54,10 +54,11 @@ class CriticalityReport:
     @property
     def spread_pp(self) -> float:
         """
-        Difference between the most and least costly satellite.
+        Разница между самым и наименее значимым аппаратом.
 
-        A wide spread means some craft matter far more than others and the design has
-        a weak point to protect. A narrow one — 0.2 pp on scenario 01 — means it does not.
+        Широкий разброс означает, что одни аппараты важнее других и у проекта есть
+        слабое место, которое надо защищать. Узкий — на сценарии 01 меньше пункта —
+        означает, что такого места нет.
         """
 
         if not self.knockouts:
@@ -76,12 +77,12 @@ class CriticalityReport:
 
 def rank_satellites(scenario: Scenario) -> CriticalityReport:
     """
-    Rank every in-service satellite by what its loss costs, most costly first.
+    Упорядочить аппараты в строю по цене их потери, самые дорогие первыми.
 
-    Craft that have not launched at the selected stage are skipped: removing
-    something that is not there measures nothing. Each knockout replaces the
-    satellite's own outage record rather than adding to it, so a scenario that
-    already contains failures is measured against itself with one more.
+    Аппараты, не запущенные на выбранной очереди, пропускаются: удалять то, чего нет,
+    — значит ничего не измерить. Каждое выключение заменяет собственную запись об
+    отказе этого аппарата, а не добавляется к ней, поэтому сценарий, в котором отказы
+    уже есть, сравнивается сам с собой плюс один.
     """
 
     times = np.asarray(scenario.times, dtype=float)
@@ -100,8 +101,8 @@ def rank_satellites(scenario: Scenario) -> CriticalityReport:
         if not contacts.active[:, index].any():
             continue
 
-        # Everything except this craft's own availability is unchanged, so the link
-        # geometry is reused and only the boolean masks are rebuilt.
+        # Кроме состава в строю ничего не меняется, поэтому геометрия связей
+        # переиспользуется и пересчитываются только булевы маски.
         active = contacts.active.copy()
         active[:, index] = False
         series = availability_series(scenario, contacts.with_service(active, offline))

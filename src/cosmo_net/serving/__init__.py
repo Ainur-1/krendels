@@ -1,3 +1,3 @@
-"""The HTTP service and the store behind it."""
+"""HTTP-сервис и хранилище за ним."""
 
 from __future__ import annotations

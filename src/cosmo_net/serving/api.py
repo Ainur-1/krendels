@@ -1,17 +1,17 @@
 """
-The HTTP service: load a scenario, change it, run it, compare runs, export the result.
+HTTP-сервис: загрузить сценарий, изменить его, посчитать, сравнить прогоны, выгрузить результат.
 
     uv run uvicorn cosmo_net.serving.api:app --reload
 
-Every endpoint that takes a design accepts it three ways — inline, by the
-identifier of a saved variant, or by the name of one of the scenarios shipped with
-the case — because the interface needs all three and resolving them in one place
-keeps the rest of the file from caring which it got.
+Любая ручка, которой нужен проект, принимает его тремя способами: телом запроса, по
+идентификатору сохранённого варианта или по имени одного из сценариев кейса.
+Интерфейсу нужны все три, а разбор их в одном месте избавляет остальной файл от
+необходимости знать, что именно пришло.
 
-The compiled frontend is mounted at `/` when it is present. When it is not, the API
-still works and `/` says so: a fresh clone that has not run `npm run build` should
-be usable through the documented endpoints rather than answering 404 with no
-explanation.
+Собранный интерфейс монтируется на `/`, если он есть. Если его нет, API продолжает
+работать, а `/` честно об этом сообщает: свежая копия репозитория, где ещё не
+запускали `npm run build`, должна быть пригодна через документированные ручки, а не
+отвечать 404 без объяснений.
 """
 
 from __future__ import annotations
@@ -51,14 +51,14 @@ app = FastAPI(
     summary="Проектирование устойчивой спутниковой группировки: расчёт, маршруты, сравнение.",
 )
 
-# Run payloads are a few hundred kilobytes of highly repetitive JSON — 720 causes
-# drawn from five words, 2160 paths over 50 identifiers — so they compress to a
-# fraction of that and the slider stays responsive over a slow link.
+# Ответ с прогоном — это несколько сотен килобайт очень однообразного JSON: 720
+# причин из пяти слов, 2160 путей по 50 идентификаторам. Сжимается он в разы, и
+# ползунок остаётся отзывчивым даже на медленном канале.
 app.add_middleware(GZipMiddleware, minimum_size=1024)
 
-# The Vite dev server runs on another port during development. In the deployed
-# container the frontend is served by this same app and no cross-origin request
-# ever happens, so this costs nothing there.
+# При разработке сервер Vite живёт на другом порту. В развёрнутом контейнере
+# интерфейс отдаёт это же приложение, кросс-доменных запросов не возникает вовсе,
+# так что там эта настройка ничего не стоит.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
@@ -71,7 +71,7 @@ runs = RunCache()
 
 
 class DesignRef(BaseModel):
-    """A design, however the caller has it to hand."""
+    """Проект — в том виде, в каком он есть у вызывающей стороны."""
 
     scenario: dict[str, Any] | None = None
     variant_id: str | None = None
@@ -81,7 +81,7 @@ class DesignRef(BaseModel):
 class RunRequest(DesignRef):
     strategy: Strategy = Strategy.MIN_HOPS
     save_as: str | None = Field(
-        default=None, description="Save the design under this label before running it"
+        default=None, description="Сохранить проект под этим названием перед расчётом"
     )
 
 
@@ -100,7 +100,7 @@ class SweepRequest(DesignRef):
 
 
 def resolve(reference: DesignRef) -> Scenario:
-    """Turn any of the three ways of naming a design into a validated `Scenario`."""
+    """Превратить любой из трёх способов назвать проект в проверенный `Scenario`."""
 
     if reference.scenario is not None:
         return parse_scenario(reference.scenario)
@@ -108,25 +108,25 @@ def resolve(reference: DesignRef) -> Scenario:
     if reference.variant_id:
         found = variants.get(reference.variant_id)
         if found is None:
-            raise HTTPException(404, f"No saved variant {reference.variant_id!r}")
+            raise HTTPException(404, f"Нет сохранённого варианта {reference.variant_id!r}")
         return found[1]
 
     if reference.bundled:
         for path in bundled_scenarios():
             if path.stem == reference.bundled:
                 return parse_scenario(_read_json(path))
-        raise HTTPException(404, f"No bundled scenario {reference.bundled!r}")
+        raise HTTPException(404, f"Нет сценария {reference.bundled!r} в комплекте кейса")
 
-    raise HTTPException(422, "Provide one of: scenario, variant_id, bundled")
+    raise HTTPException(422, "Укажите одно из: scenario, variant_id, bundled")
 
 
 @app.exception_handler(ScenarioInvalid)
 def invalid_scenario(request, exc: ScenarioInvalid) -> JSONResponse:
     """
-    422 with every problem listed, not the first one.
+    422 со списком всех проблем, а не одной первой.
 
-    The case asks the service to say which field or object is wrong after a bad
-    upload, and a user with three mistakes in a file should be told about three.
+    Кейс требует, чтобы после неудачной загрузки сервис сказал, какое поле или объект
+    неверен. Пользователю с тремя ошибками в файле надо сообщить про три.
     """
 
     return JSONResponse(status_code=422, content=error_payload(exc.errors))
@@ -134,7 +134,7 @@ def invalid_scenario(request, exc: ScenarioInvalid) -> JSONResponse:
 
 @app.get("/api/health")
 def health() -> dict[str, Any]:
-    """Enough to tell a deploy whether the thing came up and whether the UI is in it."""
+    """Достаточно, чтобы понять при выкладке, поднялся ли сервис и собран ли в нём интерфейс."""
 
     return {
         "status": "ok",
@@ -148,7 +148,7 @@ def health() -> dict[str, Any]:
 
 @app.get("/api/scenarios")
 def list_scenarios() -> list[dict[str, Any]]:
-    """The scenarios shipped with the case, summarised for a picker."""
+    """Сценарии из комплекта кейса, кратко — для списка выбора."""
 
     listing = []
     for path in bundled_scenarios():
@@ -162,12 +162,12 @@ def get_scenario(name: str) -> dict[str, Any]:
     for path in bundled_scenarios():
         if path.stem == name:
             return _read_json(path)
-    raise HTTPException(404, f"No bundled scenario {name!r}")
+    raise HTTPException(404, f"Нет сценария {name!r} в комплекте кейса")
 
 
 @app.post("/api/scenarios/validate")
 def validate_scenario(body: dict[str, Any]) -> dict[str, Any]:
-    """Check a file without running it, so an upload can be rejected before the spinner."""
+    """Проверить файл, не считая его, чтобы отклонить загрузку до появления ожидания."""
 
     scenario = parse_scenario(body)
     return {"valid": True, "summary": scenario_summary(scenario, source="upload")}
@@ -189,7 +189,7 @@ def save_variant(body: SaveRequest) -> dict[str, Any]:
 def get_variant(variant_id: str) -> dict[str, Any]:
     found = variants.get(variant_id)
     if found is None:
-        raise HTTPException(404, f"No saved variant {variant_id!r}")
+        raise HTTPException(404, f"Нет сохранённого варианта {variant_id!r}")
     label, scenario = found
     return {"id": variant_id, "label": label, "scenario": dump_scenario(scenario)}
 
@@ -197,18 +197,18 @@ def get_variant(variant_id: str) -> dict[str, Any]:
 @app.delete("/api/variants/{variant_id}", status_code=204)
 def delete_variant(variant_id: str) -> Response:
     if not variants.delete(variant_id):
-        raise HTTPException(404, f"No saved variant {variant_id!r}")
+        raise HTTPException(404, f"Нет сохранённого варианта {variant_id!r}")
     return Response(status_code=204)
 
 
 @app.post("/api/runs")
 def create_run(body: RunRequest) -> dict[str, Any]:
     """
-    Run a design over its whole horizon and return everything needed to draw it.
+    Посчитать проект на всём горизонте и вернуть всё, что нужно для отрисовки.
 
-    `save_as` stores the design first, so "change something and keep it" is one
-    round trip rather than two and a variant can never be saved in a state that was
-    never actually computed.
+    `save_as` сначала сохраняет проект, поэтому «поменять и оставить» — это одно
+    обращение, а не два, и вариант не может быть сохранён в состоянии, которое
+    никогда не считали.
     """
 
     scenario = resolve(body)
@@ -228,11 +228,11 @@ def get_run(run_id: str) -> dict[str, Any]:
 @app.get("/api/runs/{run_id}/snapshot")
 def get_snapshot(run_id: str, t_s: float = 0.0) -> dict[str, Any]:
     """
-    The network at one moment: positions, links, who sees whom.
+    Состояние сети в один момент: положения, связи, кто кого видит.
 
-    Recomputed rather than stored. A single step is about a millisecond, which is
-    less than the request takes to arrive, and storing 26 MB of arrays per run so
-    that a slider can read one row of them would be the wrong trade.
+    Пересчитывается, а не хранится. Один отсчёт — около миллисекунды, меньше, чем
+    занимает доставка самого запроса, а держать по 26 МБ массивов на прогон ради
+    одной строки из них — неудачный размен.
     """
 
     result = _require_run(run_id)
@@ -242,10 +242,10 @@ def get_snapshot(run_id: str, t_s: float = 0.0) -> dict[str, Any]:
 @app.get("/api/runs/{run_id}/trajectory")
 def get_trajectory(run_id: str) -> dict[str, Any]:
     """
-    Positions and links for every step, fetched once so playback needs no network.
+    Положения и связи на всех отсчётах, запрашиваемые один раз: проигрыванию сеть не нужна.
 
-    See `trajectory_payload`: asking for one step at a time is what made the map
-    disagree with the route drawn on top of it.
+    Подробности в `trajectory_payload`: именно запрос по одному отсчёту приводил к
+    тому, что карта расходилась с нарисованным поверх неё маршрутом.
     """
 
     return trajectory_payload(_require_run(run_id))
@@ -253,7 +253,7 @@ def get_trajectory(run_id: str) -> dict[str, Any]:
 
 @app.get("/api/runs/{run_id}/export")
 def export_run(run_id: str) -> JSONResponse:
-    """The run as `cosmo-A-result-1.0`, offered to the browser as a file."""
+    """Прогон в формате `cosmo-A-result-1.0`, отдаётся браузеру файлом."""
 
     result = _require_run(run_id)
     filename = f"{result.scenario.meta.id or 'result'}-{run_id}.json"
@@ -265,17 +265,17 @@ def export_run(run_id: str) -> JSONResponse:
 
 @app.post("/api/compare")
 def compare(body: CompareRequest) -> dict[str, Any]:
-    """Two or more runs side by side, with the parameters that differ between them."""
+    """Два и более прогона рядом, вместе с параметрами, которыми они различаются."""
 
     results = [_require_run(run_id) for run_id in body.run_ids]
     if body.labels and len(body.labels) != len(results):
-        raise HTTPException(422, "labels must match run_ids")
+        raise HTTPException(422, "labels должен совпадать по длине с run_ids")
     return compare_runs(results, body.labels)
 
 
 @app.post("/api/analysis/criticality")
 def analyse_criticality(body: DesignRef) -> dict[str, Any]:
-    """Rank every satellite by what its loss for a full day would cost."""
+    """Упорядочить аппараты по тому, во что обошлась бы потеря каждого на целые сутки."""
 
     return rank_satellites(resolve(body)).to_dict()
 
@@ -283,17 +283,17 @@ def analyse_criticality(body: DesignRef) -> dict[str, Any]:
 @app.post("/api/analysis/sweep")
 def analyse_sweep(body: SweepRequest) -> dict[str, Any]:
     """
-    Search the configuration space and return the whole field, not only the winner.
+    Обойти пространство конфигураций и вернуть всё поле, а не только победителя.
 
-    The frontier is what the interface plots: availability against the longest
-    interruption, with the designs that are not beaten on both at once.
+    Интерфейс рисует фронт: доступность против самого долгого перерыва, с проектами,
+    которые не проигрывают сразу по обоим показателям.
     """
 
     scenario = resolve(body)
 
-    # Not os.cpu_count(): inside a container that reports the host's cores, and
-    # acting on it started eight workers on a 512 MB instance and had the service
-    # killed mid-request. usable_workers reads the cgroup and caps by memory.
+    # Не os.cpu_count(): внутри контейнера он показывает ядра хоста, и из-за этого на
+    # инстансе с 512 МБ запустилось восемь процессов, а сервис убили прямо во время
+    # запроса. usable_workers читает cgroup и ограничивает по памяти.
     workers = usable_workers(body.workers)
     report = (
         sweep_spacing(scenario, workers=workers)
@@ -307,7 +307,7 @@ def _require_run(run_id: str):
     result = runs.get(run_id)
     if result is None:
         raise HTTPException(
-            404, f"Run {run_id!r} is not in the cache; run it again to recompute it"
+            404, f"Прогон {run_id!r} не найден в кеше — запустите расчёт заново"
         )
     return result
 
@@ -324,7 +324,7 @@ else:
 
     @app.get("/", response_class=HTMLResponse)
     def no_frontend() -> str:
-        """Said plainly rather than as a 404, because this is the normal state of a fresh clone."""
+        """Говорим прямо, а не отвечаем 404: для свежей копии репозитория это обычное состояние."""
 
         return (
             "<!doctype html><meta charset='utf-8'>"

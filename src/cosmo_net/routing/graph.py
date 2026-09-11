@@ -1,13 +1,14 @@
 """
-One step of the run, as a graph a path search can walk.
+Один отсчёт прогона в виде графа, по которому может пройти поиск маршрута.
 
-The shape of this graph is the one place where the case's rules about who may
-relay have to be enforced, and it is easy to get wrong: `snapshot()` in the
-reference module emits a ground edge for every ground site, client sites included,
-so a graph built by dropping its `edges` list into an adjacency map lets traffic
-hop from one northern terminal to another and come out looking far healthier than
-the network is. Here ground sites are only ever an endpoint: the client is where a
-path starts, a gateway is where it ends, and everything in between is a satellite.
+Именно здесь приходится соблюдать правило кейса о том, кто имеет право
+ретранслировать, и ошибиться тут легко. Функция `snapshot()` эталонного модуля
+выдаёт наземное ребро для каждого наземного пункта, включая клиентские. Граф,
+собранный простым переносом её списка `edges` в таблицу смежности, разрешит
+трафику перепрыгнуть с одного северного терминала на другой, и сеть будет
+выглядеть здоровее, чем она есть. Здесь наземный пункт — всегда только конец
+пути: клиент там, где маршрут начинается, шлюз — где заканчивается, а между ними
+только аппараты.
 """
 
 from __future__ import annotations
@@ -21,34 +22,34 @@ from cosmo_net.geometry.contacts import ContactSeries
 
 @dataclass(frozen=True)
 class SliceGraph:
-    """The usable links at one step, indexed for search."""
+    """Работающие связи на одном отсчёте, разложенные для поиска."""
 
     step: int
-    """Index into the calculation grid, not a time in seconds."""
+    """Номер отсчёта в сетке расчёта, а не время в секундах."""
 
     satellite_ids: list[str]
 
     neighbours: list[list[int]]
-    """Satellite index → the satellites it can reach directly."""
+    """Индекс аппарата → аппараты, до которых он дотягивается напрямую."""
 
     neighbour_distance_km: list[list[float]]
-    """Parallel to `neighbours`."""
+    """Параллельно `neighbours`."""
 
     neighbour_margin_km: list[list[float]]
-    """How much range is left over on each link. Zero means it is about to break."""
+    """Сколько дальности осталось в запасе на каждой связи. Ноль — связь вот-вот оборвётся."""
 
     uplink: dict[str, list[int]]
-    """Ground site id → the satellites it can exchange traffic with."""
+    """Идентификатор наземного пункта → аппараты, с которыми он может обмениваться трафиком."""
 
     uplink_distance_km: dict[str, list[float]]
 
     uplink_margin_deg: dict[str, list[float]]
-    """Elevation above the threshold, in degrees. The ground-link counterpart of range margin."""
+    """Превышение угла места над порогом, градусы. Наземный аналог запаса по дальности."""
 
 
 def build_slice(contacts: ContactSeries, step: int, isl_range_km: float,
                 min_elevation_deg: float) -> SliceGraph:
-    """Assemble the graph for one step of an already-computed contact series."""
+    """Собрать граф для одного отсчёта из уже посчитанного состава связей."""
 
     n_sat = len(contacts.satellite_ids)
     neighbours: list[list[int]] = [[] for _ in range(n_sat)]

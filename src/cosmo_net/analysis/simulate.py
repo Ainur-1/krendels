@@ -1,13 +1,12 @@
 """
-One run: a scenario over its whole horizon, step by step, with a route for every client.
+Один прогон: сценарий на всём горизонте, отсчёт за отсчётом, с маршрутом для каждого клиента.
 
-This is the function everything else calls. The interface calls it when the user
-presses the button, the comparison calls it twice, the criticality study calls it
-49 times and the configuration sweep calls it once per candidate — so what it
-returns is deliberately small. Positions and link sets are not kept: they are
-reproducible from the scenario in under a tenth of a second, and holding 26 MB of
-arrays per saved variant would cost more than recomputing a snapshot when one is
-actually asked for.
+Это функция, которую вызывает всё остальное. Интерфейс — когда пользователь нажимает
+кнопку, сравнение — дважды, анализ критичности — 49 раз, подбор конфигурации — по
+разу на каждого кандидата. Поэтому возвращает она намеренно немного. Положения и
+состав связей не сохраняются: они восстанавливаются из сценария меньше чем за
+десятую долю секунды, а держать по 26 МБ массивов на каждый сохранённый вариант
+дороже, чем пересчитать состояние сети, когда его действительно попросят.
 """
 
 from __future__ import annotations
@@ -27,7 +26,7 @@ from cosmo_net.scenario.schema import Scenario
 
 @dataclass
 class RunResult:
-    """What a completed run says about a design."""
+    """Что законченный прогон говорит о проекте."""
 
     scenario: Scenario
     strategy: Strategy
@@ -40,11 +39,12 @@ class RunResult:
     @property
     def worst_availability(self) -> float:
         """
-        The lowest availability across clients.
+        Наименьшая доступность среди клиентов.
 
-        The target is stated per terminal, so a design is only as good as the
-        terminal it serves worst; averaging across three sites hides the one that
-        fails and is the easiest way to talk yourself into a bad configuration.
+        Целевой ориентир задан на каждый терминал, поэтому проект хорош ровно
+        настолько, насколько хорош его худший пункт. Среднее по трём пунктам прячет
+        тот, который не справляется, и это самый простой способ уговорить себя на
+        плохую конфигурацию.
         """
 
         return min((m.availability_share for m in self.metrics.values()), default=0.0)
@@ -75,7 +75,7 @@ class RunResult:
 
 @dataclass(frozen=True)
 class NetworkSnapshot:
-    """The state of the network at one moment, for drawing rather than for measuring."""
+    """Состояние сети в один момент — чтобы нарисовать, а не чтобы померить."""
 
     t_s: float
     satellites: list[dict[str, object]]
@@ -85,7 +85,7 @@ class NetworkSnapshot:
 
 
 def simulate(scenario: Scenario, strategy: Strategy = Strategy.MIN_HOPS) -> RunResult:
-    """Run `scenario` over its full grid and measure every client on it."""
+    """Прогнать `scenario` по всей его сетке и измерить на ней каждого клиента."""
 
     times = scenario.times
     trajectory = compute_trajectory(scenario)
@@ -144,11 +144,11 @@ def simulate(scenario: Scenario, strategy: Strategy = Strategy.MIN_HOPS) -> RunR
 
 def snapshot_at(scenario: Scenario, t_s: float) -> NetworkSnapshot:
     """
-    The network at one moment, recomputed rather than stored.
+    Состояние сети в один момент, пересчитанное, а не сохранённое.
 
-    Building the single-step trajectory costs about a millisecond, which is cheaper
-    than keeping every run's arrays alive for a time slider that only ever looks at
-    one step.
+    Построить траекторию на один отсчёт стоит около миллисекунды — дешевле, чем
+    держать живыми массивы каждого прогона ради ползунка времени, который всё равно
+    смотрит только на один отсчёт.
     """
 
     times = np.array([float(t_s)])
@@ -209,7 +209,7 @@ def snapshot_at(scenario: Scenario, t_s: float) -> NetworkSnapshot:
 
 
 def slice_graph_at(contacts: ContactSeries, step: int, scenario: Scenario) -> SliceGraph:
-    """Convenience for callers that already hold a contact series."""
+    """Удобная обёртка для тех, у кого состав связей уже посчитан."""
 
     env = scenario.environment
     return build_slice(contacts, step, env.isl_range_km, env.min_elevation_deg)

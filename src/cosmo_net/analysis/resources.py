@@ -1,16 +1,16 @@
 """
-How much of this machine the process may actually use.
+Сколько от этой машины процессу на самом деле позволено занять.
 
-`os.cpu_count()` is the wrong question inside a container: it reports the cores of
-the host, not the quota of the cgroup the process is confined to. Asking it on a
-512 MB instance produced eight worker processes, each loading its own NumPy and its
-own copy of the run, and the kernel killed the service — the configuration sweep
-took the whole thing down and every cached run with it.
+Внутри контейнера `os.cpu_count()` отвечает не на тот вопрос: он показывает ядра
+хоста, а не квоту cgroup, в которую процесс заключён. На инстансе с 512 МБ памяти
+это привело к восьми рабочим процессам, каждый со своим numpy и своей копией
+прогона, и ядро убило сервис — подбор конфигурации утащил за собой всё, включая
+кеш посчитанных прогонов.
 
-So the limits are read from the cgroup where there is one, and memory is the binding
-constraint rather than cores: a worker is cheap in CPU and expensive in resident
-pages, and overcommitting cores merely makes things slow while overcommitting memory
-makes them stop.
+Поэтому ограничения читаются из cgroup, если она есть, и связывающим ограничением
+оказывается память, а не ядра: процесс дёшев по процессору и дорог по занятым
+страницам. Переоценить число ядер — значит получить медленно, переоценить память —
+значит не получить ничего.
 """
 
 from __future__ import annotations
@@ -18,20 +18,20 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-# Resident set of one worker: the interpreter, NumPy, and one run's arrays. The run
-# arrays are the (T, P) inter-satellite tables, about 26 MB for a default scenario;
-# the rest is import overhead. Rounded up, because being wrong upwards costs a
-# worker and being wrong downwards costs the service.
+# Память одного рабочего процесса: интерпретатор, numpy и массивы одного прогона.
+# Массивы — это таблицы межспутниковых связей размера (T, P), около 26 МБ на
+# базовом сценарии; остальное приходится на импорт. Округлено вверх намеренно:
+# ошибка в большую сторону стоит одного процесса, в меньшую — всего сервиса.
 WORKER_MEMORY_MB = 220
 
-# Left for the parent process, the HTTP server and the page cache.
+# Оставлено родительскому процессу, HTTP-серверу и файловому кешу.
 RESERVED_MEMORY_MB = 180
 
 CGROUP_V2 = Path("/sys/fs/cgroup")
 
 
 def available_cpus() -> int:
-    """Cores this process may schedule on, honouring cgroup quota where one is set."""
+    """Ядра, на которых процессу разрешено выполняться, с учётом квоты cgroup, если она задана."""
 
     try:
         cpus = len(os.sched_getaffinity(0))  # type: ignore[attr-defined]
@@ -45,7 +45,7 @@ def available_cpus() -> int:
 
 
 def available_memory_mb() -> int | None:
-    """The cgroup memory ceiling in MB, or None when the process is not limited."""
+    """Потолок памяти из cgroup в мегабайтах либо None, если процесс не ограничен."""
 
     for name in ("memory.max", "memory/memory.limit_in_bytes"):
         text = _read(CGROUP_V2 / name)
@@ -55,8 +55,8 @@ def available_memory_mb() -> int | None:
             value = int(text)
         except ValueError:
             continue
-        # An unlimited cgroup reports a number close to 2^63; anything above a
-        # terabyte is that sentinel rather than a real limit.
+        # Неограниченная cgroup сообщает число порядка 2^63; всё, что больше
+        # терабайта, — это такая заглушка, а не настоящее ограничение.
         if 0 < value < 1 << 40:
             return value // (1024 * 1024)
     return None
@@ -64,11 +64,11 @@ def available_memory_mb() -> int | None:
 
 def usable_workers(requested: int | None = None) -> int:
     """
-    How many processes to run in parallel, capped by what the container can hold.
+    Сколько процессов запускать параллельно, с ограничением по тому, что вмещает контейнер.
 
-    An explicit `requested` is still capped: a caller asking for eight on a 512 MB
-    instance is asking for the service to be killed, and honouring that is not
-    respectful of their intent.
+    Явно запрошенное значение `requested` тоже ограничивается: тот, кто просит восемь
+    процессов на инстансе с 512 МБ, просит убить сервис, и выполнить такую просьбу
+    буквально — не значит уважить его намерение.
     """
 
     limit = available_cpus()
@@ -84,7 +84,7 @@ def usable_workers(requested: int | None = None) -> int:
 
 
 def _cpu_quota() -> int | None:
-    """Whole cores allowed by the cgroup, rounded up so a 0.5 CPU share still gets one."""
+    """Разрешённое cgroup число целых ядер, округлённое вверх: 0.5 ядра всё равно даёт одно."""
 
     text = _read(CGROUP_V2 / "cpu.max")
     if text:

@@ -1,12 +1,12 @@
 """
-Why a client has no route at this step.
+Почему у клиента нет маршрута на этом отсчёте.
 
-The case names four reasons and asks the service to show which one applies: no
-satellite visible, the inter-satellite network split, no contact with a gateway, or
-the gateway itself unavailable. Separating them is what turns a flat availability
-figure into something an engineer can act on — the same 80 % means "add satellites"
-in one scenario and "add a ground station" in another, and on the supplied data it
-means both, in different scenarios.
+Кейс называет четыре причины и требует показывать, какая из них сработала: не виден
+ни один аппарат, разорвана межспутниковая сеть, нет контакта со шлюзом или сам шлюз
+недоступен. Разделение причин превращает голую цифру доступности в то, с чем инженер
+может что-то сделать: одни и те же 80 % в одном сценарии означают «добавьте
+аппараты», а в другом — «добавьте наземную станцию». На выданных данных встречается
+и то, и другое, в разных сценариях.
 """
 
 from __future__ import annotations
@@ -18,21 +18,21 @@ from cosmo_net.routing.graph import SliceGraph
 
 
 class Outage(StrEnum):
-    """What stops traffic at one step. `NONE` means a route exists."""
+    """Что мешает трафику на одном отсчёте. `NONE` означает, что маршрут есть."""
 
     NONE = "none"
 
     NO_CLIENT_CONTACT = "no_client_contact"
-    """Nothing in service is above the terminal's horizon."""
+    """Над горизонтом терминала нет ни одного работающего аппарата."""
 
     GATEWAY_OFFLINE = "gateway_offline"
-    """Every gateway is inside a declared outage, so there is nowhere to deliver to."""
+    """Все шлюзы находятся в объявленном отказе, доставлять некуда."""
 
     NO_GATEWAY_CONTACT = "no_gateway_contact"
-    """The gateways are up, but nothing in service is above any of them."""
+    """Шлюзы работают, но ни над одним из них нет работающего аппарата."""
 
     NETWORK_SPLIT = "network_split"
-    """Both ends have a satellite overhead and no chain of links joins them."""
+    """Над обоими концами есть аппараты, но цепочки связей между ними не существует."""
 
 
 def diagnose(
@@ -42,11 +42,11 @@ def diagnose(
     offline_gateway_ids: set[str],
 ) -> Outage:
     """
-    Classify one step for one client.
+    Определить причину для одного клиента на одном отсчёте.
 
-    The order is the order in which the problems have to be ruled out: a split
-    network cannot be observed until both ends are known to have a satellite, so
-    reporting the split first would blame the constellation for a ground problem.
+    Порядок проверок — это порядок, в котором причины приходится исключать: разрыв
+    сети нельзя увидеть, пока не известно, что аппараты есть над обоими концами.
+    Назвать разрыв первым значило бы обвинить группировку в наземной проблеме.
     """
 
     if not graph.uplink.get(client_id):

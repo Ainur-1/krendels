@@ -1,3 +1,3 @@
-"""Path search across one time slice of the network, and why a path is missing."""
+"""Поиск маршрута на одном срезе времени и причина, по которой маршрута нет."""
 
 from __future__ import annotations

@@ -1,11 +1,12 @@
 """
-Turning a per-step record of "was there a route" into the figures a design decision rests on.
+Как из записи «был ли маршрут» получаются числа, на которых стоит проектное решение.
 
-Every share is a count of steps divided by the number of steps, and every duration
-is a count of steps multiplied by the step length, exactly as the case defines
-them. The one judgement call is about gaps that touch the ends of the horizon: the
-case asks for those to be reported separately, because a run that starts mid-outage
-tells you where the grid was cut, not how long the network was down.
+Каждая доля — это число отсчётов, делённое на общее число отсчётов, а каждая
+длительность — число отсчётов, умноженное на длину шага, ровно так, как определяет
+кейс. Единственное место, где приходится решать самим, — перерывы, упирающиеся в
+края горизонта. Кейс просит показывать их отдельно, и не зря: расчёт, начавшийся
+посреди перерыва, говорит о том, где обрезали сетку, а не о том, сколько сеть была
+без связи.
 """
 
 from __future__ import annotations
@@ -18,7 +19,7 @@ from cosmo_net.routing.diagnose import Outage
 
 @dataclass(frozen=True)
 class Gap:
-    """A stretch of consecutive steps with no route, over `[start_s, end_s)`."""
+    """Непрерывная череда отсчётов без маршрута на промежутке `[start_s, end_s)`."""
 
     start_s: int
     end_s: int
@@ -26,18 +27,18 @@ class Gap:
     steps: int
 
     cause: Outage
-    """The reason that held for most of the gap. A gap can change cause part way through."""
+    """Причина, продержавшаяся большую часть перерыва. По ходу перерыва причина может смениться."""
 
     causes: dict[str, int]
-    """Step counts per reason, so a mixed gap can be shown as mixed."""
+    """Сколько отсчётов пришлось на каждую причину, чтобы смешанный перерыв так и показать."""
 
     at_horizon_edge: bool
-    """Touches the first or the last step, so its true length is unknown."""
+    """Упирается в первый или последний отсчёт, поэтому настоящая длительность неизвестна."""
 
 
 @dataclass
 class ClientMetrics:
-    """Everything the case asks to be reported per ground terminal."""
+    """Всё, что кейс просит показывать по каждому наземному терминалу."""
 
     client_id: str
 
@@ -53,13 +54,14 @@ class ClientMetrics:
 
     @property
     def visibility_share(self) -> float:
-        """Steps with at least one satellite in service overhead. Not the same as reachability."""
+        """Отсчёты, на которых над пунктом есть хотя бы один работающий аппарат.
+        Это не то же самое, что достижимость."""
 
         return self.visible_steps / self.steps if self.steps else 0.0
 
     @property
     def availability_share(self) -> float:
-        """Steps with an end-to-end path to a gateway. This is the headline figure."""
+        """Отсчёты, на которых есть сквозной путь до шлюза. Это главный показатель."""
 
         return self.routed_steps / self.steps if self.steps else 0.0
 
@@ -69,7 +71,7 @@ class ClientMetrics:
 
     @property
     def max_interior_gap_s(self) -> int:
-        """The longest gap that is wholly inside the horizon, so its length is real."""
+        """Самый долгий перерыв, целиком лежащий внутри горизонта, — его длительность настоящая."""
 
         return max((g.duration_s for g in self.gaps if not g.at_horizon_edge), default=0)
 
@@ -95,7 +97,7 @@ class ClientMetrics:
         return self.availability_share >= target_availability
 
     def summary(self, target_availability: float) -> dict[str, object]:
-        """The flat form the API and the reports use."""
+        """Плоское представление, которым пользуются API и отчёты."""
 
         return {
             "client_id": self.client_id,
@@ -115,11 +117,11 @@ class ClientMetrics:
 
 def collect_gaps(causes: list[Outage], times_s: list[int], step_s: int) -> list[Gap]:
     """
-    Group consecutive routeless steps into gaps.
+    Собрать идущие подряд отсчёты без маршрута в перерывы.
 
-    `causes` is one entry per step, `Outage.NONE` where a route existed. A gap ends
-    at the start of the next step rather than at the last routeless one, so a single
-    missed step is `step_s` long and not zero.
+    В `causes` по одной записи на отсчёт, `Outage.NONE` там, где маршрут был.
+    Перерыв заканчивается началом следующего отсчёта, а не последним отсчётом без
+    маршрута, поэтому один пропущенный отсчёт длится `step_s`, а не ноль.
     """
 
     gaps: list[Gap] = []

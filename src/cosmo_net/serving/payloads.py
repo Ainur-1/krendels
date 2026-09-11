@@ -1,11 +1,11 @@
 """
-Shaping a run for the wire: what the interface gets, and what the case says an export must be.
+Что уходит в сеть: как выглядит прогон для интерфейса и каким кейс требует видеть экспорт.
 
-One decision worth stating. A run is returned whole — every step's route, cause and
-hop count in one response — rather than one step at a time. For a default run that
-is about 200 kB before compression, and it means the time slider redraws from
-memory instead of asking the server 720 times. The alternative was tried first and
-felt exactly as slow as it sounds.
+Одно решение стоит проговорить. Прогон возвращается целиком — маршрут, причина и
+число переходов на каждом отсчёте в одном ответе, — а не по отсчёту за раз. Для
+базового прогона это около 200 КБ до сжатия, и благодаря этому ползунок времени
+перерисовывается из памяти, а не спрашивает сервер 720 раз. Обратный вариант
+пробовали первым, и ощущался он ровно так медленно, как звучит.
 """
 
 from __future__ import annotations
@@ -24,7 +24,7 @@ from cosmo_net.scenario.schema import Scenario, ScenarioError
 
 
 def run_payload(run_id: str, result: RunResult) -> dict[str, Any]:
-    """Everything the interface needs to draw a run without asking again."""
+    """Всё, что нужно интерфейсу, чтобы нарисовать прогон, ни о чём не переспрашивая."""
 
     target = result.scenario.environment.target_availability
     clients: dict[str, Any] = {}
@@ -66,22 +66,20 @@ def run_payload(run_id: str, result: RunResult) -> dict[str, Any]:
 
 def trajectory_payload(result: RunResult) -> dict[str, Any]:
     """
-    Every position and every link, for every step, in one response.
+    Все положения и все связи на всех отсчётах — одним ответом.
 
-    This exists because the map was being fed one step at a time over the network
-    while the route for the same step came out of memory. During playback the
-    fetches could not keep up and cancelled one another, so the satellites stood
-    still on a stale frame while the route line had already moved — the picture
-    disagreed with itself.
+    Появилось потому, что карта получала по одному отсчёту за раз по сети, тогда как
+    маршрут на тот же отсчёт брался из памяти. При проигрывании запросы не успевали и
+    отменяли друг друга: аппараты стояли на устаревшем кадре, а линия маршрута уже
+    уехала вперёд — картинка противоречила сама себе.
 
-    Measured on the default scenario: 240 kB gzipped for the whole run, against
-    roughly 20 kB per step and 720 round trips to play the same day through. The
-    one-off payload is both smaller in total and the only version that can be drawn
-    without waiting for anything.
+    Измерено на базовом сценарии: 240 КБ в gzip на весь прогон против примерно 20 КБ
+    на отсчёт и 720 обращений, чтобы проиграть те же сутки. Разовый ответ и меньше по
+    сумме, и единственный, который можно рисовать, ничего не дожидаясь.
 
-    Positions are Earth-fixed and rounded to the kilometre. On a world map that is
-    well under a pixel, and keeping them Cartesian is what lets the client
-    interpolate between steps without special cases at the date line or the poles.
+    Координаты гринвичские и округлены до километра: на карте мира это заметно меньше
+    пикселя. А то, что они декартовы, позволяет клиенту интерполировать между
+    отсчётами без особых случаев на 180-м меридиане и у полюсов.
     """
 
     scenario = result.scenario
@@ -94,9 +92,9 @@ def trajectory_payload(result: RunResult) -> dict[str, Any]:
         links.append([[int(contacts.pair_index[p, 0]), int(contacts.pair_index[p, 1])]
                       for p in open_pairs])
 
-    # Which satellites each ground site can use, by index into `satellite_ids`. The
-    # map draws these for the selected terminal only, but which one is selected
-    # changes without the run changing, so all of them are sent.
+    # Какие аппараты доступны каждому наземному пункту, индексами в `satellite_ids`.
+    # Карта рисует их только для выбранного терминала, но выбор меняется без
+    # пересчёта прогона, поэтому отправляются все.
     ground_visible: dict[str, list[list[int]]] = {}
     for g, site_id in enumerate(contacts.ground_ids):
         ground_visible[site_id] = [
@@ -118,7 +116,7 @@ def trajectory_payload(result: RunResult) -> dict[str, Any]:
 
 
 def snapshot_payload(snapshot: NetworkSnapshot, scenario: Scenario) -> dict[str, Any]:
-    """The network at one moment, with the ground sites it is drawn against."""
+    """Состояние сети в один момент вместе с наземными пунктами, на фоне которых оно рисуется."""
 
     return {
         "t_s": snapshot.t_s,
@@ -132,13 +130,13 @@ def snapshot_payload(snapshot: NetworkSnapshot, scenario: Scenario) -> dict[str,
 
 def export_payload(result: RunResult) -> dict[str, Any]:
     """
-    The result in the format the case specifies: `cosmo-A-result-1.0`.
+    Результат в формате, который задаёт кейс: `cosmo-A-result-1.0`.
 
-    One record per (step, client) pair — 2160 for a default run — and an empty path
-    where no route existed rather than a missing record, so a reader can count
-    availability straight out of the file. `effective_scenario` is the scenario as
-    it was actually computed, edits included, which is what makes the export
-    reloadable and the run reproducible.
+    По одной записи на пару «отсчёт — клиент», для базового прогона это 2160 записей,
+    и там, где маршрута не было, лежит пустой путь, а не отсутствующая запись: так
+    доступность можно посчитать прямо из файла. В `effective_scenario` лежит сценарий
+    в том виде, в котором его действительно считали, вместе с правками, — благодаря
+    этому выгрузка загружается обратно, а прогон воспроизводится.
     """
 
     routes = []
@@ -162,10 +160,11 @@ def export_payload(result: RunResult) -> dict[str, Any]:
 
 def error_payload(errors: list[ScenarioError]) -> dict[str, Any]:
     """
-    Validation failures, addressed by field so the interface can point at one.
+    Ошибки проверки, адресованные полем, чтобы интерфейс мог на него показать.
 
-    `code` is stable and is what the Russian interface translates; `message` is the
-    English fallback for anything the interface has no wording for yet.
+    `code` стабилен, и именно его интерфейс превращает в текст. `message` — запасной
+    вариант на случай кода, для которого формулировки ещё нет; собственные сообщения
+    сервиса русские, сообщения самого pydantic остаются английскими.
     """
 
     return {
@@ -178,7 +177,7 @@ def error_payload(errors: list[ScenarioError]) -> dict[str, Any]:
 
 
 def scenario_summary(scenario: Scenario, source: str = "") -> dict[str, Any]:
-    """The short description shown in a picker, without sending the whole file."""
+    """Короткое описание для списка выбора, без отправки всего файла."""
 
     return {
         "source": source,

@@ -1,15 +1,15 @@
 """
-Searching the configuration space the interface exposes: plane orientation and phasing.
+Поиск по пространству конфигураций, которое отдаёт интерфейс: ориентация плоскостей и фазирование.
 
-Two searches, because they answer different questions. The spacing sweep walks the
-family of evenly spread designs — every plane offset from the last by the same
-angle — which is how a constellation is normally specified and which makes the
-result something an engineer can read off as a rule. The coordinate refinement then
-lets individual planes move, which finds designs the even family cannot express but
-which are harder to justify.
+Поиска два, потому что они отвечают на разные вопросы. Перебор разноса проходит по
+семейству равномерно разнесённых проектов, где каждая плоскость смещена от
+предыдущей на один и тот же угол. Так группировку обычно и задают, и результат
+получается таким, который инженер может прочитать как правило. Уточнение по
+координатам затем позволяет плоскостям двигаться поодиночке — оно находит проекты,
+которых равномерное семейство выразить не может, но обосновать их труднее.
 
-Both are cheap enough to sit behind a button: an evaluation is 68 ms, so a 100-point
-sweep is seven seconds on one core and about one across eight.
+Оба достаточно дёшевы, чтобы жить за кнопкой: одна оценка занимает 68 мс, поэтому
+перебор из сотни точек — это семь секунд на одном ядре и около секунды на восьми.
 """
 
 from __future__ import annotations
@@ -24,20 +24,21 @@ from cosmo_net.analysis.reachability import availability_series, longest_gap_ste
 from cosmo_net.analysis.resources import usable_workers
 from cosmo_net.scenario.schema import Scenario
 
-# Stage one samples the horizon down to about this many steps. Ranking a hundred
-# candidates against each other does not need every step; deciding what to print
-# does, which is what stage two is for.
+# Первая стадия прореживает горизонт примерно до такого числа отсчётов. Чтобы
+# сравнить сотню кандидатов между собой, каждый отсчёт не нужен; чтобы решить, что
+# выводить на экран, — нужен, и ровно для этого есть вторая стадия.
 COARSE_STEPS = 180
 
-# How many of the ranked candidates are re-measured exactly. Wide enough that the
-# true winner is very unlikely to sit outside it, narrow enough to stay quick: on
-# the deployed instance an exact evaluation is 1.2 s against 0.3 s for a coarse one.
+# Сколько отранжированных кандидатов перемеряется точно. Достаточно широко, чтобы
+# настоящий победитель почти наверняка попал в список, и достаточно узко, чтобы это
+# оставалось быстрым: на развёрнутом сервере точная оценка занимает 1.2 с против
+# 0.3 с у грубой.
 SHORTLIST = 12
 
 
 @dataclass(frozen=True)
 class Candidate:
-    """One configuration and what it scores."""
+    """Одна конфигурация и то, что она набрала."""
 
     raan_deg: list[float]
     phase_deg: list[float]
@@ -48,7 +49,7 @@ class Candidate:
     availability: dict[str, float]
 
     approximate: bool = False
-    """Scored on a sampled grid to rank it, not measured. Never report these as figures."""
+    """Оценено на прореженной сетке для ранжирования, а не измерено. Показывать как число нельзя."""
 
     def to_dict(self) -> dict[str, object]:
         return {
@@ -64,20 +65,20 @@ class Candidate:
 
 @dataclass
 class SweepReport:
-    """Everything a search tried, plus the shortlist worth looking at."""
+    """Всё, что перебрал поиск, плюс короткий список, на который стоит смотреть."""
 
     baseline: Candidate
     candidates: list[Candidate] = field(default_factory=list)
 
     @property
     def measured(self) -> list[Candidate]:
-        """The candidates whose numbers came from the full grid rather than a sample."""
+        """Кандидаты, числа которых получены на полной сетке, а не на выборке."""
 
         return [c for c in self.candidates if not c.approximate]
 
     @property
     def best(self) -> Candidate:
-        """Highest availability for the worst-served client; the shortest worst gap breaks ties."""
+        """Наибольшая доступность худшего пункта; при равенстве решает более короткий перерыв."""
 
         pool = self.measured or self.candidates or [self.baseline]
         return max(pool, key=lambda c: (c.worst_availability, -c.worst_max_gap_s))
@@ -85,15 +86,14 @@ class SweepReport:
     @property
     def frontier(self) -> list[Candidate]:
         """
-        The designs not beaten on both counts at once.
+        Проекты, которые не проигрывают сразу по обоим показателям.
 
-        Availability and the longest single interruption are not the same goal, and
-        scenario 04 is where they come apart: the sweep's front there runs 73.1 % at
-        a 12 720 s worst gap, 68.2 % at 5 880 s, 67.9 % at 3 360 s, 63.9 % at 2 760 s.
-        Five points of availability against four hours of continuous silence is a
-        choice about what the service is for, not something one number can settle.
-        On scenario 01 the front collapses to a single design, because there one
-        configuration is better on both counts at once.
+        Доступность и самый долгий непрерывный перерыв — это разные цели, и на
+        сценарии 04 они расходятся: фронт перебора идёт 73.1 % при перерыве 12 720 с,
+        68.2 % при 5 880 с, 67.9 % при 3 360 с, 63.9 % при 2 760 с. Пять пунктов
+        доступности против четырёх часов непрерывной тишины — это выбор, чем сервис
+        должен быть, и одним числом он не решается. На сценарии 01 фронт схлопывается
+        в одну точку: там одна конфигурация лучше сразу по обоим показателям.
         """
 
         ordered = sorted(
@@ -117,7 +117,7 @@ class SweepReport:
 
 
 def evaluate(scenario: Scenario, stride: int = 1) -> Candidate:
-    """Score one configuration. The unit of work every search here is built from."""
+    """Оценить одну конфигурацию. Единица работы, из которой собран любой поиск здесь."""
 
     series = availability_series(scenario, stride=stride)
     step_s = scenario.environment.step_s * stride
@@ -139,7 +139,8 @@ def variant(
     phase_deg: list[float] | None = None,
     launch_stage: int | None = None,
 ) -> Scenario:
-    """A copy of `scenario` with the plane angles and stage replaced. Angles wrap into [0, 360)."""
+    """Копия `scenario` с заменёнными углами плоскостей и очередью. Углы сворачиваются
+    в [0, 360)."""
 
     changed = scenario.model_copy(deep=True)
     for index, plane in enumerate(changed.design.planes):
@@ -159,12 +160,12 @@ def sweep_spacing(
     workers: int | None = None,
 ) -> SweepReport:
     """
-    Walk the evenly spread family: plane k sits at `k × raan_spacing`, phased by the same rule.
+    Пройти по равномерному семейству: плоскость k стоит на `k × raan_spacing`.
 
-    The default RAAN grid stops at 120° because beyond that the family repeats for
-    three planes — 130° spacing places the same three orbits as 110° does, in a
-    different order. The phase grid is a quarter of the in-plane spacing, which for
-    16 satellites per plane is 22.5°/4.
+    Сетка RAAN по умолчанию останавливается на 120°, потому что дальше для трёх
+    плоскостей семейство повторяется: разнос 130° ставит те же три орбиты, что и
+    110°, только в другом порядке. Шаг сетки фаз — четверть расстояния между
+    соседями внутри плоскости, что при 16 аппаратах на плоскость даёт 22.5°/4.
     """
 
     planes = len(scenario.design.planes)
@@ -188,11 +189,11 @@ def sweep_spacing(
         for phase in phase_spacings
     ]
 
-    # Two stages, because a hundred exact evaluations is 120 s on the deployed
-    # instance and the search does not need them. Stage one samples the horizon down
-    # to about COARSE_STEPS and only ranks; stage two re-measures the shortlist on
-    # the full grid, and `best` and `frontier` are drawn from those alone. Nothing
-    # the interface prints as a figure ever comes from the sampled pass.
+    # Две стадии, потому что сотня точных оценок на развёрнутом сервере занимает
+    # 120 с, а поиску они не нужны. Первая стадия прореживает горизонт примерно до
+    # COARSE_STEPS и только ранжирует; вторая перемеряет короткий список на полной
+    # сетке, и `best` с `frontier` берутся только из него. Ничто из того, что
+    # интерфейс показывает как число, не приходит с прореженного прохода.
     stride = max(1, len(scenario.times) // COARSE_STEPS)
     ranked = sorted(
         _score_all(designs, workers, stride),
@@ -204,10 +205,10 @@ def sweep_spacing(
         for c in ranked[:SHORTLIST]
     ]
 
-    # The scenario as it stands is always measured, whether or not the grid happens
-    # to land on it - the supplied design phases its planes by 7.5 deg and the
-    # default grid steps in quarters of 22.5 deg, which misses it. Without this,
-    # "best" could be worse than changing nothing.
+    # Сценарий в его текущем виде измеряется всегда, попадает на него сетка или нет:
+    # выданный проект фазирует плоскости на 7.5°, а сетка по умолчанию шагает
+    # четвертями от 22.5° и мимо него проходит. Без этого «лучший» мог бы оказаться
+    # хуже, чем не менять ничего.
     baseline = evaluate(scenario)
     measured = [baseline] + _score_all(shortlist, workers, 1)
 
@@ -221,13 +222,14 @@ def refine(
     workers: int | None = None,
 ) -> SweepReport:
     """
-    Coordinate refinement: move one plane at a time, keep a move only if it helps.
+    Уточнение по координатам: двигаем плоскости по одной и оставляем движение, только
+    если оно помогло.
 
-    Started from whatever the scenario already is, so it improves a design the user
-    arrived at rather than replacing it. Planes are visited in order and the first
-    one is held still — rotating every plane together turns the whole constellation
-    and changes nothing about its internal geometry, only when in the day each
-    ground site passes under it.
+    Начинается с того состояния, в котором сценарий уже находится, поэтому улучшает
+    проект, к которому пользователь пришёл сам, а не подменяет его. Плоскости
+    обходятся по порядку, первая остаётся неподвижной: повернуть все плоскости разом
+    значит повернуть всю группировку, что не меняет её внутреннюю геометрию, а лишь
+    сдвигает момент суток, когда под ней проходит каждый наземный пункт.
     """
 
     baseline = evaluate(scenario)
@@ -259,12 +261,12 @@ def refine(
 
 def _score_all(designs: list[Scenario], workers: int | None, stride: int) -> list[Candidate]:
     """
-    Evaluate a batch, in parallel when the machine can actually hold the processes.
+    Оценить пачку кандидатов, параллельно — если машина действительно вмещает такие процессы.
 
-    The cap is not advisory. Asking `os.cpu_count()` inside a 512 MB container
-    produced eight workers, each with its own NumPy and its own copy of the run, and
-    the kernel killed the service mid-request — the sweep took the whole thing down
-    along with every cached run. `usable_workers` reads the cgroup instead.
+    Ограничение здесь не рекомендательное. Запрос `os.cpu_count()` внутри контейнера
+    на 512 МБ дал восемь процессов, каждый со своим numpy и своей копией прогона, и
+    ядро убило сервис прямо во время запроса: перебор утащил за собой всё, включая
+    кеш посчитанных прогонов. `usable_workers` вместо этого читает cgroup.
     """
 
     parallel = usable_workers(workers)
@@ -276,10 +278,10 @@ def _score_all(designs: list[Scenario], workers: int | None, stride: int) -> lis
 
 def _in_plane_spacing(scenario: Scenario) -> float:
     """
-    The angle between neighbouring satellites in the busiest plane.
+    Угол между соседними аппаратами в самой населённой плоскости.
 
-    Read from the design rather than assumed, so a judge's scenario with a different
-    number of craft per plane gets a phase grid that means something for it.
+    Читается из проекта, а не предполагается, поэтому сценарий жюри с другим числом
+    аппаратов на плоскость получит сетку фаз, осмысленную именно для него.
     """
 
     counts: dict[str, int] = {}

@@ -1,4 +1,4 @@
-"""Constellation design and end-to-end reachability analysis for a LEO relay network."""
+"""Проектирование группировки и анализ сквозной достижимости в низкоорбитальной сети."""
 
 from __future__ import annotations
 
