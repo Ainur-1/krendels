@@ -54,6 +54,20 @@ class RunResult:
         return max((m.max_gap_s for m in self.metrics.values()), default=0)
 
     @property
+    def mean_rtt_ms(self) -> float | None:
+        """Средняя задержка распространения по пунктам, миллисекунды."""
+
+        values = [m.mean_rtt_ms for m in self.metrics.values() if m.mean_rtt_ms is not None]
+        return sum(values) / len(values) if values else None
+
+    @property
+    def max_rtt_ms(self) -> float | None:
+        """Наибольшая задержка за горизонт среди всех пунктов."""
+
+        values = [m.max_rtt_ms for m in self.metrics.values() if m.max_rtt_ms is not None]
+        return max(values) if values else None
+
+    @property
     def meets_target(self) -> bool:
         return self.worst_availability >= self.scenario.environment.target_availability
 
@@ -69,6 +83,8 @@ class RunResult:
             "worst_availability": self.worst_availability,
             "worst_max_gap_s": self.worst_max_gap_s,
             "meets_target": self.meets_target,
+            "mean_rtt_ms": self.mean_rtt_ms,
+            "max_rtt_ms": self.max_rtt_ms,
             "clients": [m.summary(target) for m in self.metrics.values()],
         }
 

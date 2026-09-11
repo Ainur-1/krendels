@@ -30,6 +30,8 @@
     "worst_availability": 0.12638888888888888,
     "worst_max_gap_s": 47760,
     "meets_target": false,
+    "mean_rtt_ms": 25.81124320345732,
+    "max_rtt_ms": 57.18373142386504,
     "clients": [
       {
         "client_id": "C65",
@@ -43,6 +45,9 @@
         "mean_hops": 2.066326530612245,
         "max_hops": 3,
         "mean_route_length_km": 2584.353682530464,
+        "max_route_length_km": 5718.899940254854,
+        "mean_rtt_ms": 17.240951955705732,
+        "max_rtt_ms": 38.15239368199753,
         "causes": {
           "no_client_contact": 445,
           "no_gateway_contact": 79
@@ -60,6 +65,9 @@
         "mean_hops": 2.1403508771929824,
         "max_hops": 3,
         "mean_route_length_km": 3172.8490646726013,
+        "max_route_length_km": 6008.464114650854,
+        "mean_rtt_ms": 21.16697054915639,
+        "max_rtt_ms": 40.084157918681555,
         "causes": {
           "no_client_contact": 369,
           "no_gateway_contact": 237
@@ -77,6 +85,9 @@
         "mean_hops": 3.120879120879121,
         "max_hops": 4,
         "mean_route_length_km": 5849.821318797329,
+        "max_route_length_km": 8571.62570058617,
+        "mean_rtt_ms": 39.025807105509834,
+        "max_rtt_ms": 57.18373142386504,
         "causes": {
           "no_gateway_contact": 330,
           "no_client_contact": 299
@@ -95,6 +106,8 @@
       "worst_availability": 0.12638888888888888,
       "worst_max_gap_s": 47760,
       "meets_target": false,
+      "mean_rtt_ms": 25.81124320345732,
+      "max_rtt_ms": 57.18373142386504,
       "clients": [
         {
           "client_id": "C65",
@@ -108,6 +121,9 @@
           "mean_hops": 2.066326530612245,
           "max_hops": 3,
           "mean_route_length_km": 2584.353682530464,
+          "max_route_length_km": 5718.899940254854,
+          "mean_rtt_ms": 17.240951955705732,
+          "max_rtt_ms": 38.15239368199753,
           "causes": {
             "no_client_contact": 445,
             "no_gateway_contact": 79
@@ -125,6 +141,9 @@
           "mean_hops": 2.1403508771929824,
           "max_hops": 3,
           "mean_route_length_km": 3172.8490646726013,
+          "max_route_length_km": 6008.464114650854,
+          "mean_rtt_ms": 21.16697054915639,
+          "max_rtt_ms": 40.084157918681555,
           "causes": {
             "no_client_contact": 369,
             "no_gateway_contact": 237
@@ -142,6 +161,9 @@
           "mean_hops": 3.120879120879121,
           "max_hops": 4,
           "mean_route_length_km": 5849.821318797329,
+          "max_route_length_km": 8571.62570058617,
+          "mean_rtt_ms": 39.025807105509834,
+          "max_rtt_ms": 57.18373142386504,
           "causes": {
             "no_gateway_contact": 330,
             "no_client_contact": 299
@@ -159,6 +181,8 @@
       "worst_availability": 0.12638888888888888,
       "worst_max_gap_s": 47760,
       "meets_target": false,
+      "mean_rtt_ms": 25.81124320345732,
+      "max_rtt_ms": 57.18373142386504,
       "clients": [
         {
           "client_id": "C65",
@@ -172,6 +196,9 @@
           "mean_hops": 2.066326530612245,
           "max_hops": 3,
           "mean_route_length_km": 2584.353682530464,
+          "max_route_length_km": 5718.899940254854,
+          "mean_rtt_ms": 17.240951955705732,
+          "max_rtt_ms": 38.15239368199753,
           "causes": {
             "no_client_contact": 445,
             "no_gateway_contact": 79
@@ -189,6 +216,9 @@
           "mean_hops": 2.1403508771929824,
           "max_hops": 3,
           "mean_route_length_km": 3172.8490646726013,
+          "max_route_length_km": 6008.464114650854,
+          "mean_rtt_ms": 21.16697054915639,
+          "max_rtt_ms": 40.084157918681555,
           "causes": {
             "no_client_contact": 369,
             "no_gateway_contact": 237
@@ -206,6 +236,9 @@
           "mean_hops": 3.120879120879121,
           "max_hops": 4,
           "mean_route_length_km": 5849.821318797329,
+          "max_route_length_km": 8571.62570058617,
+          "mean_rtt_ms": 39.025807105509834,
+          "max_rtt_ms": 57.18373142386504,
           "causes": {
             "no_gateway_contact": 330,
             "no_client_contact": 299
@@ -223,6 +256,8 @@
       "worst_availability": 0.12638888888888888,
       "worst_max_gap_s": 47760,
       "meets_target": false,
+      "mean_rtt_ms": 36.49634395576995,
+      "max_rtt_ms": 293.48874458254505,
       "clients": [
         {
           "client_id": "C65",
@@ -236,6 +271,9 @@
           "mean_hops": 2.489795918367347,
           "max_hops": 17,
           "mean_route_length_km": 3719.7892851725996,
+          "max_route_length_km": 43525.063263116295,
+          "mean_rtt_ms": 24.81576294472758,
+          "max_rtt_ms": 290.3679669160743,
           "causes": {
             "no_client_contact": 445,
             "no_gateway_contact": 79
@@ -253,6 +291,9 @@
           "mean_hops": 2.473684210526316,
           "max_hops": 17,
           "mean_route_length_km": 4052.916650123273,
+          "max_route_length_km": 43769.22015105752,
+          "mean_rtt_ms": 27.0381495062379,
+          "max_rtt_ms": 291.9968063443245,
           "causes": {
             "no_client_contact": 369,
             "no_gateway_contact": 237
@@ -270,6 +311,9 @@
           "mean_hops": 4.153846153846154,
           "max_hops": 17,
           "mean_route_length_km": 8639.287058474703,
+          "max_route_length_km": 43992.85606686768,
+          "mean_rtt_ms": 57.63511941634438,
+          "max_rtt_ms": 293.48874458254505,
           "causes": {
             "no_gateway_contact": 330,
             "no_client_contact": 299
@@ -4453,6 +4497,8 @@
       "worst_availability": 0.12638888888888888,
       "worst_max_gap_s": 47760,
       "meets_target": false,
+      "mean_rtt_ms": 25.81124320345732,
+      "max_rtt_ms": 57.18373142386504,
       "clients": [
         {
           "client_id": "C65",
@@ -4466,6 +4512,9 @@
           "mean_hops": 2.066326530612245,
           "max_hops": 3,
           "mean_route_length_km": 2584.353682530464,
+          "max_route_length_km": 5718.899940254854,
+          "mean_rtt_ms": 17.240951955705732,
+          "max_rtt_ms": 38.15239368199753,
           "causes": {
             "no_client_contact": 445,
             "no_gateway_contact": 79
@@ -4483,6 +4532,9 @@
           "mean_hops": 2.1403508771929824,
           "max_hops": 3,
           "mean_route_length_km": 3172.8490646726013,
+          "max_route_length_km": 6008.464114650854,
+          "mean_rtt_ms": 21.16697054915639,
+          "max_rtt_ms": 40.084157918681555,
           "causes": {
             "no_client_contact": 369,
             "no_gateway_contact": 237
@@ -4500,6 +4552,9 @@
           "mean_hops": 3.120879120879121,
           "max_hops": 4,
           "mean_route_length_km": 5849.821318797329,
+          "max_route_length_km": 8571.62570058617,
+          "mean_rtt_ms": 39.025807105509834,
+          "max_rtt_ms": 57.18373142386504,
           "causes": {
             "no_gateway_contact": 330,
             "no_client_contact": 299
@@ -4517,6 +4572,8 @@
       "worst_availability": 0.12638888888888888,
       "worst_max_gap_s": 47760,
       "meets_target": false,
+      "mean_rtt_ms": 25.81124320345732,
+      "max_rtt_ms": 57.18373142386504,
       "clients": [
         {
           "client_id": "C65",
@@ -4530,6 +4587,9 @@
           "mean_hops": 2.066326530612245,
           "max_hops": 3,
           "mean_route_length_km": 2584.353682530464,
+          "max_route_length_km": 5718.899940254854,
+          "mean_rtt_ms": 17.240951955705732,
+          "max_rtt_ms": 38.15239368199753,
           "causes": {
             "no_client_contact": 445,
             "no_gateway_contact": 79
@@ -4547,6 +4607,9 @@
           "mean_hops": 2.1403508771929824,
           "max_hops": 3,
           "mean_route_length_km": 3172.8490646726013,
+          "max_route_length_km": 6008.464114650854,
+          "mean_rtt_ms": 21.16697054915639,
+          "max_rtt_ms": 40.084157918681555,
           "causes": {
             "no_client_contact": 369,
             "no_gateway_contact": 237
@@ -4564,6 +4627,9 @@
           "mean_hops": 3.120879120879121,
           "max_hops": 4,
           "mean_route_length_km": 5849.821318797329,
+          "max_route_length_km": 8571.62570058617,
+          "mean_rtt_ms": 39.025807105509834,
+          "max_rtt_ms": 57.18373142386504,
           "causes": {
             "no_gateway_contact": 330,
             "no_client_contact": 299
@@ -4581,6 +4647,8 @@
       "worst_availability": 0.3819444444444444,
       "worst_max_gap_s": 34440,
       "meets_target": false,
+      "mean_rtt_ms": 18.78720139895033,
+      "max_rtt_ms": 57.18373142386504,
       "clients": [
         {
           "client_id": "C65",
@@ -4594,6 +4662,9 @@
           "mean_hops": 2.0036363636363634,
           "max_hops": 3,
           "mean_route_length_km": 2318.967968627781,
+          "max_route_length_km": 5134.291224929051,
+          "mean_rtt_ms": 15.470489044976448,
+          "max_rtt_ms": 34.25230413854541,
           "causes": {
             "no_client_contact": 445
           }
@@ -4610,6 +4681,9 @@
           "mean_hops": 2.0088757396449703,
           "max_hops": 3,
           "mean_route_length_km": 2547.3395033317256,
+          "max_route_length_km": 5547.361817511697,
+          "mean_rtt_ms": 16.994019931827143,
+          "max_rtt_ms": 37.00801450790131,
           "causes": {
             "no_client_contact": 369,
             "no_gateway_contact": 13
@@ -4627,6 +4701,9 @@
           "mean_hops": 2.372413793103448,
           "max_hops": 4,
           "mean_route_length_km": 3582.0844575390306,
+          "max_route_length_km": 8571.62570058617,
+          "mean_rtt_ms": 23.8970952200474,
+          "max_rtt_ms": 57.18373142386504,
           "causes": {
             "no_gateway_contact": 131,
             "no_client_contact": 299
@@ -4644,6 +4721,8 @@
       "worst_availability": 0.41944444444444445,
       "worst_max_gap_s": 33480,
       "meets_target": false,
+      "mean_rtt_ms": 26.280153566209805,
+      "max_rtt_ms": 64.01567158021079,
       "clients": [
         {
           "client_id": "C65",
@@ -4657,6 +4736,9 @@
           "mean_hops": 2.033112582781457,
           "max_hops": 3,
           "mean_route_length_km": 2991.919751809358,
+          "max_route_length_km": 6957.812271417364,
+          "mean_rtt_ms": 19.959940098355364,
+          "max_rtt_ms": 46.41752709747864,
           "causes": {
             "no_client_contact": 358,
             "no_gateway_contact": 60
@@ -4674,6 +4756,9 @@
           "mean_hops": 2.21875,
           "max_hops": 3,
           "mean_route_length_km": 3855.335473621933,
+          "max_route_length_km": 6917.909657154334,
+          "mean_rtt_ms": 25.720029778880786,
+          "max_rtt_ms": 46.15132550902488,
           "causes": {
             "no_client_contact": 196,
             "no_gateway_contact": 172
@@ -4691,6 +4776,9 @@
           "mean_hops": 2.5748502994011977,
           "max_hops": 4,
           "mean_route_length_km": 4970.632525915963,
+          "max_route_length_km": 9595.707766776068,
+          "mean_rtt_ms": 33.16049082139327,
+          "max_rtt_ms": 64.01567158021079,
           "causes": {
             "no_gateway_contact": 240,
             "no_client_contact": 146
@@ -4708,6 +4796,8 @@
       "worst_availability": 0.5027777777777778,
       "worst_max_gap_s": 24360,
       "meets_target": false,
+      "mean_rtt_ms": 20.963166179630402,
+      "max_rtt_ms": 64.01567158021079,
       "clients": [
         {
           "client_id": "C65",
@@ -4721,6 +4811,9 @@
           "mean_hops": 2.0,
           "max_hops": 2,
           "mean_route_length_km": 2647.0081160864997,
+          "max_route_length_km": 3993.1470737647737,
+          "mean_rtt_ms": 17.658937344491168,
+          "max_rtt_ms": 26.639409813069907,
           "causes": {
             "no_client_contact": 358
           }
@@ -4737,6 +4830,9 @@
           "mean_hops": 2.025145067698259,
           "max_hops": 3,
           "mean_route_length_km": 3050.4012266653003,
+          "max_route_length_km": 6683.750343488295,
+          "mean_rtt_ms": 20.35008650327888,
+          "max_rtt_ms": 44.589182717120224,
           "causes": {
             "no_client_contact": 196,
             "no_gateway_contact": 7
@@ -4754,6 +4850,9 @@
           "mean_hops": 2.256513026052104,
           "max_hops": 4,
           "mean_route_length_km": 3729.4893319290004,
+          "max_route_length_km": 9595.707766776068,
+          "mean_rtt_ms": 24.880474691121155,
+          "max_rtt_ms": 64.01567158021079,
           "causes": {
             "no_client_contact": 146,
             "no_gateway_contact": 75
@@ -4861,5 +4960,5 @@
     ],
     "changes": []
   },
-  "elapsed_s": 7.42
+  "elapsed_s": 7.56
 }

@@ -14,6 +14,7 @@ from __future__ import annotations
 from collections import Counter
 from dataclasses import dataclass, field
 
+from cosmo_net.config import SPEED_OF_LIGHT_KM_S
 from cosmo_net.routing.diagnose import Outage
 
 
@@ -93,6 +94,31 @@ class ClientMetrics:
             return None
         return sum(self.route_lengths_km) / len(self.route_lengths_km)
 
+    @property
+    def max_route_length_km(self) -> float | None:
+        return max(self.route_lengths_km) if self.route_lengths_km else None
+
+    @property
+    def mean_rtt_ms(self) -> float | None:
+        """
+        Средняя задержка распространения туда и обратно, миллисекунды.
+
+        Показатель второй после доступности и нужен, чтобы у трёх стратегий
+        маршрутизации был виден смысл: на доступность они не влияют вовсе, а
+        различаются именно здесь. Измерено на полной группировке у C72: 32.2 мс у
+        кратчайшей трассы, 34.6 мс у минимума переходов и 54.7 мс у максимального
+        запаса, причём у последнего наибольшая задержка за сутки доходит до 315 мс
+        против 51 мс. Запас на линиях покупается задержкой, и цену стоит назвать.
+        """
+
+        return _rtt_ms(self.mean_route_length_km)
+
+    @property
+    def max_rtt_ms(self) -> float | None:
+        """Наибольшая задержка за горизонт: столько ждёт самый неудачный обмен."""
+
+        return _rtt_ms(self.max_route_length_km)
+
     def meets(self, target_availability: float) -> bool:
         return self.availability_share >= target_availability
 
@@ -111,8 +137,19 @@ class ClientMetrics:
             "mean_hops": self.mean_hops,
             "max_hops": self.max_hops,
             "mean_route_length_km": self.mean_route_length_km,
+            "max_route_length_km": self.max_route_length_km,
+            "mean_rtt_ms": self.mean_rtt_ms,
+            "max_rtt_ms": self.max_rtt_ms,
             "causes": self.causes,
         }
+
+
+def _rtt_ms(length_km: float | None) -> float | None:
+    """Длина трассы в задержку туда-обратно. Умножение на два — это и есть «обратно»."""
+
+    if length_km is None:
+        return None
+    return 2 * length_km / SPEED_OF_LIGHT_KM_S * 1000
 
 
 def collect_gaps(causes: list[Outage], times_s: list[int], step_s: int) -> list[Gap]:
