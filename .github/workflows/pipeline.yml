@@ -105,6 +105,13 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      # A Docker reference must be lowercase and this repository is Ainur-1/krendels,
+      # so ${{ github.repository }} cannot be used as a tag directly - buildx rejects
+      # it with "repository name must be lowercase".
+      - name: Lowercase the image name
+        id: image
+        run: echo "name=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
+
       # Tagged with the commit SHA as well as latest, so a deploy names exactly
       # what it is deploying and a rollback has something to point at.
       - uses: docker/build-push-action@v6
@@ -112,7 +119,7 @@ jobs:
           context: .
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}:latest
-            ghcr.io/${{ github.repository }}:${{ github.sha }}
+            ${{ steps.image.outputs.name }}:latest
+            ${{ steps.image.outputs.name }}:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
