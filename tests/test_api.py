@@ -16,7 +16,7 @@ import json
 import pytest
 from fastapi.testclient import TestClient
 
-from cosmo_net.config import RESULT_SCHEMA_VERSION, SCENARIOS_DIR
+from cosmo_net.config import RESULT_SCHEMA_VERSION, SCENARIOS_DIR, STATIC_DIR
 from cosmo_net.serving import api as api_module
 from cosmo_net.serving.store import RunCache, VariantStore
 
@@ -228,9 +228,19 @@ def test_the_sweep_returns_a_frontier(client):
     assert len(body["candidates"]) > 50
 
 
-def test_the_root_page_explains_a_missing_frontend(client):
-    """A fresh clone has no bundle; saying so beats a bare 404."""
+def test_the_root_page_works_in_both_states(client):
+    """
+    The bundle is gitignored, so the root route has two legitimate answers.
+
+    On a machine where `npm run build` has run, `/` is the interface. On a fresh
+    clone and in CI it is a page saying how to build it — which beats a bare 404,
+    because a missing bundle is the normal state of a checkout, not a fault.
+    """
 
     response = client.get("/")
     assert response.status_code == 200
-    assert "npm" in response.text
+
+    if STATIC_DIR.is_dir():
+        assert '<div id="root">' in response.text
+    else:
+        assert "npm" in response.text
