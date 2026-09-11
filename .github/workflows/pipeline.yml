@@ -51,24 +51,14 @@ jobs:
 
       # Отчёты, на которые ссылаются документы, пересчитываются и сравниваются:
       # правка, молча сдвигающая опубликованное число, падает здесь, а не на защите.
+      # Сверяются 276 значений — всё, на что ссылаются README и docs/findings.md.
+      # Процессов два, а не восемь: это заодно проверяет, что число процессов на
+      # результат не влияет.
       - name: Отчёты воспроизводятся
         if: matrix.python-version == '3.12'
         run: |
           uv run python scripts/make_report.py --out /tmp/metrics --workers 2
-          uv run python - <<'PY'
-          import json, pathlib, sys
-          bad = []
-          for fresh in sorted(pathlib.Path("/tmp/metrics").glob("0*.json")):
-              stored = pathlib.Path("reports/metrics") / fresh.name
-              a = json.loads(fresh.read_text(encoding="utf-8"))["baseline"]
-              b = json.loads(stored.read_text(encoding="utf-8"))["baseline"]
-              if abs(a["worst_availability"] - b["worst_availability"]) > 1e-9:
-                  bad.append(f"{fresh.stem}: {b['worst_availability']} -> {a['worst_availability']}")
-          if bad:
-              print("committed reports disagree with a fresh run:", *bad, sep="\n  ")
-              sys.exit(1)
-          print("reports reproduce")
-          PY
+          uv run python scripts/check_report.py /tmp/metrics
 
   frontend:
     runs-on: ubuntu-latest

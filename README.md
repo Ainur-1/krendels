@@ -29,7 +29,13 @@ uv run ruff check src tests scripts
 uv run python scripts/make_report.py
 ```
 
-Последняя команда пересчитывает `reports/metrics/*.json` — источник каждого числа в этом README и в [docs/findings.md](docs/findings.md).
+Последняя команда пересчитывает `reports/metrics/*.json` — источник каждого числа в этом README и в [docs/findings.md](docs/findings.md). Проверить, что опубликованные числа не разошлись со свежим прогоном:
+
+```bash
+uv run python scripts/make_report.py --out /tmp/metrics && uv run python scripts/check_report.py /tmp/metrics
+```
+
+Сверяются 276 значений по четырём сценариям. То же самое делает CI на каждом пуше, поэтому правка, молча сдвигающая опубликованное число, падает там, а не обнаруживается на защите.
 
 ## Что мы нашли в данных
 
@@ -159,7 +165,7 @@ src/cosmo_net/
   analysis/     показатели за горизонт, критичность, перебор, сравнение
   serving/      HTTP-сервис, хранилище вариантов, формат выгрузки
 frontend/       интерфейс на Vite + React, собирается в serving/static
-scripts/        тонкие точки входа: отчёты, генерация проверочного сценария
+scripts/        тонкие точки входа: отчёты, их сверка, графики, проверочный сценарий
 tests/          ядро, API, сверка с эталоном, «чужой» сценарий
 data/scenarios/ выданные сценарии
 reference/      эталонный модуль организаторов, используется в сверочных тестах
