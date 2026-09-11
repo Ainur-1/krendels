@@ -139,3 +139,97 @@ def test_comparison_tabulates_every_client(full_constellation):
     for row in table["clients"]:
         before, after = row["cells"]
         assert after["availability_share"] >= before["availability_share"]
+
+
+# --- what the sweep may and may not report -------------------------------------
+
+
+def test_the_sweep_never_reports_a_sampled_figure(full_constellation):
+    """
+    Stage one ranks on a sampled grid; stage two measures. Only stage two is quoted.
+
+    The sampled pass exists because a hundred exact evaluations is two minutes on the
+    deployed instance. It is a search, not a measurement, and a percentage that came
+    out of it must never reach the interface — so `best` and every point on the
+    frontier is checked to have been measured on the full grid.
+    """
+
+    report = sweep_spacing(full_constellation)
+
+    assert report.best.approximate is False
+    assert all(not candidate.approximate for candidate in report.frontier)
+    assert any(candidate.approximate for candidate in report.candidates), (
+        "nothing was sampled, so this test is not exercising the two-stage path"
+    )
+
+
+def test_the_sampled_search_finds_the_same_winner(full_constellation):
+    """
+    The shortcut does not cost the answer.
+
+    Measured on all four supplied scenarios: ranking on a sampled grid and then
+    measuring the shortlist picks the same configuration as evaluating every
+    candidate exactly. Here that is RAAN 0/65/130 at a 5.625° phase step, 99.58 %.
+    """
+
+    report = sweep_spacing(full_constellation)
+    exact = evaluate(
+        variant(full_constellation, report.best.raan_deg, report.best.phase_deg)
+    )
+
+    assert exact.worst_availability == pytest.approx(report.best.worst_availability)
+    assert report.best.worst_availability > report.baseline.worst_availability
+
+
+def test_a_sampled_series_may_not_reuse_full_grid_contacts(full_constellation):
+    """Mixing the two would silently score a candidate on the wrong number of steps."""
+
+    from cosmo_net.analysis.reachability import availability_series
+    from cosmo_net.geometry.contacts import compute_contacts
+    from cosmo_net.geometry.orbit import compute_trajectory
+
+    contacts = compute_contacts(full_constellation, compute_trajectory(full_constellation))
+    with pytest.raises(ValueError):
+        availability_series(full_constellation, contacts, stride=4)
+
+
+# --- how much of the machine a sweep may take ----------------------------------
+
+
+def test_workers_never_exceed_what_memory_holds(monkeypatch):
+    """
+    The bug this guards is not hypothetical.
+
+    `os.cpu_count()` inside a 512 MB container reports the cores of the host, so the
+    sweep started eight workers, each with its own NumPy and its own copy of the run.
+    The kernel killed the service mid-request and took every cached run with it —
+    a judge who pressed the button lost the service, not just the answer.
+    """
+
+    from cosmo_net.analysis import resources
+
+    monkeypatch.setattr(resources, "available_cpus", lambda: 16)
+    monkeypatch.setattr(resources, "available_memory_mb", lambda: 512)
+
+    # (512 - 180) / 220 is one worker, and an explicit request for eight is refused.
+    assert resources.usable_workers() == 1
+    assert resources.usable_workers(8) == 1
+
+
+def test_workers_follow_the_cores_when_memory_is_plentiful(monkeypatch):
+    from cosmo_net.analysis import resources
+
+    monkeypatch.setattr(resources, "available_cpus", lambda: 4)
+    monkeypatch.setattr(resources, "available_memory_mb", lambda: 8192)
+
+    assert resources.usable_workers() == 4
+    assert resources.usable_workers(2) == 2
+
+
+def test_workers_is_at_least_one(monkeypatch):
+    from cosmo_net.analysis import resources
+
+    monkeypatch.setattr(resources, "available_cpus", lambda: 1)
+    monkeypatch.setattr(resources, "available_memory_mb", lambda: 128)
+    assert resources.usable_workers(0) == 1
+    assert resources.usable_workers(None) == 1

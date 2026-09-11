@@ -16,7 +16,6 @@ explanation.
 
 from __future__ import annotations
 
-import os
 from typing import Any, Literal
 
 from fastapi import FastAPI, HTTPException, Response
@@ -30,6 +29,7 @@ from cosmo_net import __version__
 from cosmo_net.analysis.compare import compare_runs
 from cosmo_net.analysis.criticality import rank_satellites
 from cosmo_net.analysis.optimise import refine, sweep_spacing
+from cosmo_net.analysis.resources import usable_workers
 from cosmo_net.analysis.simulate import simulate, snapshot_at
 from cosmo_net.config import STATIC_DIR
 from cosmo_net.routing.strategies import Strategy
@@ -140,6 +140,7 @@ def health() -> dict[str, Any]:
         "status": "ok",
         "version": __version__,
         "frontend_bundled": STATIC_DIR.is_dir(),
+        "sweep_workers": usable_workers(),
         "bundled_scenarios": [path.stem for path in bundled_scenarios()],
         "cached_runs": len(runs),
     }
@@ -289,7 +290,11 @@ def analyse_sweep(body: SweepRequest) -> dict[str, Any]:
     """
 
     scenario = resolve(body)
-    workers = body.workers if body.workers is not None else min(8, os.cpu_count() or 1)
+
+    # Not os.cpu_count(): inside a container that reports the host's cores, and
+    # acting on it started eight workers on a 512 MB instance and had the service
+    # killed mid-request. usable_workers reads the cgroup and caps by memory.
+    workers = usable_workers(body.workers)
     report = (
         sweep_spacing(scenario, workers=workers)
         if body.mode == "spacing"

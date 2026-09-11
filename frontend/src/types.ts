@@ -205,6 +205,8 @@ export interface Candidate {
   worst_availability: number;
   worst_max_gap_s: number;
   availability: Record<string, number>;
+  /** Ranked on a sampled grid rather than measured. Never quote these as figures. */
+  approximate: boolean;
 }
 
 export interface SweepReport {

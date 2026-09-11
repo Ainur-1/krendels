@@ -171,6 +171,11 @@ export function AnalysisPanel({
  * interesting band between 96 and 100 % into a few pixels. The axis is floored ten
  * points below whichever of the baseline and the best is lower, and what falls off
  * the bottom is counted rather than silently dropped.
+ *
+ * Filled points were measured on the full grid; hollow ones were ranked on a
+ * sampled one and are drawn faintly, because they are where the search looked
+ * rather than what it found. The distinction is in the legend for the same reason
+ * it is in the data: a percentage nobody measured should not look like one.
  */
 function ParetoPlot({ report }: { report: SweepReport }) {
   const width = 520;
@@ -238,13 +243,15 @@ function ParetoPlot({ report }: { report: SweepReport }) {
             cx={x(candidate.worst_max_gap_s)}
             cy={y(candidate.worst_availability)}
             r={front ? 4 : 2.2}
-            fill={front ? "#3fb950" : "#3a4757"}
-            stroke={front ? "#0e1116" : "none"}
+            fill={front ? "#3fb950" : candidate.approximate ? "none" : "#4c9aff"}
+            stroke={front ? "#0e1116" : candidate.approximate ? "#3a4757" : "none"}
+            strokeWidth={candidate.approximate ? 1 : 0}
           >
             <title>
               RAAN {angles(candidate.raan_deg)} · фаза {angles(candidate.phase_deg)} →{" "}
               {percent(candidate.worst_availability)}, перерыв{" "}
               {duration(candidate.worst_max_gap_s)}
+              {candidate.approximate ? " (оценка по прореженной сетке)" : ""}
             </title>
           </circle>
         );
@@ -263,7 +270,9 @@ function ParetoPlot({ report }: { report: SweepReport }) {
     </svg>
     <p className="hint" style={{ marginTop: 2 }}>
       Зелёным — конфигурации, которые не проигрывают сразу по обоим показателям.
-      Жёлтым обведена текущая.
+      Жёлтым обведена текущая. Закрашенные точки посчитаны на полной сетке времени,
+      полые — ранжированы по прореженной: это места, куда поиск заглядывал, а не
+      измеренные значения.
       {hidden > 0 &&
         ` Ниже шкалы осталось ${hidden} вариантов с доступностью хуже ${percent(floor)}.`}
     </p>

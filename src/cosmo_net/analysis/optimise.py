@@ -16,11 +16,23 @@ from __future__ import annotations
 
 from concurrent.futures import ProcessPoolExecutor
 from dataclasses import dataclass, field
+from functools import partial
 
 import numpy as np
 
 from cosmo_net.analysis.reachability import availability_series, longest_gap_steps
+from cosmo_net.analysis.resources import usable_workers
 from cosmo_net.scenario.schema import Scenario
+
+# Stage one samples the horizon down to about this many steps. Ranking a hundred
+# candidates against each other does not need every step; deciding what to print
+# does, which is what stage two is for.
+COARSE_STEPS = 180
+
+# How many of the ranked candidates are re-measured exactly. Wide enough that the
+# true winner is very unlikely to sit outside it, narrow enough to stay quick: on
+# the deployed instance an exact evaluation is 1.2 s against 0.3 s for a coarse one.
+SHORTLIST = 12
 
 
 @dataclass(frozen=True)
@@ -35,6 +47,9 @@ class Candidate:
     worst_max_gap_s: int
     availability: dict[str, float]
 
+    approximate: bool = False
+    """Scored on a sampled grid to rank it, not measured. Never report these as figures."""
+
     def to_dict(self) -> dict[str, object]:
         return {
             "raan_deg": self.raan_deg,
@@ -43,6 +58,7 @@ class Candidate:
             "worst_availability": self.worst_availability,
             "worst_max_gap_s": self.worst_max_gap_s,
             "availability": self.availability,
+            "approximate": self.approximate,
         }
 
 
@@ -54,13 +70,17 @@ class SweepReport:
     candidates: list[Candidate] = field(default_factory=list)
 
     @property
+    def measured(self) -> list[Candidate]:
+        """The candidates whose numbers came from the full grid rather than a sample."""
+
+        return [c for c in self.candidates if not c.approximate]
+
+    @property
     def best(self) -> Candidate:
         """Highest availability for the worst-served client; the shortest worst gap breaks ties."""
 
-        return max(
-            self.candidates or [self.baseline],
-            key=lambda c: (c.worst_availability, -c.worst_max_gap_s),
-        )
+        pool = self.measured or self.candidates or [self.baseline]
+        return max(pool, key=lambda c: (c.worst_availability, -c.worst_max_gap_s))
 
     @property
     def frontier(self) -> list[Candidate]:
@@ -77,7 +97,7 @@ class SweepReport:
         """
 
         ordered = sorted(
-            self.candidates, key=lambda c: (-c.worst_availability, c.worst_max_gap_s)
+            self.measured, key=lambda c: (-c.worst_availability, c.worst_max_gap_s)
         )
         front: list[Candidate] = []
         best_gap = float("inf")
@@ -96,13 +116,14 @@ class SweepReport:
         }
 
 
-def evaluate(scenario: Scenario) -> Candidate:
+def evaluate(scenario: Scenario, stride: int = 1) -> Candidate:
     """Score one configuration. The unit of work every search here is built from."""
 
-    series = availability_series(scenario)
-    step_s = scenario.environment.step_s
+    series = availability_series(scenario, stride=stride)
+    step_s = scenario.environment.step_s * stride
     availability = {client: float(r.mean()) for client, r in series.items()}
     return Candidate(
+        approximate=stride > 1,
         raan_deg=[p.raan_deg for p in scenario.design.planes],
         phase_deg=[p.phase_deg for p in scenario.design.planes],
         launch_stage=scenario.design.launch_stage,
@@ -167,13 +188,30 @@ def sweep_spacing(
         for phase in phase_spacings
     ]
 
-    # The scenario as it stands is always a candidate, whether or not the grid
-    # happens to land on it — the supplied design phases its planes by 7.5° and the
-    # default grid steps in quarters of 22.5°, which misses it. Without this, "best"
-    # could be worse than changing nothing and the interface would still report it
-    # as an improvement.
+    # Two stages, because a hundred exact evaluations is 120 s on the deployed
+    # instance and the search does not need them. Stage one samples the horizon down
+    # to about COARSE_STEPS and only ranks; stage two re-measures the shortlist on
+    # the full grid, and `best` and `frontier` are drawn from those alone. Nothing
+    # the interface prints as a figure ever comes from the sampled pass.
+    stride = max(1, len(scenario.times) // COARSE_STEPS)
+    ranked = sorted(
+        _score_all(designs, workers, stride),
+        key=lambda c: (-c.worst_availability, c.worst_max_gap_s),
+    )
+
+    shortlist = [
+        variant(scenario, raan_deg=c.raan_deg, phase_deg=c.phase_deg)
+        for c in ranked[:SHORTLIST]
+    ]
+
+    # The scenario as it stands is always measured, whether or not the grid happens
+    # to land on it - the supplied design phases its planes by 7.5 deg and the
+    # default grid steps in quarters of 22.5 deg, which misses it. Without this,
+    # "best" could be worse than changing nothing.
     baseline = evaluate(scenario)
-    return SweepReport(baseline=baseline, candidates=[baseline] + _score_all(designs, workers))
+    measured = [baseline] + _score_all(shortlist, workers, 1)
+
+    return SweepReport(baseline=baseline, candidates=measured + ranked[SHORTLIST:])
 
 
 def refine(
@@ -206,7 +244,7 @@ def refine(
                 raan[index] = raan[index] + float(offset)
                 designs.append(variant(current, raan_deg=raan))
 
-            scored = _score_all(designs, workers)
+            scored = _score_all(designs, workers, 1)
             tried.extend(scored)
             winner = max(scored, key=lambda c: (c.worst_availability, -c.worst_max_gap_s))
             if (winner.worst_availability, -winner.worst_max_gap_s) > (
@@ -219,13 +257,21 @@ def refine(
     return SweepReport(baseline=baseline, candidates=tried)
 
 
-def _score_all(designs: list[Scenario], workers: int | None) -> list[Candidate]:
-    """Evaluate a batch, in parallel when there is enough of it to be worth the processes."""
+def _score_all(designs: list[Scenario], workers: int | None, stride: int) -> list[Candidate]:
+    """
+    Evaluate a batch, in parallel when the machine can actually hold the processes.
 
-    if workers is not None and workers > 1 and len(designs) > 8:
-        with ProcessPoolExecutor(max_workers=workers) as pool:
-            return list(pool.map(evaluate, designs))
-    return [evaluate(design) for design in designs]
+    The cap is not advisory. Asking `os.cpu_count()` inside a 512 MB container
+    produced eight workers, each with its own NumPy and its own copy of the run, and
+    the kernel killed the service mid-request — the sweep took the whole thing down
+    along with every cached run. `usable_workers` reads the cgroup instead.
+    """
+
+    parallel = usable_workers(workers)
+    if parallel > 1 and len(designs) > 8:
+        with ProcessPoolExecutor(max_workers=parallel) as pool:
+            return list(pool.map(partial(evaluate, stride=stride), designs))
+    return [evaluate(design, stride=stride) for design in designs]
 
 
 def _in_plane_spacing(scenario: Scenario) -> float:

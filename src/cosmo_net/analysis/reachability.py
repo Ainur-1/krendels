@@ -25,19 +25,29 @@ from cosmo_net.scenario.schema import Scenario
 
 
 def availability_series(
-    scenario: Scenario, contacts: ContactSeries | None = None
+    scenario: Scenario, contacts: ContactSeries | None = None, stride: int = 1
 ) -> dict[str, np.ndarray]:
     """
     (T,) booleans per client: was there a path to some reachable gateway at this step.
 
     Passing `contacts` in lets a caller that already built them — the criticality
     study rebuilds only the service mask between runs — skip the expensive half.
+
+    `stride` samples every nth step instead of all of them, which is what the
+    configuration sweep uses to rank a hundred candidates against each other. It
+    makes the result an estimate rather than a measurement, so nothing computed this
+    way may be reported as a figure: the sweep re-measures its shortlist on the full
+    grid before showing a number.
     """
 
-    if contacts is None:
-        contacts = compute_contacts(scenario, compute_trajectory(scenario))
+    if stride > 1 and contacts is not None:
+        raise ValueError("a subsampled series cannot reuse a full-grid contact series")
 
-    times = np.asarray(scenario.times, dtype=float)
+    if contacts is None:
+        sampled = np.asarray(scenario.times[::stride], dtype=float)
+        contacts = compute_contacts(scenario, compute_trajectory(scenario, sampled))
+
+    times = np.asarray(contacts.times_s, dtype=float)
     offline = gateway_offline_mask(scenario, times)
 
     client_slots = [
@@ -48,7 +58,7 @@ def availability_series(
     ]
     client_ids = [scenario.ground_sites[g].id for g in client_slots]
 
-    steps = len(scenario.times)
+    steps = len(times)
     result = {client_id: np.zeros(steps, dtype=bool) for client_id in client_ids}
     pairs = contacts.pair_index
 
