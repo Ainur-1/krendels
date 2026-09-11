@@ -1,0 +1,30 @@
+[
+  {
+    "scenario_id": "01_full_constellation",
+    "file": "01_full_constellation.json",
+    "worst_availability": 0.9666666666666667,
+    "meets_target": true,
+    "best_tuned_availability": 0.9958333333333333
+  },
+  {
+    "scenario_id": "02_first_launch",
+    "file": "02_first_launch.json",
+    "worst_availability": 0.12638888888888888,
+    "meets_target": false,
+    "best_tuned_availability": 0.12638888888888888
+  },
+  {
+    "scenario_id": "03_satellite_outages",
+    "file": "03_satellite_outages.json",
+    "worst_availability": 0.7930555555555555,
+    "meets_target": false,
+    "best_tuned_availability": 0.8152777777777778
+  },
+  {
+    "scenario_id": "04_link_range",
+    "file": "04_link_range.json",
+    "worst_availability": 0.6222222222222222,
+    "meets_target": false,
+    "best_tuned_availability": 0.7305555555555555
+  }
+]

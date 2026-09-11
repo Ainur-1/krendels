@@ -1,0 +1,3116 @@
+{
+  "scenario": {
+    "id": "01_full_constellation",
+    "title": "Полная группировка",
+    "file": "01_full_constellation.json",
+    "satellites": 48,
+    "planes": 3,
+    "launch_stage": 3,
+    "clients": [
+      "C65",
+      "C70",
+      "C72"
+    ],
+    "gateways": [
+      "G_MUR"
+    ],
+    "isl_range_km": 3000.0,
+    "min_elevation_deg": 10.0,
+    "steps": 720
+  },
+  "baseline": {
+    "scenario_id": "01_full_constellation",
+    "strategy": "min_hops",
+    "steps": 720,
+    "step_s": 120,
+    "horizon_s": 86400,
+    "target_availability": 0.9,
+    "worst_availability": 0.9666666666666667,
+    "worst_max_gap_s": 480,
+    "meets_target": true,
+    "clients": [
+      {
+        "client_id": "C65",
+        "steps": 720,
+        "visibility_share": 0.9777777777777777,
+        "availability_share": 0.9666666666666667,
+        "meets_target": true,
+        "max_gap_s": 480,
+        "max_interior_gap_s": 480,
+        "gap_count": 19,
+        "mean_hops": 2.2873563218390807,
+        "max_hops": 5,
+        "mean_route_length_km": 3151.497512941296,
+        "causes": {
+          "no_client_contact": 16,
+          "no_gateway_contact": 8
+        }
+      },
+      {
+        "client_id": "C70",
+        "steps": 720,
+        "visibility_share": 0.9986111111111111,
+        "availability_share": 0.9875,
+        "meets_target": true,
+        "max_gap_s": 120,
+        "max_interior_gap_s": 120,
+        "gap_count": 9,
+        "mean_hops": 2.6554149085794654,
+        "max_hops": 4,
+        "mean_route_length_km": 4009.3323698885433,
+        "causes": {
+          "no_client_contact": 1,
+          "no_gateway_contact": 8
+        }
+      },
+      {
+        "client_id": "C72",
+        "steps": 720,
+        "visibility_share": 1.0,
+        "availability_share": 0.9888888888888889,
+        "meets_target": true,
+        "max_gap_s": 120,
+        "max_interior_gap_s": 120,
+        "gap_count": 8,
+        "mean_hops": 3.1530898876404496,
+        "max_hops": 4,
+        "mean_route_length_km": 5187.635032512992,
+        "causes": {
+          "no_gateway_contact": 8
+        }
+      }
+    ]
+  },
+  "strategies": {
+    "min_hops": {
+      "scenario_id": "01_full_constellation",
+      "strategy": "min_hops",
+      "steps": 720,
+      "step_s": 120,
+      "horizon_s": 86400,
+      "target_availability": 0.9,
+      "worst_availability": 0.9666666666666667,
+      "worst_max_gap_s": 480,
+      "meets_target": true,
+      "clients": [
+        {
+          "client_id": "C65",
+          "steps": 720,
+          "visibility_share": 0.9777777777777777,
+          "availability_share": 0.9666666666666667,
+          "meets_target": true,
+          "max_gap_s": 480,
+          "max_interior_gap_s": 480,
+          "gap_count": 19,
+          "mean_hops": 2.2873563218390807,
+          "max_hops": 5,
+          "mean_route_length_km": 3151.497512941296,
+          "causes": {
+            "no_client_contact": 16,
+            "no_gateway_contact": 8
+          }
+        },
+        {
+          "client_id": "C70",
+          "steps": 720,
+          "visibility_share": 0.9986111111111111,
+          "availability_share": 0.9875,
+          "meets_target": true,
+          "max_gap_s": 120,
+          "max_interior_gap_s": 120,
+          "gap_count": 9,
+          "mean_hops": 2.6554149085794654,
+          "max_hops": 4,
+          "mean_route_length_km": 4009.3323698885433,
+          "causes": {
+            "no_client_contact": 1,
+            "no_gateway_contact": 8
+          }
+        },
+        {
+          "client_id": "C72",
+          "steps": 720,
+          "visibility_share": 1.0,
+          "availability_share": 0.9888888888888889,
+          "meets_target": true,
+          "max_gap_s": 120,
+          "max_interior_gap_s": 120,
+          "gap_count": 8,
+          "mean_hops": 3.1530898876404496,
+          "max_hops": 4,
+          "mean_route_length_km": 5187.635032512992,
+          "causes": {
+            "no_gateway_contact": 8
+          }
+        }
+      ]
+    },
+    "min_distance": {
+      "scenario_id": "01_full_constellation",
+      "strategy": "min_distance",
+      "steps": 720,
+      "step_s": 120,
+      "horizon_s": 86400,
+      "target_availability": 0.9,
+      "worst_availability": 0.9666666666666667,
+      "worst_max_gap_s": 480,
+      "meets_target": true,
+      "clients": [
+        {
+          "client_id": "C65",
+          "steps": 720,
+          "visibility_share": 0.9777777777777777,
+          "availability_share": 0.9666666666666667,
+          "meets_target": true,
+          "max_gap_s": 480,
+          "max_interior_gap_s": 480,
+          "gap_count": 19,
+          "mean_hops": 2.2873563218390807,
+          "max_hops": 5,
+          "mean_route_length_km": 3130.9004491364353,
+          "causes": {
+            "no_client_contact": 16,
+            "no_gateway_contact": 8
+          }
+        },
+        {
+          "client_id": "C70",
+          "steps": 720,
+          "visibility_share": 0.9986111111111111,
+          "availability_share": 0.9875,
+          "meets_target": true,
+          "max_gap_s": 120,
+          "max_interior_gap_s": 120,
+          "gap_count": 9,
+          "mean_hops": 2.6554149085794654,
+          "max_hops": 4,
+          "mean_route_length_km": 3964.592927743142,
+          "causes": {
+            "no_client_contact": 1,
+            "no_gateway_contact": 8
+          }
+        },
+        {
+          "client_id": "C72",
+          "steps": 720,
+          "visibility_share": 1.0,
+          "availability_share": 0.9888888888888889,
+          "meets_target": true,
+          "max_gap_s": 120,
+          "max_interior_gap_s": 120,
+          "gap_count": 8,
+          "mean_hops": 3.1530898876404496,
+          "max_hops": 4,
+          "mean_route_length_km": 4819.296293563167,
+          "causes": {
+            "no_gateway_contact": 8
+          }
+        }
+      ]
+    },
+    "max_margin": {
+      "scenario_id": "01_full_constellation",
+      "strategy": "max_margin",
+      "steps": 720,
+      "step_s": 120,
+      "horizon_s": 86400,
+      "target_availability": 0.9,
+      "worst_availability": 0.9666666666666667,
+      "worst_max_gap_s": 480,
+      "meets_target": true,
+      "clients": [
+        {
+          "client_id": "C65",
+          "steps": 720,
+          "visibility_share": 0.9777777777777777,
+          "availability_share": 0.9666666666666667,
+          "meets_target": true,
+          "max_gap_s": 480,
+          "max_interior_gap_s": 480,
+          "gap_count": 19,
+          "mean_hops": 3.589080459770115,
+          "max_hops": 21,
+          "mean_route_length_km": 6035.637974321305,
+          "causes": {
+            "no_client_contact": 16,
+            "no_gateway_contact": 8
+          }
+        },
+        {
+          "client_id": "C70",
+          "steps": 720,
+          "visibility_share": 0.9986111111111111,
+          "availability_share": 0.9875,
+          "meets_target": true,
+          "max_gap_s": 120,
+          "max_interior_gap_s": 120,
+          "gap_count": 9,
+          "mean_hops": 4.489451476793249,
+          "max_hops": 22,
+          "mean_route_length_km": 7604.727380158053,
+          "causes": {
+            "no_client_contact": 1,
+            "no_gateway_contact": 8
+          }
+        },
+        {
+          "client_id": "C72",
+          "steps": 720,
+          "visibility_share": 1.0,
+          "availability_share": 0.9888888888888889,
+          "meets_target": true,
+          "max_gap_s": 120,
+          "max_interior_gap_s": 120,
+          "gap_count": 8,
+          "mean_hops": 5.056179775280899,
+          "max_hops": 20,
+          "mean_route_length_km": 8199.305992478856,
+          "causes": {
+            "no_gateway_contact": 8
+          }
+        }
+      ]
+    }
+  },
+  "criticality": {
+    "baseline_worst_availability": 0.9666666666666667,
+    "baseline_worst_max_gap_s": 480,
+    "spread_pp": 0.9722222222222188,
+    "knockouts": [
+      {
+        "satellite_id": "S19",
+        "plane_id": "P2",
+        "worst_availability": 0.9430555555555555,
+        "drop_pp": 2.361111111111114,
+        "worst_max_gap_s": 480
+      },
+      {
+        "satellite_id": "S33",
+        "plane_id": "P3",
+        "worst_availability": 0.9430555555555555,
+        "drop_pp": 2.361111111111114,
+        "worst_max_gap_s": 480
+      },
+      {
+        "satellite_id": "S44",
+        "plane_id": "P3",
+        "worst_availability": 0.9430555555555555,
+        "drop_pp": 2.361111111111114,
+        "worst_max_gap_s": 480
+      },
+      {
+        "satellite_id": "S45",
+        "plane_id": "P3",
+        "worst_availability": 0.9430555555555555,
+        "drop_pp": 2.361111111111114,
+        "worst_max_gap_s": 480
+      },
+      {
+        "satellite_id": "S02",
+        "plane_id": "P1",
+        "worst_availability": 0.9444444444444444,
+        "drop_pp": 2.2222222222222254,
+        "worst_max_gap_s": 480
+      },
+      {
+        "satellite_id": "S22",
+        "plane_id": "P2",
+        "worst_availability": 0.9444444444444444,
+        "drop_pp": 2.2222222222222254,
+        "worst_max_gap_s": 480
+      },
+      {
+        "satellite_id": "S23",
+        "plane_id": "P2",
+        "worst_availability": 0.9444444444444444,
+        "drop_pp": 2.2222222222222254,
+        "worst_max_gap_s": 480
+      },
+      {
+        "satellite_id": "S24",
+        "plane_id": "P2",
+        "worst_availability": 0.9444444444444444,
+        "drop_pp": 2.2222222222222254,
+        "worst_max_gap_s": 480
+      },
+      {
+        "satellite_id": "S29",
+        "plane_id": "P2",
+        "worst_availability": 0.9444444444444444,
+        "drop_pp": 2.2222222222222254,
+        "worst_max_gap_s": 480
+      },
+      {
+        "satellite_id": "S30",
+        "plane_id": "P2",
+        "worst_availability": 0.9444444444444444,
+        "drop_pp": 2.2222222222222254,
+        "worst_max_gap_s": 480
+      },
+      {
+        "satellite_id": "S43",
+        "plane_id": "P3",
+        "worst_availability": 0.9444444444444444,
+        "drop_pp": 2.2222222222222254,
+        "worst_max_gap_s": 480
+      },
+      {
+        "satellite_id": "S46",
+        "plane_id": "P3",
+        "worst_availability": 0.9444444444444444,
+        "drop_pp": 2.2222222222222254,
+        "worst_max_gap_s": 480
+      },
+      {
+        "satellite_id": "S03",
+        "plane_id": "P1",
+        "worst_availability": 0.9458333333333333,
+        "drop_pp": 2.083333333333337,
+        "worst_max_gap_s": 480
+      },
+      {
+        "satellite_id": "S15",
+        "plane_id": "P1",
+        "worst_availability": 0.9458333333333333,
+        "drop_pp": 2.083333333333337,
+        "worst_max_gap_s": 480
+      },
+      {
+        "satellite_id": "S16",
+        "plane_id": "P1",
+        "worst_availability": 0.9458333333333333,
+        "drop_pp": 2.083333333333337,
+        "worst_max_gap_s": 480
+      },
+      {
+        "satellite_id": "S17",
+        "plane_id": "P2",
+        "worst_availability": 0.9458333333333333,
+        "drop_pp": 2.083333333333337,
+        "worst_max_gap_s": 480
+      },
+      {
+        "satellite_id": "S26",
+        "plane_id": "P2",
+        "worst_availability": 0.9458333333333333,
+        "drop_pp": 2.083333333333337,
+        "worst_max_gap_s": 480
+      },
+      {
+        "satellite_id": "S28",
+        "plane_id": "P2",
+        "worst_availability": 0.9458333333333333,
+        "drop_pp": 2.083333333333337,
+        "worst_max_gap_s": 480
+      },
+      {
+        "satellite_id": "S31",
+        "plane_id": "P2",
+        "worst_availability": 0.9458333333333333,
+        "drop_pp": 2.083333333333337,
+        "worst_max_gap_s": 480
+      },
+      {
+        "satellite_id": "S32",
+        "plane_id": "P2",
+        "worst_availability": 0.9458333333333333,
+        "drop_pp": 2.083333333333337,
+        "worst_max_gap_s": 480
+      },
+      {
+        "satellite_id": "S34",
+        "plane_id": "P3",
+        "worst_availability": 0.9458333333333333,
+        "drop_pp": 2.083333333333337,
+        "worst_max_gap_s": 480
+      },
+      {
+        "satellite_id": "S47",
+        "plane_id": "P3",
+        "worst_availability": 0.9458333333333333,
+        "drop_pp": 2.083333333333337,
+        "worst_max_gap_s": 480
+      },
+      {
+        "satellite_id": "S48",
+        "plane_id": "P3",
+        "worst_availability": 0.9458333333333333,
+        "drop_pp": 2.083333333333337,
+        "worst_max_gap_s": 480
+      },
+      {
+        "satellite_id": "S01",
+        "plane_id": "P1",
+        "worst_availability": 0.9472222222222222,
+        "drop_pp": 1.9444444444444486,
+        "worst_max_gap_s": 480
+      },
+      {
+        "satellite_id": "S12",
+        "plane_id": "P1",
+        "worst_availability": 0.9472222222222222,
+        "drop_pp": 1.9444444444444486,
+        "worst_max_gap_s": 480
+      },
+      {
+        "satellite_id": "S18",
+        "plane_id": "P2",
+        "worst_availability": 0.9472222222222222,
+        "drop_pp": 1.9444444444444486,
+        "worst_max_gap_s": 480
+      },
+      {
+        "satellite_id": "S20",
+        "plane_id": "P2",
+        "worst_availability": 0.9472222222222222,
+        "drop_pp": 1.9444444444444486,
+        "worst_max_gap_s": 480
+      },
+      {
+        "satellite_id": "S21",
+        "plane_id": "P2",
+        "worst_availability": 0.9472222222222222,
+        "drop_pp": 1.9444444444444486,
+        "worst_max_gap_s": 480
+      },
+      {
+        "satellite_id": "S27",
+        "plane_id": "P2",
+        "worst_availability": 0.9472222222222222,
+        "drop_pp": 1.9444444444444486,
+        "worst_max_gap_s": 480
+      },
+      {
+        "satellite_id": "S04",
+        "plane_id": "P1",
+        "worst_availability": 0.9486111111111111,
+        "drop_pp": 1.8055555555555602,
+        "worst_max_gap_s": 480
+      },
+      {
+        "satellite_id": "S05",
+        "plane_id": "P1",
+        "worst_availability": 0.9486111111111111,
+        "drop_pp": 1.8055555555555602,
+        "worst_max_gap_s": 600
+      },
+      {
+        "satellite_id": "S06",
+        "plane_id": "P1",
+        "worst_availability": 0.9486111111111111,
+        "drop_pp": 1.8055555555555602,
+        "worst_max_gap_s": 600
+      },
+      {
+        "satellite_id": "S07",
+        "plane_id": "P1",
+        "worst_availability": 0.9486111111111111,
+        "drop_pp": 1.8055555555555602,
+        "worst_max_gap_s": 840
+      },
+      {
+        "satellite_id": "S13",
+        "plane_id": "P1",
+        "worst_availability": 0.9486111111111111,
+        "drop_pp": 1.8055555555555602,
+        "worst_max_gap_s": 480
+      },
+      {
+        "satellite_id": "S14",
+        "plane_id": "P1",
+        "worst_availability": 0.9486111111111111,
+        "drop_pp": 1.8055555555555602,
+        "worst_max_gap_s": 480
+      },
+      {
+        "satellite_id": "S25",
+        "plane_id": "P2",
+        "worst_availability": 0.9486111111111111,
+        "drop_pp": 1.8055555555555602,
+        "worst_max_gap_s": 480
+      },
+      {
+        "satellite_id": "S35",
+        "plane_id": "P3",
+        "worst_availability": 0.9486111111111111,
+        "drop_pp": 1.8055555555555602,
+        "worst_max_gap_s": 480
+      },
+      {
+        "satellite_id": "S36",
+        "plane_id": "P3",
+        "worst_availability": 0.9486111111111111,
+        "drop_pp": 1.8055555555555602,
+        "worst_max_gap_s": 480
+      },
+      {
+        "satellite_id": "S08",
+        "plane_id": "P1",
+        "worst_availability": 0.95,
+        "drop_pp": 1.6666666666666718,
+        "worst_max_gap_s": 480
+      },
+      {
+        "satellite_id": "S09",
+        "plane_id": "P1",
+        "worst_availability": 0.95,
+        "drop_pp": 1.6666666666666718,
+        "worst_max_gap_s": 480
+      },
+      {
+        "satellite_id": "S11",
+        "plane_id": "P1",
+        "worst_availability": 0.95,
+        "drop_pp": 1.6666666666666718,
+        "worst_max_gap_s": 480
+      },
+      {
+        "satellite_id": "S37",
+        "plane_id": "P3",
+        "worst_availability": 0.95,
+        "drop_pp": 1.6666666666666718,
+        "worst_max_gap_s": 480
+      },
+      {
+        "satellite_id": "S38",
+        "plane_id": "P3",
+        "worst_availability": 0.95,
+        "drop_pp": 1.6666666666666718,
+        "worst_max_gap_s": 600
+      },
+      {
+        "satellite_id": "S42",
+        "plane_id": "P3",
+        "worst_availability": 0.95,
+        "drop_pp": 1.6666666666666718,
+        "worst_max_gap_s": 720
+      },
+      {
+        "satellite_id": "S10",
+        "plane_id": "P1",
+        "worst_availability": 0.9513888888888888,
+        "drop_pp": 1.5277777777777835,
+        "worst_max_gap_s": 480
+      },
+      {
+        "satellite_id": "S39",
+        "plane_id": "P3",
+        "worst_availability": 0.9513888888888888,
+        "drop_pp": 1.5277777777777835,
+        "worst_max_gap_s": 600
+      },
+      {
+        "satellite_id": "S41",
+        "plane_id": "P3",
+        "worst_availability": 0.9513888888888888,
+        "drop_pp": 1.5277777777777835,
+        "worst_max_gap_s": 480
+      },
+      {
+        "satellite_id": "S40",
+        "plane_id": "P3",
+        "worst_availability": 0.9527777777777777,
+        "drop_pp": 1.388888888888895,
+        "worst_max_gap_s": 480
+      }
+    ]
+  },
+  "sweep": {
+    "baseline": {
+      "raan_deg": [
+        0.0,
+        60.0,
+        120.0
+      ],
+      "phase_deg": [
+        0.0,
+        7.5,
+        15.0
+      ],
+      "launch_stage": 3,
+      "worst_availability": 0.9666666666666667,
+      "worst_max_gap_s": 480,
+      "availability": {
+        "C65": 0.9666666666666667,
+        "C70": 0.9875,
+        "C72": 0.9888888888888889
+      }
+    },
+    "best": {
+      "raan_deg": [
+        0.0,
+        65.0,
+        130.0
+      ],
+      "phase_deg": [
+        0.0,
+        5.625,
+        11.25
+      ],
+      "launch_stage": 3,
+      "worst_availability": 0.9958333333333333,
+      "worst_max_gap_s": 120,
+      "availability": {
+        "C65": 0.9958333333333333,
+        "C70": 1.0,
+        "C72": 1.0
+      }
+    },
+    "frontier": [
+      {
+        "raan_deg": [
+          0.0,
+          65.0,
+          130.0
+        ],
+        "phase_deg": [
+          0.0,
+          5.625,
+          11.25
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.9958333333333333,
+        "worst_max_gap_s": 120,
+        "availability": {
+          "C65": 0.9958333333333333,
+          "C70": 1.0,
+          "C72": 1.0
+        }
+      }
+    ],
+    "candidates": [
+      {
+        "raan_deg": [
+          0.0,
+          60.0,
+          120.0
+        ],
+        "phase_deg": [
+          0.0,
+          7.5,
+          15.0
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.9666666666666667,
+        "worst_max_gap_s": 480,
+        "availability": {
+          "C65": 0.9666666666666667,
+          "C70": 0.9875,
+          "C72": 0.9888888888888889
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "phase_deg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.12638888888888888,
+        "worst_max_gap_s": 47760,
+        "availability": {
+          "C65": 0.2722222222222222,
+          "C70": 0.15833333333333333,
+          "C72": 0.12638888888888888
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "phase_deg": [
+          0.0,
+          5.625,
+          11.25
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.2152777777777778,
+        "worst_max_gap_s": 47640,
+        "availability": {
+          "C65": 0.3194444444444444,
+          "C70": 0.21944444444444444,
+          "C72": 0.2152777777777778
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "phase_deg": [
+          0.0,
+          11.25,
+          22.5
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.2013888888888889,
+        "worst_max_gap_s": 47760,
+        "availability": {
+          "C65": 0.3111111111111111,
+          "C70": 0.20972222222222223,
+          "C72": 0.2013888888888889
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "phase_deg": [
+          0.0,
+          16.875,
+          33.75
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.2152777777777778,
+        "worst_max_gap_s": 47760,
+        "availability": {
+          "C65": 0.3125,
+          "C70": 0.2152777777777778,
+          "C72": 0.2263888888888889
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          5.0,
+          10.0
+        ],
+        "phase_deg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.18472222222222223,
+        "worst_max_gap_s": 45600,
+        "availability": {
+          "C65": 0.325,
+          "C70": 0.22916666666666666,
+          "C72": 0.18472222222222223
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          5.0,
+          10.0
+        ],
+        "phase_deg": [
+          0.0,
+          5.625,
+          11.25
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.24444444444444444,
+        "worst_max_gap_s": 37200,
+        "availability": {
+          "C65": 0.3347222222222222,
+          "C70": 0.24444444444444444,
+          "C72": 0.2569444444444444
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          5.0,
+          10.0
+        ],
+        "phase_deg": [
+          0.0,
+          11.25,
+          22.5
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.24166666666666667,
+        "worst_max_gap_s": 45600,
+        "availability": {
+          "C65": 0.3402777777777778,
+          "C70": 0.25,
+          "C72": 0.24166666666666667
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          5.0,
+          10.0
+        ],
+        "phase_deg": [
+          0.0,
+          16.875,
+          33.75
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.23333333333333334,
+        "worst_max_gap_s": 37200,
+        "availability": {
+          "C65": 0.3388888888888889,
+          "C70": 0.23333333333333334,
+          "C72": 0.24583333333333332
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          10.0,
+          20.0
+        ],
+        "phase_deg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.27361111111111114,
+        "worst_max_gap_s": 34800,
+        "availability": {
+          "C65": 0.37916666666666665,
+          "C70": 0.29305555555555557,
+          "C72": 0.27361111111111114
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          10.0,
+          20.0
+        ],
+        "phase_deg": [
+          0.0,
+          5.625,
+          11.25
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.3,
+        "worst_max_gap_s": 34680,
+        "availability": {
+          "C65": 0.3819444444444444,
+          "C70": 0.3,
+          "C72": 0.3263888888888889
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          10.0,
+          20.0
+        ],
+        "phase_deg": [
+          0.0,
+          11.25,
+          22.5
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.29583333333333334,
+        "worst_max_gap_s": 34800,
+        "availability": {
+          "C65": 0.3819444444444444,
+          "C70": 0.29583333333333334,
+          "C72": 0.30972222222222223
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          10.0,
+          20.0
+        ],
+        "phase_deg": [
+          0.0,
+          16.875,
+          33.75
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.2875,
+        "worst_max_gap_s": 34680,
+        "availability": {
+          "C65": 0.3819444444444444,
+          "C70": 0.2875,
+          "C72": 0.2986111111111111
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          15.0,
+          30.0
+        ],
+        "phase_deg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.35833333333333334,
+        "worst_max_gap_s": 32280,
+        "availability": {
+          "C65": 0.43333333333333335,
+          "C70": 0.35833333333333334,
+          "C72": 0.38472222222222224
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          15.0,
+          30.0
+        ],
+        "phase_deg": [
+          0.0,
+          5.625,
+          11.25
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.3763888888888889,
+        "worst_max_gap_s": 32160,
+        "availability": {
+          "C65": 0.44027777777777777,
+          "C70": 0.3763888888888889,
+          "C72": 0.40555555555555556
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          15.0,
+          30.0
+        ],
+        "phase_deg": [
+          0.0,
+          11.25,
+          22.5
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.3625,
+        "worst_max_gap_s": 32280,
+        "availability": {
+          "C65": 0.43333333333333335,
+          "C70": 0.3625,
+          "C72": 0.4013888888888889
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          15.0,
+          30.0
+        ],
+        "phase_deg": [
+          0.0,
+          16.875,
+          33.75
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.37083333333333335,
+        "worst_max_gap_s": 32160,
+        "availability": {
+          "C65": 0.44027777777777777,
+          "C70": 0.37083333333333335,
+          "C72": 0.39166666666666666
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          20.0,
+          40.0
+        ],
+        "phase_deg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.44166666666666665,
+        "worst_max_gap_s": 30120,
+        "availability": {
+          "C65": 0.49027777777777776,
+          "C70": 0.44166666666666665,
+          "C72": 0.49583333333333335
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          20.0,
+          40.0
+        ],
+        "phase_deg": [
+          0.0,
+          5.625,
+          11.25
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.45555555555555555,
+        "worst_max_gap_s": 30000,
+        "availability": {
+          "C65": 0.49444444444444446,
+          "C70": 0.45555555555555555,
+          "C72": 0.49583333333333335
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          20.0,
+          40.0
+        ],
+        "phase_deg": [
+          0.0,
+          11.25,
+          22.5
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.44166666666666665,
+        "worst_max_gap_s": 30120,
+        "availability": {
+          "C65": 0.49027777777777776,
+          "C70": 0.44166666666666665,
+          "C72": 0.49722222222222223
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          20.0,
+          40.0
+        ],
+        "phase_deg": [
+          0.0,
+          16.875,
+          33.75
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.45416666666666666,
+        "worst_max_gap_s": 30000,
+        "availability": {
+          "C65": 0.49444444444444446,
+          "C70": 0.45416666666666666,
+          "C72": 0.4861111111111111
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          25.0,
+          50.0
+        ],
+        "phase_deg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.5333333333333333,
+        "worst_max_gap_s": 27720,
+        "availability": {
+          "C65": 0.5486111111111112,
+          "C70": 0.5333333333333333,
+          "C72": 0.5819444444444445
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          25.0,
+          50.0
+        ],
+        "phase_deg": [
+          0.0,
+          5.625,
+          11.25
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.5361111111111111,
+        "worst_max_gap_s": 27480,
+        "availability": {
+          "C65": 0.55,
+          "C70": 0.5361111111111111,
+          "C72": 0.5777777777777777
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          25.0,
+          50.0
+        ],
+        "phase_deg": [
+          0.0,
+          11.25,
+          22.5
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.5333333333333333,
+        "worst_max_gap_s": 27720,
+        "availability": {
+          "C65": 0.5486111111111112,
+          "C70": 0.5333333333333333,
+          "C72": 0.5819444444444445
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          25.0,
+          50.0
+        ],
+        "phase_deg": [
+          0.0,
+          16.875,
+          33.75
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.5361111111111111,
+        "worst_max_gap_s": 27480,
+        "availability": {
+          "C65": 0.55,
+          "C70": 0.5361111111111111,
+          "C72": 0.5736111111111111
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          30.0,
+          60.0
+        ],
+        "phase_deg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.6152777777777778,
+        "worst_max_gap_s": 19680,
+        "availability": {
+          "C65": 0.6152777777777778,
+          "C70": 0.6222222222222222,
+          "C72": 0.6666666666666666
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          30.0,
+          60.0
+        ],
+        "phase_deg": [
+          0.0,
+          5.625,
+          11.25
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.6138888888888889,
+        "worst_max_gap_s": 19920,
+        "availability": {
+          "C65": 0.6138888888888889,
+          "C70": 0.6277777777777778,
+          "C72": 0.6666666666666666
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          30.0,
+          60.0
+        ],
+        "phase_deg": [
+          0.0,
+          11.25,
+          22.5
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.6152777777777778,
+        "worst_max_gap_s": 19680,
+        "availability": {
+          "C65": 0.6152777777777778,
+          "C70": 0.6222222222222222,
+          "C72": 0.6666666666666666
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          30.0,
+          60.0
+        ],
+        "phase_deg": [
+          0.0,
+          16.875,
+          33.75
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.6138888888888889,
+        "worst_max_gap_s": 19920,
+        "availability": {
+          "C65": 0.6138888888888889,
+          "C70": 0.6277777777777778,
+          "C72": 0.6652777777777777
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          35.0,
+          70.0
+        ],
+        "phase_deg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.6916666666666667,
+        "worst_max_gap_s": 17520,
+        "availability": {
+          "C65": 0.6916666666666667,
+          "C70": 0.7097222222222223,
+          "C72": 0.7472222222222222
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          35.0,
+          70.0
+        ],
+        "phase_deg": [
+          0.0,
+          5.625,
+          11.25
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.6888888888888889,
+        "worst_max_gap_s": 17400,
+        "availability": {
+          "C65": 0.6888888888888889,
+          "C70": 0.725,
+          "C72": 0.7513888888888889
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          35.0,
+          70.0
+        ],
+        "phase_deg": [
+          0.0,
+          11.25,
+          22.5
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.6916666666666667,
+        "worst_max_gap_s": 17520,
+        "availability": {
+          "C65": 0.6916666666666667,
+          "C70": 0.7097222222222223,
+          "C72": 0.7472222222222222
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          35.0,
+          70.0
+        ],
+        "phase_deg": [
+          0.0,
+          16.875,
+          33.75
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.6888888888888889,
+        "worst_max_gap_s": 17400,
+        "availability": {
+          "C65": 0.6888888888888889,
+          "C70": 0.725,
+          "C72": 0.7513888888888889
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          40.0,
+          80.0
+        ],
+        "phase_deg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.7597222222222222,
+        "worst_max_gap_s": 15000,
+        "availability": {
+          "C65": 0.7597222222222222,
+          "C70": 0.7902777777777777,
+          "C72": 0.8166666666666667
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          40.0,
+          80.0
+        ],
+        "phase_deg": [
+          0.0,
+          5.625,
+          11.25
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.75,
+        "worst_max_gap_s": 14880,
+        "availability": {
+          "C65": 0.75,
+          "C70": 0.7916666666666666,
+          "C72": 0.8138888888888889
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          40.0,
+          80.0
+        ],
+        "phase_deg": [
+          0.0,
+          11.25,
+          22.5
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.7597222222222222,
+        "worst_max_gap_s": 15000,
+        "availability": {
+          "C65": 0.7597222222222222,
+          "C70": 0.7902777777777777,
+          "C72": 0.8166666666666667
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          40.0,
+          80.0
+        ],
+        "phase_deg": [
+          0.0,
+          16.875,
+          33.75
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.75,
+        "worst_max_gap_s": 14880,
+        "availability": {
+          "C65": 0.75,
+          "C70": 0.7916666666666666,
+          "C72": 0.8138888888888889
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          45.0,
+          90.0
+        ],
+        "phase_deg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.8194444444444444,
+        "worst_max_gap_s": 7680,
+        "availability": {
+          "C65": 0.8194444444444444,
+          "C70": 0.85,
+          "C72": 0.8736111111111111
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          45.0,
+          90.0
+        ],
+        "phase_deg": [
+          0.0,
+          5.625,
+          11.25
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.8138888888888889,
+        "worst_max_gap_s": 12720,
+        "availability": {
+          "C65": 0.8138888888888889,
+          "C70": 0.8527777777777777,
+          "C72": 0.875
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          45.0,
+          90.0
+        ],
+        "phase_deg": [
+          0.0,
+          11.25,
+          22.5
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.8194444444444444,
+        "worst_max_gap_s": 7680,
+        "availability": {
+          "C65": 0.8194444444444444,
+          "C70": 0.85,
+          "C72": 0.8736111111111111
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          45.0,
+          90.0
+        ],
+        "phase_deg": [
+          0.0,
+          16.875,
+          33.75
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.8138888888888889,
+        "worst_max_gap_s": 12720,
+        "availability": {
+          "C65": 0.8138888888888889,
+          "C70": 0.8527777777777777,
+          "C72": 0.875
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          50.0,
+          100.0
+        ],
+        "phase_deg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.8708333333333333,
+        "worst_max_gap_s": 5160,
+        "availability": {
+          "C65": 0.8708333333333333,
+          "C70": 0.9083333333333333,
+          "C72": 0.9263888888888889
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          50.0,
+          100.0
+        ],
+        "phase_deg": [
+          0.0,
+          5.625,
+          11.25
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.8666666666666667,
+        "worst_max_gap_s": 5880,
+        "availability": {
+          "C65": 0.8666666666666667,
+          "C70": 0.9055555555555556,
+          "C72": 0.9263888888888889
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          50.0,
+          100.0
+        ],
+        "phase_deg": [
+          0.0,
+          11.25,
+          22.5
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.8708333333333333,
+        "worst_max_gap_s": 5160,
+        "availability": {
+          "C65": 0.8708333333333333,
+          "C70": 0.9083333333333333,
+          "C72": 0.9263888888888889
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          50.0,
+          100.0
+        ],
+        "phase_deg": [
+          0.0,
+          16.875,
+          33.75
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.8666666666666667,
+        "worst_max_gap_s": 5880,
+        "availability": {
+          "C65": 0.8666666666666667,
+          "C70": 0.9055555555555556,
+          "C72": 0.9263888888888889
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          55.0,
+          110.0
+        ],
+        "phase_deg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.9291666666666667,
+        "worst_max_gap_s": 2760,
+        "availability": {
+          "C65": 0.9291666666666667,
+          "C70": 0.9652777777777778,
+          "C72": 0.9763888888888889
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          55.0,
+          110.0
+        ],
+        "phase_deg": [
+          0.0,
+          5.625,
+          11.25
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.9263888888888889,
+        "worst_max_gap_s": 2520,
+        "availability": {
+          "C65": 0.9263888888888889,
+          "C70": 0.9583333333333334,
+          "C72": 0.9708333333333333
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          55.0,
+          110.0
+        ],
+        "phase_deg": [
+          0.0,
+          11.25,
+          22.5
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.9305555555555556,
+        "worst_max_gap_s": 2760,
+        "availability": {
+          "C65": 0.9305555555555556,
+          "C70": 0.9652777777777778,
+          "C72": 0.9763888888888889
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          55.0,
+          110.0
+        ],
+        "phase_deg": [
+          0.0,
+          16.875,
+          33.75
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.9263888888888889,
+        "worst_max_gap_s": 2520,
+        "availability": {
+          "C65": 0.9263888888888889,
+          "C70": 0.9583333333333334,
+          "C72": 0.9708333333333333
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          60.0,
+          120.0
+        ],
+        "phase_deg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.9708333333333333,
+        "worst_max_gap_s": 240,
+        "availability": {
+          "C65": 0.9708333333333333,
+          "C70": 0.9986111111111111,
+          "C72": 0.9986111111111111
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          60.0,
+          120.0
+        ],
+        "phase_deg": [
+          0.0,
+          5.625,
+          11.25
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.9736111111111111,
+        "worst_max_gap_s": 360,
+        "availability": {
+          "C65": 0.9736111111111111,
+          "C70": 0.9861111111111112,
+          "C72": 0.9930555555555556
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          60.0,
+          120.0
+        ],
+        "phase_deg": [
+          0.0,
+          11.25,
+          22.5
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.9763888888888889,
+        "worst_max_gap_s": 240,
+        "availability": {
+          "C65": 0.9763888888888889,
+          "C70": 0.9986111111111111,
+          "C72": 0.9986111111111111
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          60.0,
+          120.0
+        ],
+        "phase_deg": [
+          0.0,
+          16.875,
+          33.75
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.9736111111111111,
+        "worst_max_gap_s": 360,
+        "availability": {
+          "C65": 0.9736111111111111,
+          "C70": 0.9861111111111112,
+          "C72": 0.9930555555555556
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          65.0,
+          130.0
+        ],
+        "phase_deg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.9708333333333333,
+        "worst_max_gap_s": 120,
+        "availability": {
+          "C65": 0.9708333333333333,
+          "C70": 1.0,
+          "C72": 1.0
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          65.0,
+          130.0
+        ],
+        "phase_deg": [
+          0.0,
+          5.625,
+          11.25
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.9958333333333333,
+        "worst_max_gap_s": 120,
+        "availability": {
+          "C65": 0.9958333333333333,
+          "C70": 1.0,
+          "C72": 1.0
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          65.0,
+          130.0
+        ],
+        "phase_deg": [
+          0.0,
+          11.25,
+          22.5
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.9875,
+        "worst_max_gap_s": 120,
+        "availability": {
+          "C65": 0.9875,
+          "C70": 1.0,
+          "C72": 1.0
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          65.0,
+          130.0
+        ],
+        "phase_deg": [
+          0.0,
+          16.875,
+          33.75
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.9916666666666667,
+        "worst_max_gap_s": 120,
+        "availability": {
+          "C65": 0.9916666666666667,
+          "C70": 1.0,
+          "C72": 1.0
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          70.0,
+          140.0
+        ],
+        "phase_deg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.9555555555555556,
+        "worst_max_gap_s": 240,
+        "availability": {
+          "C65": 0.9555555555555556,
+          "C70": 0.9972222222222222,
+          "C72": 0.9972222222222222
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          70.0,
+          140.0
+        ],
+        "phase_deg": [
+          0.0,
+          5.625,
+          11.25
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.9736111111111111,
+        "worst_max_gap_s": 120,
+        "availability": {
+          "C65": 0.9736111111111111,
+          "C70": 1.0,
+          "C72": 1.0
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          70.0,
+          140.0
+        ],
+        "phase_deg": [
+          0.0,
+          11.25,
+          22.5
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.9638888888888889,
+        "worst_max_gap_s": 120,
+        "availability": {
+          "C65": 0.9638888888888889,
+          "C70": 1.0,
+          "C72": 1.0
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          70.0,
+          140.0
+        ],
+        "phase_deg": [
+          0.0,
+          16.875,
+          33.75
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.9611111111111111,
+        "worst_max_gap_s": 240,
+        "availability": {
+          "C65": 0.9611111111111111,
+          "C70": 0.9902777777777778,
+          "C72": 0.9986111111111111
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          75.0,
+          150.0
+        ],
+        "phase_deg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.9152777777777777,
+        "worst_max_gap_s": 240,
+        "availability": {
+          "C65": 0.9152777777777777,
+          "C70": 0.9916666666666667,
+          "C72": 0.9916666666666667
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          75.0,
+          150.0
+        ],
+        "phase_deg": [
+          0.0,
+          5.625,
+          11.25
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.9180555555555555,
+        "worst_max_gap_s": 240,
+        "availability": {
+          "C65": 0.9180555555555555,
+          "C70": 1.0,
+          "C72": 1.0
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          75.0,
+          150.0
+        ],
+        "phase_deg": [
+          0.0,
+          11.25,
+          22.5
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.9208333333333333,
+        "worst_max_gap_s": 360,
+        "availability": {
+          "C65": 0.9208333333333333,
+          "C70": 1.0,
+          "C72": 1.0
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          75.0,
+          150.0
+        ],
+        "phase_deg": [
+          0.0,
+          16.875,
+          33.75
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.9222222222222223,
+        "worst_max_gap_s": 240,
+        "availability": {
+          "C65": 0.9222222222222223,
+          "C70": 0.9805555555555555,
+          "C72": 0.9986111111111111
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          80.0,
+          160.0
+        ],
+        "phase_deg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.8569444444444444,
+        "worst_max_gap_s": 1200,
+        "availability": {
+          "C65": 0.8569444444444444,
+          "C70": 0.9819444444444444,
+          "C72": 0.9833333333333333
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          80.0,
+          160.0
+        ],
+        "phase_deg": [
+          0.0,
+          5.625,
+          11.25
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.8680555555555556,
+        "worst_max_gap_s": 1560,
+        "availability": {
+          "C65": 0.8680555555555556,
+          "C70": 0.9972222222222222,
+          "C72": 1.0
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          80.0,
+          160.0
+        ],
+        "phase_deg": [
+          0.0,
+          11.25,
+          22.5
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.8472222222222222,
+        "worst_max_gap_s": 1680,
+        "availability": {
+          "C65": 0.8472222222222222,
+          "C70": 0.9847222222222223,
+          "C72": 0.9847222222222223
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          80.0,
+          160.0
+        ],
+        "phase_deg": [
+          0.0,
+          16.875,
+          33.75
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.8611111111111112,
+        "worst_max_gap_s": 1680,
+        "availability": {
+          "C65": 0.8611111111111112,
+          "C70": 0.9486111111111111,
+          "C72": 0.9777777777777777
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          85.0,
+          170.0
+        ],
+        "phase_deg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.8263888888888888,
+        "worst_max_gap_s": 2280,
+        "availability": {
+          "C65": 0.8263888888888888,
+          "C70": 0.9708333333333333,
+          "C72": 0.975
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          85.0,
+          170.0
+        ],
+        "phase_deg": [
+          0.0,
+          5.625,
+          11.25
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.8347222222222223,
+        "worst_max_gap_s": 2520,
+        "availability": {
+          "C65": 0.8347222222222223,
+          "C70": 0.9875,
+          "C72": 0.9888888888888889
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          85.0,
+          170.0
+        ],
+        "phase_deg": [
+          0.0,
+          11.25,
+          22.5
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.8069444444444445,
+        "worst_max_gap_s": 2160,
+        "availability": {
+          "C65": 0.8069444444444445,
+          "C70": 0.9597222222222223,
+          "C72": 0.9694444444444444
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          85.0,
+          170.0
+        ],
+        "phase_deg": [
+          0.0,
+          16.875,
+          33.75
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.8222222222222222,
+        "worst_max_gap_s": 2760,
+        "availability": {
+          "C65": 0.8222222222222222,
+          "C70": 0.9444444444444444,
+          "C72": 0.9666666666666667
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          90.0,
+          180.0
+        ],
+        "phase_deg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.8111111111111111,
+        "worst_max_gap_s": 3720,
+        "availability": {
+          "C65": 0.8111111111111111,
+          "C70": 0.9416666666666667,
+          "C72": 0.9625
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          90.0,
+          180.0
+        ],
+        "phase_deg": [
+          0.0,
+          5.625,
+          11.25
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.8027777777777778,
+        "worst_max_gap_s": 3720,
+        "availability": {
+          "C65": 0.8027777777777778,
+          "C70": 0.9541666666666667,
+          "C72": 0.9611111111111111
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          90.0,
+          180.0
+        ],
+        "phase_deg": [
+          0.0,
+          11.25,
+          22.5
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.7916666666666666,
+        "worst_max_gap_s": 3600,
+        "availability": {
+          "C65": 0.7916666666666666,
+          "C70": 0.9361111111111111,
+          "C72": 0.9583333333333334
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          90.0,
+          180.0
+        ],
+        "phase_deg": [
+          0.0,
+          16.875,
+          33.75
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.8027777777777778,
+        "worst_max_gap_s": 3840,
+        "availability": {
+          "C65": 0.8027777777777778,
+          "C70": 0.9333333333333333,
+          "C72": 0.9541666666666667
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          95.0,
+          190.0
+        ],
+        "phase_deg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.7833333333333333,
+        "worst_max_gap_s": 5160,
+        "availability": {
+          "C65": 0.7833333333333333,
+          "C70": 0.9027777777777778,
+          "C72": 0.9333333333333333
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          95.0,
+          190.0
+        ],
+        "phase_deg": [
+          0.0,
+          5.625,
+          11.25
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.7736111111111111,
+        "worst_max_gap_s": 5040,
+        "availability": {
+          "C65": 0.7736111111111111,
+          "C70": 0.9027777777777778,
+          "C72": 0.9333333333333333
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          95.0,
+          190.0
+        ],
+        "phase_deg": [
+          0.0,
+          11.25,
+          22.5
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.7583333333333333,
+        "worst_max_gap_s": 5640,
+        "availability": {
+          "C65": 0.7583333333333333,
+          "C70": 0.8888888888888888,
+          "C72": 0.9222222222222223
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          95.0,
+          190.0
+        ],
+        "phase_deg": [
+          0.0,
+          16.875,
+          33.75
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.775,
+        "worst_max_gap_s": 4920,
+        "availability": {
+          "C65": 0.775,
+          "C70": 0.9027777777777778,
+          "C72": 0.925
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          100.0,
+          200.0
+        ],
+        "phase_deg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.7680555555555556,
+        "worst_max_gap_s": 5280,
+        "availability": {
+          "C65": 0.7680555555555556,
+          "C70": 0.8777777777777778,
+          "C72": 0.9180555555555555
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          100.0,
+          200.0
+        ],
+        "phase_deg": [
+          0.0,
+          5.625,
+          11.25
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.7597222222222222,
+        "worst_max_gap_s": 5280,
+        "availability": {
+          "C65": 0.7597222222222222,
+          "C70": 0.8652777777777778,
+          "C72": 0.9111111111111111
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          100.0,
+          200.0
+        ],
+        "phase_deg": [
+          0.0,
+          11.25,
+          22.5
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.7527777777777778,
+        "worst_max_gap_s": 5880,
+        "availability": {
+          "C65": 0.7527777777777778,
+          "C70": 0.8611111111111112,
+          "C72": 0.9
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          100.0,
+          200.0
+        ],
+        "phase_deg": [
+          0.0,
+          16.875,
+          33.75
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.7638888888888888,
+        "worst_max_gap_s": 5160,
+        "availability": {
+          "C65": 0.7638888888888888,
+          "C70": 0.8708333333333333,
+          "C72": 0.8930555555555556
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          105.0,
+          210.0
+        ],
+        "phase_deg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.8097222222222222,
+        "worst_max_gap_s": 4080,
+        "availability": {
+          "C65": 0.8097222222222222,
+          "C70": 0.8916666666666667,
+          "C72": 0.9291666666666667
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          105.0,
+          210.0
+        ],
+        "phase_deg": [
+          0.0,
+          5.625,
+          11.25
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.8055555555555556,
+        "worst_max_gap_s": 3840,
+        "availability": {
+          "C65": 0.8055555555555556,
+          "C70": 0.8819444444444444,
+          "C72": 0.925
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          105.0,
+          210.0
+        ],
+        "phase_deg": [
+          0.0,
+          11.25,
+          22.5
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.7986111111111112,
+        "worst_max_gap_s": 3960,
+        "availability": {
+          "C65": 0.7986111111111112,
+          "C70": 0.8736111111111111,
+          "C72": 0.9055555555555556
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          105.0,
+          210.0
+        ],
+        "phase_deg": [
+          0.0,
+          16.875,
+          33.75
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.8013888888888889,
+        "worst_max_gap_s": 3720,
+        "availability": {
+          "C65": 0.8013888888888889,
+          "C70": 0.8861111111111111,
+          "C72": 0.9208333333333333
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          110.0,
+          220.0
+        ],
+        "phase_deg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.8541666666666666,
+        "worst_max_gap_s": 2760,
+        "availability": {
+          "C65": 0.8541666666666666,
+          "C70": 0.9319444444444445,
+          "C72": 0.9513888888888888
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          110.0,
+          220.0
+        ],
+        "phase_deg": [
+          0.0,
+          5.625,
+          11.25
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.8638888888888889,
+        "worst_max_gap_s": 2760,
+        "availability": {
+          "C65": 0.8638888888888889,
+          "C70": 0.9208333333333333,
+          "C72": 0.9486111111111111
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          110.0,
+          220.0
+        ],
+        "phase_deg": [
+          0.0,
+          11.25,
+          22.5
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.8430555555555556,
+        "worst_max_gap_s": 2520,
+        "availability": {
+          "C65": 0.8430555555555556,
+          "C70": 0.9083333333333333,
+          "C72": 0.9333333333333333
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          110.0,
+          220.0
+        ],
+        "phase_deg": [
+          0.0,
+          16.875,
+          33.75
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.85,
+        "worst_max_gap_s": 2640,
+        "availability": {
+          "C65": 0.85,
+          "C70": 0.925,
+          "C72": 0.9513888888888888
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          115.0,
+          230.0
+        ],
+        "phase_deg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.8944444444444445,
+        "worst_max_gap_s": 1680,
+        "availability": {
+          "C65": 0.8944444444444445,
+          "C70": 0.9805555555555555,
+          "C72": 0.9805555555555555
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          115.0,
+          230.0
+        ],
+        "phase_deg": [
+          0.0,
+          5.625,
+          11.25
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.9125,
+        "worst_max_gap_s": 1800,
+        "availability": {
+          "C65": 0.9125,
+          "C70": 0.9583333333333334,
+          "C72": 0.9708333333333333
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          115.0,
+          230.0
+        ],
+        "phase_deg": [
+          0.0,
+          11.25,
+          22.5
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.8888888888888888,
+        "worst_max_gap_s": 1440,
+        "availability": {
+          "C65": 0.8888888888888888,
+          "C70": 0.9444444444444444,
+          "C72": 0.9666666666666667
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          115.0,
+          230.0
+        ],
+        "phase_deg": [
+          0.0,
+          16.875,
+          33.75
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.8944444444444445,
+        "worst_max_gap_s": 1680,
+        "availability": {
+          "C65": 0.8944444444444445,
+          "C70": 0.9486111111111111,
+          "C72": 0.9666666666666667
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          120.0,
+          240.0
+        ],
+        "phase_deg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.925,
+        "worst_max_gap_s": 600,
+        "availability": {
+          "C65": 0.925,
+          "C70": 0.9916666666666667,
+          "C72": 0.9916666666666667
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          120.0,
+          240.0
+        ],
+        "phase_deg": [
+          0.0,
+          5.625,
+          11.25
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.9277777777777778,
+        "worst_max_gap_s": 600,
+        "availability": {
+          "C65": 0.9277777777777778,
+          "C70": 0.9791666666666666,
+          "C72": 0.9763888888888889
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          120.0,
+          240.0
+        ],
+        "phase_deg": [
+          0.0,
+          11.25,
+          22.5
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.9222222222222223,
+        "worst_max_gap_s": 600,
+        "availability": {
+          "C65": 0.9222222222222223,
+          "C70": 0.9652777777777778,
+          "C72": 0.9805555555555555
+        }
+      },
+      {
+        "raan_deg": [
+          0.0,
+          120.0,
+          240.0
+        ],
+        "phase_deg": [
+          0.0,
+          16.875,
+          33.75
+        ],
+        "launch_stage": 3,
+        "worst_availability": 0.9,
+        "worst_max_gap_s": 480,
+        "availability": {
+          "C65": 0.9,
+          "C70": 0.9444444444444444,
+          "C72": 0.9555555555555556
+        }
+      }
+    ]
+  },
+  "what_if": {
+    "baseline": {
+      "scenario_id": "01_full_constellation",
+      "strategy": "min_hops",
+      "steps": 720,
+      "step_s": 120,
+      "horizon_s": 86400,
+      "target_availability": 0.9,
+      "worst_availability": 0.9666666666666667,
+      "worst_max_gap_s": 480,
+      "meets_target": true,
+      "clients": [
+        {
+          "client_id": "C65",
+          "steps": 720,
+          "visibility_share": 0.9777777777777777,
+          "availability_share": 0.9666666666666667,
+          "meets_target": true,
+          "max_gap_s": 480,
+          "max_interior_gap_s": 480,
+          "gap_count": 19,
+          "mean_hops": 2.2873563218390807,
+          "max_hops": 5,
+          "mean_route_length_km": 3151.497512941296,
+          "causes": {
+            "no_client_contact": 16,
+            "no_gateway_contact": 8
+          }
+        },
+        {
+          "client_id": "C70",
+          "steps": 720,
+          "visibility_share": 0.9986111111111111,
+          "availability_share": 0.9875,
+          "meets_target": true,
+          "max_gap_s": 120,
+          "max_interior_gap_s": 120,
+          "gap_count": 9,
+          "mean_hops": 2.6554149085794654,
+          "max_hops": 4,
+          "mean_route_length_km": 4009.3323698885433,
+          "causes": {
+            "no_client_contact": 1,
+            "no_gateway_contact": 8
+          }
+        },
+        {
+          "client_id": "C72",
+          "steps": 720,
+          "visibility_share": 1.0,
+          "availability_share": 0.9888888888888889,
+          "meets_target": true,
+          "max_gap_s": 120,
+          "max_interior_gap_s": 120,
+          "gap_count": 8,
+          "mean_hops": 3.1530898876404496,
+          "max_hops": 4,
+          "mean_route_length_km": 5187.635032512992,
+          "causes": {
+            "no_gateway_contact": 8
+          }
+        }
+      ]
+    },
+    "tuned_planes": {
+      "scenario_id": "01_full_constellation",
+      "strategy": "min_hops",
+      "steps": 720,
+      "step_s": 120,
+      "horizon_s": 86400,
+      "target_availability": 0.9,
+      "worst_availability": 0.9958333333333333,
+      "worst_max_gap_s": 120,
+      "meets_target": true,
+      "clients": [
+        {
+          "client_id": "C65",
+          "steps": 720,
+          "visibility_share": 0.9958333333333333,
+          "availability_share": 0.9958333333333333,
+          "meets_target": true,
+          "max_gap_s": 120,
+          "max_interior_gap_s": 120,
+          "gap_count": 3,
+          "mean_hops": 2.3347280334728033,
+          "max_hops": 5,
+          "mean_route_length_km": 3286.1120915775,
+          "causes": {
+            "no_client_contact": 3
+          }
+        },
+        {
+          "client_id": "C70",
+          "steps": 720,
+          "visibility_share": 1.0,
+          "availability_share": 1.0,
+          "meets_target": true,
+          "max_gap_s": 0,
+          "max_interior_gap_s": 0,
+          "gap_count": 0,
+          "mean_hops": 2.6625,
+          "max_hops": 4,
+          "mean_route_length_km": 4022.5011717827765,
+          "causes": {}
+        },
+        {
+          "client_id": "C72",
+          "steps": 720,
+          "visibility_share": 1.0,
+          "availability_share": 1.0,
+          "meets_target": true,
+          "max_gap_s": 0,
+          "max_interior_gap_s": 0,
+          "gap_count": 0,
+          "mean_hops": 3.095833333333333,
+          "max_hops": 4,
+          "mean_route_length_km": 5029.401435896792,
+          "causes": {}
+        }
+      ]
+    },
+    "second_gateway": {
+      "scenario_id": "01_full_constellation",
+      "strategy": "min_hops",
+      "steps": 720,
+      "step_s": 120,
+      "horizon_s": 86400,
+      "target_availability": 0.9,
+      "worst_availability": 0.9777777777777777,
+      "worst_max_gap_s": 480,
+      "meets_target": true,
+      "clients": [
+        {
+          "client_id": "C65",
+          "steps": 720,
+          "visibility_share": 0.9777777777777777,
+          "availability_share": 0.9777777777777777,
+          "meets_target": true,
+          "max_gap_s": 480,
+          "max_interior_gap_s": 480,
+          "gap_count": 11,
+          "mean_hops": 2.0198863636363638,
+          "max_hops": 3,
+          "mean_route_length_km": 2344.390858234836,
+          "causes": {
+            "no_client_contact": 16
+          }
+        },
+        {
+          "client_id": "C70",
+          "steps": 720,
+          "visibility_share": 0.9986111111111111,
+          "availability_share": 0.9986111111111111,
+          "meets_target": true,
+          "max_gap_s": 120,
+          "max_interior_gap_s": 120,
+          "gap_count": 1,
+          "mean_hops": 2.0,
+          "max_hops": 2,
+          "mean_route_length_km": 2404.947398446346,
+          "causes": {
+            "no_client_contact": 1
+          }
+        },
+        {
+          "client_id": "C72",
+          "steps": 720,
+          "visibility_share": 1.0,
+          "availability_share": 1.0,
+          "meets_target": true,
+          "max_gap_s": 0,
+          "max_interior_gap_s": 0,
+          "gap_count": 0,
+          "mean_hops": 2.2875,
+          "max_hops": 4,
+          "mean_route_length_km": 3117.820760109243,
+          "causes": {}
+        }
+      ]
+    },
+    "elevation_5deg": {
+      "scenario_id": "01_full_constellation",
+      "strategy": "min_hops",
+      "steps": 720,
+      "step_s": 120,
+      "horizon_s": 86400,
+      "target_availability": 0.9,
+      "worst_availability": 1.0,
+      "worst_max_gap_s": 0,
+      "meets_target": true,
+      "clients": [
+        {
+          "client_id": "C65",
+          "steps": 720,
+          "visibility_share": 1.0,
+          "availability_share": 1.0,
+          "meets_target": true,
+          "max_gap_s": 0,
+          "max_interior_gap_s": 0,
+          "gap_count": 0,
+          "mean_hops": 2.029166666666667,
+          "max_hops": 4,
+          "mean_route_length_km": 2786.2138803393027,
+          "causes": {}
+        },
+        {
+          "client_id": "C70",
+          "steps": 720,
+          "visibility_share": 1.0,
+          "availability_share": 1.0,
+          "meets_target": true,
+          "max_gap_s": 0,
+          "max_interior_gap_s": 0,
+          "gap_count": 0,
+          "mean_hops": 2.091666666666667,
+          "max_hops": 3,
+          "mean_route_length_km": 3304.993156160717,
+          "causes": {}
+        },
+        {
+          "client_id": "C72",
+          "steps": 720,
+          "visibility_share": 1.0,
+          "availability_share": 1.0,
+          "meets_target": true,
+          "max_gap_s": 0,
+          "max_interior_gap_s": 0,
+          "gap_count": 0,
+          "mean_hops": 2.4819444444444443,
+          "max_hops": 3,
+          "mean_route_length_km": 4430.460501219925,
+          "causes": {}
+        }
+      ]
+    },
+    "second_gateway_and_elevation_5deg": {
+      "scenario_id": "01_full_constellation",
+      "strategy": "min_hops",
+      "steps": 720,
+      "step_s": 120,
+      "horizon_s": 86400,
+      "target_availability": 0.9,
+      "worst_availability": 1.0,
+      "worst_max_gap_s": 0,
+      "meets_target": true,
+      "clients": [
+        {
+          "client_id": "C65",
+          "steps": 720,
+          "visibility_share": 1.0,
+          "availability_share": 1.0,
+          "meets_target": true,
+          "max_gap_s": 0,
+          "max_interior_gap_s": 0,
+          "gap_count": 0,
+          "mean_hops": 2.0,
+          "max_hops": 2,
+          "mean_route_length_km": 2560.0072881426026,
+          "causes": {}
+        },
+        {
+          "client_id": "C70",
+          "steps": 720,
+          "visibility_share": 1.0,
+          "availability_share": 1.0,
+          "meets_target": true,
+          "max_gap_s": 0,
+          "max_interior_gap_s": 0,
+          "gap_count": 0,
+          "mean_hops": 2.0,
+          "max_hops": 2,
+          "mean_route_length_km": 2919.496352632374,
+          "causes": {}
+        },
+        {
+          "client_id": "C72",
+          "steps": 720,
+          "visibility_share": 1.0,
+          "availability_share": 1.0,
+          "meets_target": true,
+          "max_gap_s": 0,
+          "max_interior_gap_s": 0,
+          "gap_count": 0,
+          "mean_hops": 2.011111111111111,
+          "max_hops": 3,
+          "mean_route_length_km": 3013.704842473103,
+          "causes": {}
+        }
+      ]
+    }
+  },
+  "tuned_vs_baseline": {
+    "runs": [
+      {
+        "label": "baseline",
+        "scenario_id": "01_full_constellation",
+        "strategy": "min_hops",
+        "worst_availability": 0.9666666666666667,
+        "worst_max_gap_s": 480,
+        "meets_target": true
+      },
+      {
+        "label": "tuned_planes",
+        "scenario_id": "01_full_constellation",
+        "strategy": "min_hops",
+        "worst_availability": 0.9958333333333333,
+        "worst_max_gap_s": 120,
+        "meets_target": true
+      }
+    ],
+    "clients": [
+      {
+        "client_id": "C65",
+        "cells": [
+          {
+            "availability_share": 0.9666666666666667,
+            "visibility_share": 0.9777777777777777,
+            "max_gap_s": 480,
+            "gap_count": 19,
+            "mean_hops": 2.2873563218390807,
+            "mean_route_length_km": 3151.497512941296,
+            "meets_target": true
+          },
+          {
+            "availability_share": 0.9958333333333333,
+            "visibility_share": 0.9958333333333333,
+            "max_gap_s": 120,
+            "gap_count": 3,
+            "mean_hops": 2.3347280334728033,
+            "mean_route_length_km": 3286.1120915775,
+            "meets_target": true
+          }
+        ]
+      },
+      {
+        "client_id": "C70",
+        "cells": [
+          {
+            "availability_share": 0.9875,
+            "visibility_share": 0.9986111111111111,
+            "max_gap_s": 120,
+            "gap_count": 9,
+            "mean_hops": 2.6554149085794654,
+            "mean_route_length_km": 4009.3323698885433,
+            "meets_target": true
+          },
+          {
+            "availability_share": 1.0,
+            "visibility_share": 1.0,
+            "max_gap_s": 0,
+            "gap_count": 0,
+            "mean_hops": 2.6625,
+            "mean_route_length_km": 4022.5011717827765,
+            "meets_target": true
+          }
+        ]
+      },
+      {
+        "client_id": "C72",
+        "cells": [
+          {
+            "availability_share": 0.9888888888888889,
+            "visibility_share": 1.0,
+            "max_gap_s": 120,
+            "gap_count": 8,
+            "mean_hops": 3.1530898876404496,
+            "mean_route_length_km": 5187.635032512992,
+            "meets_target": true
+          },
+          {
+            "availability_share": 1.0,
+            "visibility_share": 1.0,
+            "max_gap_s": 0,
+            "gap_count": 0,
+            "mean_hops": 3.095833333333333,
+            "mean_route_length_km": 5029.401435896792,
+            "meets_target": true
+          }
+        ]
+      }
+    ],
+    "comparable": true,
+    "grids": [
+      [
+        86400,
+        120
+      ]
+    ],
+    "changes": [
+      {
+        "path": "design.planes[P2].phase_deg",
+        "before": 7.5,
+        "after": 5.625
+      },
+      {
+        "path": "design.planes[P2].raan_deg",
+        "before": 60.0,
+        "after": 65.0
+      },
+      {
+        "path": "design.planes[P3].phase_deg",
+        "before": 15.0,
+        "after": 11.25
+      },
+      {
+        "path": "design.planes[P3].raan_deg",
+        "before": 120.0,
+        "after": 130.0
+      }
+    ]
+  },
+  "elapsed_s": 4.56
+}
