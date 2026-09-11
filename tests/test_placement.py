@@ -43,12 +43,13 @@ def test_a_second_gateway_never_hurts(full_constellation, link_range):
         assert len(with_gateway_at(scenario, 70.0, 90.0).gateways) == len(scenario.gateways) + 1
 
 
-def test_a_healthy_network_does_not_care_where_the_gateway_is(full_constellation):
+def test_a_healthy_network_barely_cares_where_the_gateway_is(full_constellation):
     """
-    Измерено: на целой сети второй шлюз даёт 97.8 % из любой точки сетки.
+    Измерено: на целой сети разница между лучшим и худшим местом — 1.11 пункта.
 
-    Сеть довезёт трафик куда угодно, поэтому выбор места ничего не решает — и это
-    объясняет, почему на сценарии 01 наземный рычаг слабее орбитального.
+    Полный максимум 97.78 % дают 164 точки из 192, и на каждой широте он достижим.
+    Сеть довозит трафик куда угодно, поэтому выбор места почти ничего не решает — и
+    это объясняет, почему на сценарии 01 наземный рычаг слабее орбитального.
     """
 
     report = placement_grid(full_constellation)
@@ -56,6 +57,13 @@ def test_a_healthy_network_does_not_care_where_the_gateway_is(full_constellation
     assert best is not None
     assert best.worst_availability == pytest.approx(0.9778, abs=0.002)
 
+    spread = best.gain_pp - min(point.gain_pp for point in report.points)
+    assert spread == pytest.approx(1.11, abs=0.05)
+
+    at_best = [p for p in report.points if p.worst_availability == best.worst_availability]
+    assert len(at_best) == 164
+
+    # На каждой широте максимум достижим — меняется только число подходящих долгот.
     per_latitude = [value for _, value in report.best_per_latitude()]
     assert max(per_latitude) - min(per_latitude) < 0.005
 
@@ -74,6 +82,10 @@ def test_a_broken_network_makes_the_place_decisive(link_range):
     assert by_latitude[70.0] == pytest.approx(0.944, abs=0.005)
     assert by_latitude[50.0] == pytest.approx(0.658, abs=0.005)
     assert by_latitude[70.0] - by_latitude[50.0] > 0.25
+
+    # Тот же разброс, что на целой сети равен 1.11 пункта, здесь в тридцать раз больше.
+    spread = report.best.gain_pp - min(point.gain_pp for point in report.points)
+    assert spread == pytest.approx(32.2, abs=0.2)
 
     assert evaluate_site(link_range, NORILSK) == pytest.approx(0.958, abs=0.005)
     assert evaluate_site(link_range, NORILSK) >= report.best.worst_availability
