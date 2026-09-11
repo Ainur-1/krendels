@@ -873,6 +873,35 @@
       }
     ]
   },
+  "redundancy": {
+    "worst_single_path_share": 0.7180555555555556,
+    "clients": [
+      {
+        "client_id": "C65",
+        "mean_disjoint_paths": 0.8388888888888889,
+        "no_path_share": 0.225,
+        "single_path_share": 0.7180555555555556,
+        "redundant_share": 0.05694444444444444,
+        "max_disjoint_paths": 3
+      },
+      {
+        "client_id": "C70",
+        "mean_disjoint_paths": 0.7333333333333333,
+        "no_path_share": 0.37777777777777777,
+        "single_path_share": 0.5111111111111111,
+        "redundant_share": 0.1111111111111111,
+        "max_disjoint_paths": 2
+      },
+      {
+        "client_id": "C72",
+        "mean_disjoint_paths": 0.6833333333333333,
+        "no_path_share": 0.3486111111111111,
+        "single_path_share": 0.6194444444444445,
+        "redundant_share": 0.03194444444444444,
+        "max_disjoint_paths": 2
+      }
+    ]
+  },
   "sweep": {
     "baseline": {
       "raan_deg": [
@@ -3538,5 +3567,5 @@
       }
     ]
   },
-  "elapsed_s": 7.8
+  "elapsed_s": 7.9
 }
