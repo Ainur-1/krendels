@@ -395,6 +395,138 @@
       }
     ]
   },
+  "delivery": {
+    "deadlines_s": [
+      0,
+      300,
+      900,
+      1800,
+      3600,
+      7200
+    ],
+    "worst_within": [
+      {
+        "deadline_s": 0,
+        "share": 0.12638888888888888
+      },
+      {
+        "deadline_s": 300,
+        "share": 0.22083333333333333
+      },
+      {
+        "deadline_s": 900,
+        "share": 0.23472222222222222
+      },
+      {
+        "deadline_s": 1800,
+        "share": 0.2569444444444444
+      },
+      {
+        "deadline_s": 3600,
+        "share": 0.2986111111111111
+      },
+      {
+        "deadline_s": 7200,
+        "share": 0.3819444444444444
+      }
+    ],
+    "worst_max_latency_s": 47760.0,
+    "clients": [
+      {
+        "client_id": "C65",
+        "undelivered_share": 0.07361111111111111,
+        "max_latency_s": 34320.0,
+        "within": [
+          {
+            "deadline_s": 0,
+            "share": 0.2722222222222222
+          },
+          {
+            "deadline_s": 300,
+            "share": 0.32083333333333336
+          },
+          {
+            "deadline_s": 900,
+            "share": 0.3347222222222222
+          },
+          {
+            "deadline_s": 1800,
+            "share": 0.35694444444444445
+          },
+          {
+            "deadline_s": 3600,
+            "share": 0.39861111111111114
+          },
+          {
+            "deadline_s": 7200,
+            "share": 0.48194444444444445
+          }
+        ]
+      },
+      {
+        "client_id": "C70",
+        "undelivered_share": 0.11388888888888889,
+        "max_latency_s": 39480.0,
+        "within": [
+          {
+            "deadline_s": 0,
+            "share": 0.15833333333333333
+          },
+          {
+            "deadline_s": 300,
+            "share": 0.22083333333333333
+          },
+          {
+            "deadline_s": 900,
+            "share": 0.23472222222222222
+          },
+          {
+            "deadline_s": 1800,
+            "share": 0.2569444444444444
+          },
+          {
+            "deadline_s": 3600,
+            "share": 0.2986111111111111
+          },
+          {
+            "deadline_s": 7200,
+            "share": 0.3819444444444444
+          }
+        ]
+      },
+      {
+        "client_id": "C72",
+        "undelivered_share": 0.001388888888888889,
+        "max_latency_s": 47760.0,
+        "within": [
+          {
+            "deadline_s": 0,
+            "share": 0.12638888888888888
+          },
+          {
+            "deadline_s": 300,
+            "share": 0.22083333333333333
+          },
+          {
+            "deadline_s": 900,
+            "share": 0.2513888888888889
+          },
+          {
+            "deadline_s": 1800,
+            "share": 0.2847222222222222
+          },
+          {
+            "deadline_s": 3600,
+            "share": 0.3472222222222222
+          },
+          {
+            "deadline_s": 7200,
+            "share": 0.43472222222222223
+          }
+        ]
+      }
+    ]
+  },
   "sweep": {
     "baseline": {
       "raan_deg": [
@@ -3004,5 +3136,5 @@
     ],
     "changes": []
   },
-  "elapsed_s": 1.76
+  "elapsed_s": 2.19
 }

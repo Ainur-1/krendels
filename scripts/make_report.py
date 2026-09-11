@@ -17,6 +17,7 @@ from pathlib import Path
 
 from cosmo_net.analysis.compare import compare_runs
 from cosmo_net.analysis.criticality import rank_satellites
+from cosmo_net.analysis.delivery import delivery_report
 from cosmo_net.analysis.optimise import sweep_spacing, variant
 from cosmo_net.analysis.simulate import simulate
 from cosmo_net.config import METRICS_DIR
@@ -93,6 +94,7 @@ def study_scenario(path: Path, workers: int) -> dict[str, object]:
         "baseline": baseline.summary(),
         "strategies": strategies,
         "criticality": rank_satellites(scenario).to_dict(),
+        "delivery": delivery_report(scenario).to_dict(),
         "sweep": sweep.to_dict(),
         "what_if": what_if,
         "tuned_vs_baseline": compare_runs(

@@ -76,17 +76,37 @@ def availability_series(
         if not landing:
             continue
 
-        parent = list(range(len(contacts.satellite_ids)))
-        for p in np.flatnonzero(contacts.isl_open[step]):
-            _union(parent, int(pairs[p, 0]), int(pairs[p, 1]))
-
-        landing_roots = {_find(parent, n) for n in landing}
+        labels = connected_components(contacts.isl_open[step], pairs, len(contacts.satellite_ids))
+        landing_roots = {int(labels[n]) for n in landing}
         for client_id, g in zip(client_ids, client_slots, strict=True):
             visible = np.flatnonzero(contacts.ground_open[step, g])
-            if visible.size and any(_find(parent, int(n)) in landing_roots for n in visible):
+            if visible.size and any(int(labels[n]) in landing_roots for n in visible):
                 result[client_id][step] = True
 
     return result
+
+
+def connected_components(
+    isl_open_step: np.ndarray, pair_index: np.ndarray, count: int
+) -> np.ndarray:
+    """
+    (N,) метка компоненты связности для каждого аппарата на одном отсчёте.
+
+    Вынесено отдельно, потому что вопросов, которые сводятся к связности сети на
+    срезе времени, оказалось два. Достижимость спрашивает, лежат ли видимый клиенту
+    и видимый шлюзу аппараты в одной компоненте. Доставка с допустимой задержкой
+    спрашивает, какой лучший результат доступен всей компоненте сразу. Считаются они
+    одним и тем же объединением множеств, и держать его в одном месте дешевле, чем
+    следить за тем, чтобы две копии не разошлись.
+
+    Метка — это корень, выбранный объединением, а не порядковый номер: сравнивать её
+    можно только на равенство.
+    """
+
+    parent = list(range(count))
+    for p in np.flatnonzero(isl_open_step):
+        _union(parent, int(pair_index[p, 0]), int(pair_index[p, 1]))
+    return np.array([_find(parent, n) for n in range(count)], dtype=np.int64)
 
 
 def worst_availability(scenario: Scenario, contacts: ContactSeries | None = None) -> float:

@@ -615,6 +615,138 @@
       }
     ]
   },
+  "delivery": {
+    "deadlines_s": [
+      0,
+      300,
+      900,
+      1800,
+      3600,
+      7200
+    ],
+    "worst_within": [
+      {
+        "deadline_s": 0,
+        "share": 0.9666666666666667
+      },
+      {
+        "deadline_s": 300,
+        "share": 0.9972222222222222
+      },
+      {
+        "deadline_s": 900,
+        "share": 1.0
+      },
+      {
+        "deadline_s": 1800,
+        "share": 1.0
+      },
+      {
+        "deadline_s": 3600,
+        "share": 1.0
+      },
+      {
+        "deadline_s": 7200,
+        "share": 1.0
+      }
+    ],
+    "worst_max_latency_s": 480.0,
+    "clients": [
+      {
+        "client_id": "C65",
+        "undelivered_share": 0.0,
+        "max_latency_s": 480.0,
+        "within": [
+          {
+            "deadline_s": 0,
+            "share": 0.9666666666666667
+          },
+          {
+            "deadline_s": 300,
+            "share": 0.9972222222222222
+          },
+          {
+            "deadline_s": 900,
+            "share": 1.0
+          },
+          {
+            "deadline_s": 1800,
+            "share": 1.0
+          },
+          {
+            "deadline_s": 3600,
+            "share": 1.0
+          },
+          {
+            "deadline_s": 7200,
+            "share": 1.0
+          }
+        ]
+      },
+      {
+        "client_id": "C70",
+        "undelivered_share": 0.0,
+        "max_latency_s": 120.0,
+        "within": [
+          {
+            "deadline_s": 0,
+            "share": 0.9875
+          },
+          {
+            "deadline_s": 300,
+            "share": 1.0
+          },
+          {
+            "deadline_s": 900,
+            "share": 1.0
+          },
+          {
+            "deadline_s": 1800,
+            "share": 1.0
+          },
+          {
+            "deadline_s": 3600,
+            "share": 1.0
+          },
+          {
+            "deadline_s": 7200,
+            "share": 1.0
+          }
+        ]
+      },
+      {
+        "client_id": "C72",
+        "undelivered_share": 0.0,
+        "max_latency_s": 120.0,
+        "within": [
+          {
+            "deadline_s": 0,
+            "share": 0.9888888888888889
+          },
+          {
+            "deadline_s": 300,
+            "share": 1.0
+          },
+          {
+            "deadline_s": 900,
+            "share": 1.0
+          },
+          {
+            "deadline_s": 1800,
+            "share": 1.0
+          },
+          {
+            "deadline_s": 3600,
+            "share": 1.0
+          },
+          {
+            "deadline_s": 7200,
+            "share": 1.0
+          }
+        ]
+      }
+    ]
+  },
   "sweep": {
     "baseline": {
       "raan_deg": [
@@ -3216,5 +3348,5 @@
       }
     ]
   },
-  "elapsed_s": 3.7
+  "elapsed_s": 4.64
 }
