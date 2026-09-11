@@ -83,6 +83,10 @@ export interface ClientMetrics {
   mean_hops: number | null;
   max_hops: number | null;
   mean_route_length_km: number | null;
+  max_route_length_km: number | null;
+  /** Задержка распространения туда и обратно. Только распространение: очередей в модели нет. */
+  mean_rtt_ms: number | null;
+  max_rtt_ms: number | null;
   causes: Record<string, number>;
 }
 
@@ -116,6 +120,8 @@ export interface RunSummary {
   worst_availability: number;
   worst_max_gap_s: number;
   meets_target: boolean;
+  mean_rtt_ms: number | null;
+  max_rtt_ms: number | null;
   clients: ClientMetrics[];
 }
 
@@ -255,6 +261,102 @@ export interface Comparison {
   }[];
   clients: { client_id: string; cells: (ComparisonCell | null)[] }[];
   changes: { path: string; before: unknown; after: unknown }[];
+}
+
+/**
+ * Доставка с допустимой задержкой.
+ *
+ * Строка с `deadline_s: 0` — это мгновенная доступность, та же, что в ответе расчёта.
+ * Остальные отвечают на вопрос, которого постановка не задаёт: для какого класса
+ * трафика конфигурация провалена.
+ */
+export interface DeliveryShare {
+  deadline_s: number;
+  share: number;
+}
+
+export interface ClientDelivery {
+  client_id: string;
+  undelivered_share: number;
+  max_latency_s: number | null;
+  within: DeliveryShare[];
+}
+
+export interface DeliveryReport {
+  deadlines_s: number[];
+  worst_within: DeliveryShare[];
+  worst_max_latency_s: number | null;
+  clients: ClientDelivery[];
+}
+
+/** Сколько маршрутов без общих аппаратов есть на каждом отсчёте. Ноль — маршрута нет. */
+export interface ClientRedundancy {
+  client_id: string;
+  mean_disjoint_paths: number;
+  no_path_share: number;
+  single_path_share: number;
+  redundant_share: number;
+  max_disjoint_paths: number;
+}
+
+export interface RedundancyReport {
+  worst_single_path_share: number;
+  clients: ClientRedundancy[];
+  times_s: number[];
+  series: Record<string, number[]>;
+}
+
+export interface DegradationPoint {
+  failures: number;
+  trials: number;
+  mean_worst_availability: number;
+  best_worst_availability: number;
+  worst_worst_availability: number;
+  meets_target_share: number;
+}
+
+export interface DegradationCurve {
+  target_availability: number;
+  satellites_in_service: number;
+  seed: number;
+  /** Наибольшее число отказов, при котором цель удержана в **каждом** наборе. */
+  tolerated_failures: number;
+  slope_pp_per_satellite: number;
+  linear_fit_error_pp: number;
+  points: DegradationPoint[];
+}
+
+export interface PlacementPoint {
+  lat_deg: number;
+  lon_deg: number;
+  worst_availability: number;
+  gain_pp: number;
+}
+
+export interface PlacementReport {
+  baseline_worst_availability: number;
+  lat_deg: number[];
+  lon_deg: number[];
+  best: PlacementPoint | null;
+  /** По строкам: для каждой широты все долготы. */
+  points: PlacementPoint[];
+}
+
+export interface SpacingPoint {
+  spacing_deg: number;
+  worst_availability: number;
+}
+
+export interface FamilyReport {
+  planes: number;
+  supplied_spacing_deg: number | null;
+  /** `null`, если плоскости разнесены неравномерно: тогда относить проект не к чему. */
+  supplied_family: "star" | "delta" | null;
+  star_spacing_deg: number;
+  delta_spacing_deg: number;
+  star_best: SpacingPoint | null;
+  delta_best: SpacingPoint | null;
+  points: SpacingPoint[];
 }
 
 export interface FieldError {

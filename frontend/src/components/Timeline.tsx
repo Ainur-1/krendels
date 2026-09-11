@@ -9,15 +9,27 @@
  * Рисуется на canvas, потому что это 720 ячеек на терминал и они меняются при каждом
  * пересчёте. Клик в любом месте переносит туда часы и выбирает этот терминал, так что
  * прочитать картинку и рассмотреть момент — это одно движение.
+ *
+ * Под каждой полосой идёт узкая лента запаса маршрутов. Она отвечает на другой вопрос:
+ * основная полоса говорит, есть ли связь, лента — на скольких аппаратах она держится.
+ * На выданных данных разница разительная: полоса почти сплошь зелёная при 96.7 %
+ * доступности, а лента под ней жёлтая на четырёх пятых суток, потому что маршрут всё
+ * это время ровно один. Показывать это отдельной лентой, а не заменой цвета, —
+ * сознательное решение: причина перерыва остаётся главной картинкой.
  */
 
 import { useEffect, useRef, useState } from "react";
 
 import { CAUSE_LABEL, CAUSE_RGB, clock, duration, percent } from "../lib/format";
-import type { OutageCause, Run } from "../types";
+import type { OutageCause, RedundancyReport, Run } from "../types";
 
 const BAND_HEIGHT = 26;
 const BAND_GAP = 6;
+const SPARE_HEIGHT = 6;
+const SPARE_GAP = 2;
+
+/** Ноль маршрутов, один, два и больше. Ноль совпадает с отсутствием связи на полосе выше. */
+const SPARE_RGB = ["#3a2226", "#d29922", "#3fb950"] as const;
 const LABEL_WIDTH = 54;
 const AXIS_HEIGHT = 18;
 
@@ -35,6 +47,7 @@ const SPEEDS: { label: string; stepMs: number }[] = [
 
 export function Timeline({
   run,
+  redundancy,
   step,
   client,
   playing,
@@ -45,6 +58,7 @@ export function Timeline({
   onStepMs,
 }: {
   run: Run | null;
+  redundancy: RedundancyReport | null;
   step: number;
   client: string | null;
   playing: boolean;
@@ -60,7 +74,12 @@ export function Timeline({
 
   const clients = run ? Object.keys(run.clients) : [];
   const steps = run?.times_s.length ?? 0;
-  const height = clients.length * (BAND_HEIGHT + BAND_GAP) + AXIS_HEIGHT;
+  // Лента запаса добавляет высоты только тогда, когда есть что показать: до её
+  // прихода шкала не должна дёргаться, а после — не должна налезать сама на себя.
+  const spare = redundancy?.series ?? null;
+  const rowHeight =
+    BAND_HEIGHT + BAND_GAP + (spare ? SPARE_HEIGHT + SPARE_GAP : 0);
+  const height = clients.length * rowHeight + AXIS_HEIGHT;
 
   useEffect(() => {
     const element = wrapper.current;
@@ -97,7 +116,7 @@ export function Timeline({
     const cell = plotWidth / steps;
 
     clients.forEach((clientId, row) => {
-      const top = row * (BAND_HEIGHT + BAND_GAP);
+      const top = row * rowHeight;
       const series = run.clients[clientId];
 
       context.fillStyle = clientId === client ? "#e6edf3" : "#9aa7b4";
@@ -127,11 +146,33 @@ export function Timeline({
       context.strokeStyle = clientId === client ? "#4c9aff" : "#2a3441";
       context.lineWidth = 1;
       context.strokeRect(LABEL_WIDTH + 0.5, top + 0.5, plotWidth - 1, BAND_HEIGHT - 1);
+
+      const counts = spare?.[clientId];
+      if (!counts) return;
+
+      // Та же склейка подряд идущих одинаковых значений, что и у основной полосы, и
+      // по той же причине: 720 ячеек на 900 пикселей поштучно оставляют швы.
+      const spareTop = top + BAND_HEIGHT + SPARE_GAP;
+      let spareStart = 0;
+      let spareValue = Math.min(2, counts[0] ?? 0);
+      for (let index = 1; index <= steps; index += 1) {
+        const value = index < steps ? Math.min(2, counts[index] ?? 0) : -1;
+        if (value === spareValue) continue;
+        context.fillStyle = SPARE_RGB[spareValue];
+        context.fillRect(
+          LABEL_WIDTH + spareStart * cell,
+          spareTop,
+          Math.max(cell, (index - spareStart) * cell),
+          SPARE_HEIGHT,
+        );
+        spareStart = index;
+        spareValue = value;
+      }
     });
 
     // Часовые засечки берутся из сетки, а не предполагаются: сценарий жюри может идти
     // двенадцать часов с шагом 60 с.
-    const axisTop = clients.length * (BAND_HEIGHT + BAND_GAP);
+    const axisTop = clients.length * rowHeight;
     context.fillStyle = "#6b7886";
     context.strokeStyle = "#2a3441";
     context.font = "10px var(--mono, monospace)";
@@ -153,7 +194,7 @@ export function Timeline({
     context.moveTo(cursorX, 0);
     context.lineTo(cursorX, axisTop);
     context.stroke();
-  }, [run, width, height, step, client, clients, steps]);
+  }, [run, width, height, step, client, clients, steps, spare, rowHeight]);
 
   if (!run) {
     return (
@@ -166,6 +207,11 @@ export function Timeline({
 
   const series = client ? run.clients[client] : null;
   const currentCause = series?.cause[step] ?? "none";
+  const spareNow = client && spare?.[client] ? spare[client][step] : null;
+  const spareShare =
+    client && redundancy
+      ? (redundancy.clients.find((c) => c.client_id === client)?.single_path_share ?? null)
+      : null;
 
   return (
     <section className="panel">
@@ -189,7 +235,7 @@ export function Timeline({
             if (x >= 0 && plotWidth > 0) {
               onStep(Math.min(steps - 1, Math.max(0, Math.floor((x / plotWidth) * steps))));
             }
-            const row = Math.floor(y / (BAND_HEIGHT + BAND_GAP));
+            const row = Math.floor(y / rowHeight);
             if (row >= 0 && row < clients.length) onClient(clients[row]);
           }}
         />
@@ -234,11 +280,32 @@ export function Timeline({
         ))}
       </div>
 
+      {spare && (
+        <div className="legend" style={{ marginTop: 4 }}>
+          <span className="hint">узкая лента — запас маршрутов:</span>
+          <span>
+            <i className="swatch" style={{ background: SPARE_RGB[1] }} />
+            маршрут один
+          </span>
+          <span>
+            <i className="swatch" style={{ background: SPARE_RGB[2] }} />
+            два и больше
+          </span>
+        </div>
+      )}
+
       {series && (
         <p className="hint" style={{ marginTop: 8, marginBottom: 0 }}>
           {client}: доступность {percent(series.metrics.availability_share)}, перерывов{" "}
           {series.metrics.gap_count}, самый долгий {duration(series.metrics.max_gap_s)}. В этот
-          момент — {CAUSE_LABEL[currentCause]}.
+          момент — {CAUSE_LABEL[currentCause]}
+          {spareNow !== null && `, независимых маршрутов ${spareNow}`}.
+          {spareShare !== null && (
+            <>
+              {" "}
+              Связь держится на одном аппарате {percent(spareShare)} времени.
+            </>
+          )}
         </p>
       )}
     </section>

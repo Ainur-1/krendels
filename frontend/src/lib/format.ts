@@ -32,6 +32,11 @@ export function km(value: number | null): string {
   return value === null ? "—" : `${Math.round(value).toLocaleString("ru-RU")} км`;
 }
 
+/** Задержка распространения. Десятые доли миллисекунды тут значимы: разница стратегий — единицы. */
+export function ms(value: number | null, digits = 1): string {
+  return value === null ? "—" : `${value.toFixed(digits)} мс`;
+}
+
 export function decimal(value: number | null, digits = 2): string {
   return value === null ? "—" : value.toFixed(digits);
 }

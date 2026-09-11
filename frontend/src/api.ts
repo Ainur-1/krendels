@@ -10,7 +10,12 @@
 import type {
   Comparison,
   CriticalityReport,
+  DegradationCurve,
+  DeliveryReport,
+  FamilyReport,
   FieldError,
+  PlacementReport,
+  RedundancyReport,
   Run,
   Scenario,
   ScenarioSummary,
@@ -120,6 +125,24 @@ export const api = {
 
   sweep: (design: DesignRef, mode: "spacing" | "refine" = "spacing") =>
     post<SweepReport>("/analysis/sweep", { ...design, mode }),
+
+  delivery: (design: DesignRef) => post<DeliveryReport>("/analysis/delivery", design),
+
+  /**
+   * Запас маршрутов привязан к прогону, а не к проекту: им раскрашивается шкала
+   * того самого прогона, который сейчас показан на экране.
+   */
+  redundancy: (runId: string) => request<RedundancyReport>(`/runs/${runId}/redundancy`),
+
+  degradation: (design: DesignRef, options?: { max_failures?: number; trials?: number }) =>
+    post<DegradationCurve>("/analysis/degradation", { ...design, ...options }),
+
+  placement: (
+    design: DesignRef,
+    grid?: { lat_step_deg?: number; lon_step_deg?: number },
+  ) => post<PlacementReport>("/analysis/placement", { ...design, ...grid }),
+
+  families: (design: DesignRef) => post<FamilyReport>("/analysis/families", design),
 };
 
 /**

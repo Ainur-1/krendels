@@ -19,9 +19,17 @@ import { ConfigPanel } from "./components/ConfigPanel";
 import { ErrorList } from "./components/ErrorList";
 import { MapView } from "./components/MapView";
 import { MetricsPanel } from "./components/MetricsPanel";
+import { ResiliencePanel } from "./components/ResiliencePanel";
 import { Timeline } from "./components/Timeline";
 import { VariantsPanel } from "./components/VariantsPanel";
-import type { FieldError, Run, Scenario, ScenarioSummary, Strategy } from "./types";
+import type {
+  FieldError,
+  RedundancyReport,
+  Run,
+  Scenario,
+  ScenarioSummary,
+  Strategy,
+} from "./types";
 
 export interface SavedRun {
   runId: string;
@@ -36,9 +44,11 @@ interface State {
   sourceLabel: string;
   strategy: Strategy;
   run: Run | null;
+  /** Запас маршрутов того же прогона. Приходит отдельным ответом, потому что нужен не всем. */
+  redundancy: RedundancyReport | null;
   step: number;
   client: string | null;
-  tab: "metrics" | "compare" | "analysis";
+  tab: "metrics" | "compare" | "analysis" | "resilience";
   playing: boolean;
   stepMs: number;
   saved: SavedRun[];
@@ -54,6 +64,7 @@ type Action =
   | { type: "revert" }
   | { type: "strategy"; strategy: Strategy }
   | { type: "ran"; run: Run }
+  | { type: "redundancy"; redundancy: RedundancyReport }
   | { type: "step"; step: number }
   | { type: "client"; client: string }
   | { type: "tab"; tab: State["tab"] }
@@ -72,6 +83,7 @@ const initial: State = {
   sourceLabel: "",
   strategy: "min_hops",
   run: null,
+  redundancy: null,
   step: 0,
   client: null,
   tab: "metrics",
@@ -99,6 +111,7 @@ function reducer(state: State, action: Action): State {
         baseline: action.scenario,
         sourceLabel: action.label,
         run: null,
+        redundancy: null,
         step: 0,
         client: null,
         playing: false,
@@ -122,11 +135,18 @@ function reducer(state: State, action: Action): State {
       return {
         ...state,
         run: action.run,
+        // Запас маршрутов принадлежит предыдущему прогону. Оставить его значило бы
+        // раскрасить новую шкалу старыми числами — ровно та ошибка, от которой
+        // защищает сброс прогона при загрузке сценария.
+        redundancy: null,
         step: Math.min(state.step, action.run.times_s.length - 1),
         client: state.client && clients.includes(state.client) ? state.client : clients[0],
         errors: null,
       };
     }
+
+    case "redundancy":
+      return { ...state, redundancy: action.redundancy };
 
     case "step":
       return { ...state, step: action.step };
@@ -246,6 +266,21 @@ export default function App() {
     [design, guard, state.strategy, state.sourceLabel],
   );
 
+  // Запас маршрутов считается 0.14 с и нужен шкале, поэтому запрашивается сразу после
+  // расчёта, а не по кнопке. Отказ здесь молчаливый: шкала просто останется без
+  // дополнительной полосы, а это не повод показывать ошибку поверх готовых чисел.
+  useEffect(() => {
+    if (!run) return;
+    let alive = true;
+    api
+      .redundancy(run.run_id)
+      .then((report) => alive && dispatch({ type: "redundancy", redundancy: report }))
+      .catch(() => undefined);
+    return () => {
+      alive = false;
+    };
+  }, [run]);
+
   const changed = scenario !== baseline;
   const clients = run ? Object.keys(run.clients) : [];
 
@@ -324,6 +359,7 @@ export default function App() {
 
           <Timeline
             run={run}
+            redundancy={state.redundancy}
             step={step}
             client={client}
             playing={state.playing}
@@ -341,6 +377,7 @@ export default function App() {
                   ["metrics", "Показатели"],
                   ["compare", "Сравнение"],
                   ["analysis", "Анализ"],
+                  ["resilience", "Устойчивость"],
                 ] as const
               ).map(([id, title]) => (
                 <button
@@ -378,6 +415,13 @@ export default function App() {
                 design={design}
                 scenario={scenario}
                 onApply={(next) => dispatch({ type: "edit", scenario: next })}
+                onError={(message) => dispatch({ type: "message", message })}
+              />
+            )}
+
+            {state.tab === "resilience" && (
+              <ResiliencePanel
+                design={design}
                 onError={(message) => dispatch({ type: "message", message })}
               />
             )}

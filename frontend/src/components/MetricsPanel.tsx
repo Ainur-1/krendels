@@ -5,9 +5,14 @@
  * суток, когда аппарат над головой есть, а данные всё равно не уходят. Ровно об этом
  * кейс и говорит, различая покрытие и достижимость. На сценарии 04 этот промежуток —
  * тридцать пунктов.
+ *
+ * Задержка стоит в той же таблице по другой причине. Три стратегии маршрутизации на
+ * доступность не влияют вовсе — путь либо есть, либо нет, — и различаются они только
+ * здесь. Без этой колонки выбор стратегии в шапке выглядел бы переключателем, который
+ * ничего не делает.
  */
 
-import { CAUSE_LABEL, CAUSE_RGB, decimal, duration, km, percent } from "../lib/format";
+import { CAUSE_LABEL, CAUSE_RGB, decimal, duration, km, ms, percent } from "../lib/format";
 import type { OutageCause, Run } from "../types";
 
 export function MetricsPanel({
@@ -53,6 +58,9 @@ export function MetricsPanel({
               <th className="num">Макс. перерыв</th>
               <th className="num">Переходов</th>
               <th className="num">Длина трассы</th>
+              <th className="num" title="задержка распространения туда и обратно">
+                Задержка
+              </th>
               <th>Цель</th>
             </tr>
           </thead>
@@ -79,6 +87,9 @@ export function MetricsPanel({
                 </td>
                 <td className="num">{decimal(data.metrics.mean_hops)}</td>
                 <td className="num">{km(data.metrics.mean_route_length_km)}</td>
+                <td className="num" title={`максимум за горизонт ${ms(data.metrics.max_rtt_ms)}`}>
+                  {ms(data.metrics.mean_rtt_ms)}
+                </td>
                 <td>
                   <span className={data.metrics.meets_target ? "pill ok" : "pill bad"}>
                     {data.metrics.meets_target ? "да" : "нет"}
@@ -89,6 +100,15 @@ export function MetricsPanel({
           </tbody>
         </table>
       </div>
+
+      {run.summary.mean_rtt_ms !== null && (
+        <p className="hint" style={{ marginTop: 6 }}>
+          Задержка — только распространение сигнала: обработка в аппарате и ожидание в
+          очереди кейсом не заданы. В среднем по пунктам {ms(run.summary.mean_rtt_ms)},
+          наибольшая за горизонт {ms(run.summary.max_rtt_ms)}. На доступность выбор
+          стратегии не влияет — различаются стратегии именно здесь.
+        </p>
+      )}
 
       {Object.values(run.clients).some((data) =>
         data.gaps.some((gap) => gap.at_horizon_edge),
