@@ -88,3 +88,12 @@ def test_only_satellites_in_service_can_fail(first_launch):
     # аппараты, часть прогонов повторяла бы базовую линию.
     baseline = curve.points[0].mean_worst_availability
     assert curve.points[1].best_worst_availability < baseline
+
+
+def test_the_curve_stops_at_the_satellites_that_exist(first_launch):
+    """Выбить больше аппаратов, чем в строю, нельзя: кривая обрывается там, где нечего терять."""
+
+    curve = degradation_curve(first_launch, max_failures=40, trials=2)
+    assert curve.satellites_in_service == 16
+    assert [p.failures for p in curve.points] == list(range(17))
+    assert curve.points[-1].mean_worst_availability == 0.0

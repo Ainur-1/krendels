@@ -96,3 +96,46 @@ def test_the_full_constellation_delivers_everything_within_ten_minutes(full_cons
     assert report.worst_max_latency_s == pytest.approx(480, abs=1)
     assert report.worst_share_within(900) == pytest.approx(1.0, abs=1e-12)
     assert all(c.undelivered_share == 0.0 for c in report.clients)
+
+
+def test_an_offline_gateway_accepts_nothing(full_constellation):
+    """
+    Станция в отказе данные не принимает — и переносом это не обходится.
+
+    Проверка того, что отказ шлюза действительно участвует в расчёте: если бы маска
+    доступности станции сюда не доходила, аппарат «сбросил» бы данные выключенному
+    шлюзу и доставка выглядела бы прежней.
+    """
+
+    from cosmo_net.scenario.schema import GatewayOutage
+
+    dead = full_constellation.model_copy(deep=True)
+    dead.gateway_outages = [
+        GatewayOutage(gateway_id=full_constellation.gateways[0].id, start_s=0, end_s=86400)
+    ]
+
+    report = delivery_report(dead)
+    assert report.worst_share_within(7200) == 0.0
+    assert report.worst_max_latency_s is None
+    assert all(client.undelivered_share == 1.0 for client in report.clients)
+
+
+def test_data_cannot_wait_for_a_gateway_that_never_returns(full_constellation):
+    """
+    Ждать можно только вперёд: данные второй половины суток не доходят никогда.
+
+    Шлюз выключается на 43 200 с и до конца горизонта. В сценарии 01 все перерывы
+    приходятся на вторую половину суток, поэтому первая половина доставляется
+    полностью, и доля выходит ровно 50 % — на любом пороге задержки.
+    """
+
+    from cosmo_net.scenario.schema import GatewayOutage
+
+    half = full_constellation.model_copy(deep=True)
+    half.gateway_outages = [
+        GatewayOutage(gateway_id=full_constellation.gateways[0].id, start_s=43200, end_s=86400)
+    ]
+
+    report = delivery_report(half)
+    assert report.worst_share_within(0) == pytest.approx(0.5, abs=1e-9)
+    assert report.worst_share_within(43200) == pytest.approx(0.5, abs=1e-9)

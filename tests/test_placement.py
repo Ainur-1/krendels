@@ -98,3 +98,15 @@ def test_the_search_runs_on_an_unfamiliar_scenario(judge_fixture):
     assert len(report.points) == 12
     assert report.best is not None
     assert report.best.worst_availability >= report.baseline_worst_availability
+
+
+def test_a_degenerate_grid_still_works(full_constellation):
+    """Одна широта и две долготы — тоже сетка, и таблица обязана сойтись по форме."""
+
+    report = placement_grid(
+        full_constellation, lat_range=(70.0, 70.0), lat_step=5.0, lon_step=180.0
+    )
+    assert report.lat_deg == [70.0]
+    assert report.lon_deg == [-180.0, 0.0]
+    assert len(report.points) == 2
+    assert report.grid.shape == (1, 2)

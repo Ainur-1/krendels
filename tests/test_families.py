@@ -120,3 +120,22 @@ def test_equal_planes_keep_their_relative_spacing(full_constellation):
     ]
     assert max(drifts) - min(drifts) == pytest.approx(0.0, abs=1e-12)
     assert abs(drifts[0]) == pytest.approx(142.7, abs=0.5)
+
+
+def test_one_plane_has_no_spacing_to_sweep(full_constellation):
+    """
+    У одной плоскости разносить нечего, и кривая обязана выйти горизонтальной.
+
+    Проверка не умозрительная: сценарий жюри вправе описать одну плоскость, и поиск
+    не должен ни падать, ни делать вид, что нашёл максимум.
+    """
+
+    one = full_constellation.model_copy(deep=True)
+    kept = one.design.planes[0].id
+    one.design.planes = [one.design.planes[0]]
+    one.design.satellites = [s for s in one.design.satellites if s.plane_id == kept]
+
+    assert supplied_spacing_deg(one) is None
+    curve = spacing_curve(one, step_deg=45)
+    assert curve.supplied_family is None
+    assert len({round(p.worst_availability, 12) for p in curve.points}) == 1

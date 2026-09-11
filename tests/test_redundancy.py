@@ -108,3 +108,17 @@ def test_counts_are_whole_numbers(full_constellation):
         assert client.disjoint_paths.dtype.kind == "i"
         assert (client.disjoint_paths >= 0).all()
         assert np.isfinite(client.disjoint_paths).all()
+
+
+def test_an_offline_gateway_leaves_no_paths(full_constellation):
+    """Выключенный шлюз обнуляет запас: приземлять маршрут некуда."""
+
+    from cosmo_net.scenario.schema import GatewayOutage
+
+    dead = full_constellation.model_copy(deep=True)
+    dead.gateway_outages = [
+        GatewayOutage(gateway_id=full_constellation.gateways[0].id, start_s=0, end_s=86400)
+    ]
+
+    for client in disjoint_path_counts(dead):
+        assert int(client.disjoint_paths.max()) == 0
