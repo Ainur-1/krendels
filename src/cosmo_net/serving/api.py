@@ -211,6 +211,29 @@ def validate_scenario(body: dict[str, Any]) -> dict[str, Any]:
     return {"valid": True, "summary": scenario_summary(scenario, source="upload")}
 
 
+@app.post("/api/scenarios/export")
+def export_scenario(body: DesignRef) -> JSONResponse:
+    """
+    Текущий проект файлом формата `cosmo-A-1.0`, готовым загрузить обратно.
+
+    Кейс требует, чтобы изменённый сценарий можно было выгрузить и загрузить снова,
+    и до сих пор этого не хватало: выгружался только результат расчёта. Файл
+    результата в поле загрузки сценария, разумеется, отвергался — формат другой, — и
+    тупик выглядел ограничением сервиса, хотя им не был.
+
+    Проходит через разбор и обратную сборку, а не отдаётся как есть: то, что скачано,
+    гарантированно принимается обратно, потому что собрано тем же кодом, который
+    сценарии и читает.
+    """
+
+    scenario = resolve(body)
+    name = f"{scenario.meta.id or 'scenario'}.json"
+    return JSONResponse(
+        content=dump_scenario(scenario),
+        headers={"Content-Disposition": f'attachment; filename="{name}"'},
+    )
+
+
 @app.get("/api/variants")
 def list_variants() -> list[dict[str, Any]]:
     return variants.list()

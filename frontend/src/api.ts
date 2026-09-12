@@ -104,8 +104,28 @@ export const api = {
   /** Вся геометрия прогона одним ответом — почему не по отсчётам, объяснено в MapView. */
   trajectory: (runId: string) => request<Trajectory>(`/runs/${runId}/trajectory`),
 
-  /** Выгрузка — это скачивание, поэтому ссылка отдаётся браузеру напрямую. */
+  /** Выгрузка результата — это скачивание, поэтому ссылка отдаётся браузеру напрямую. */
   exportUrl: (runId: string) => `/api/runs/${runId}/export`,
+
+  /**
+   * Выгрузка сценария. Ссылкой не обойтись: проект живёт в памяти вкладки, а не по
+   * адресу, поэтому его надо отправить на сервер и забрать обратно файлом.
+   */
+  exportScenario: async (design: DesignRef, filename: string) => {
+    const response = await fetch("/api/scenarios/export", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(design),
+    });
+    if (!response.ok) throw new ApiError(response.status, "Не удалось выгрузить сценарий");
+
+    const url = URL.createObjectURL(await response.blob());
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    link.click();
+    URL.revokeObjectURL(url);
+  },
 
   variants: () => request<VariantListing[]>("/variants"),
 

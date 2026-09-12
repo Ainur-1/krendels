@@ -291,14 +291,29 @@ export default function App() {
   const openUploaded = useCallback(
     (text: string, filename: string) =>
       guard("Проверка файла", async () => {
-        const parsed = JSON.parse(text) as unknown;
-        await api.validate(parsed);
-        const loaded = parsed as Scenario;
+        const parsed = JSON.parse(text) as Record<string, unknown>;
+
+        // Файл результата принимается наравне со сценарием: внутри него лежит полный
+        // использованный проект. Иначе выгрузить результат и попробовать загрузить
+        // его обратно — естественное движение — упиралось бы в отказ по формату,
+        // и это выглядело бы ограничением сервиса, хотя им не является.
+        const fromResult =
+          parsed?.schema_version === "cosmo-A-result-1.0" && parsed.effective_scenario;
+        const candidate = fromResult ? parsed.effective_scenario : parsed;
+
+        await api.validate(candidate);
+        const loaded = candidate as Scenario;
         dispatch({
           type: "load",
           scenario: loaded,
           label: loaded.meta?.title || filename,
         });
+        if (fromResult) {
+          dispatch({
+            type: "message",
+            message: "Это файл результата — взят сценарий, по которому он посчитан",
+          });
+        }
       }).catch(() => undefined),
     [guard],
   );
@@ -394,6 +409,18 @@ export default function App() {
         </select>
         <button className="primary" disabled={!scenario || !!busy} onClick={() => calculate()}>
           Рассчитать
+        </button>
+        <button
+          disabled={!design || !!busy}
+          onClick={() =>
+            design &&
+            void guard("Выгрузка сценария", () =>
+              api.exportScenario(design, `${scenario?.meta?.id || "scenario"}.json`),
+            )
+          }
+          title="Файл формата cosmo-A-1.0, его можно загрузить обратно"
+        >
+          Выгрузить сценарий
         </button>
         <button
           disabled={!run}

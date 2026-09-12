@@ -317,3 +317,39 @@ def test_families_endpoint_names_the_family_of_the_supplied_design(client):
     assert body["supplied_family"] == "star"
     assert body["supplied_spacing_deg"] == pytest.approx(60.0)
     assert body["star_best"]["worst_availability"] > body["delta_best"]["worst_availability"]
+
+
+def test_scenario_export_round_trips(client):
+    """
+    Выгруженный сценарий обязан приниматься обратно — этого требует кейс.
+
+    Проверка не формальная: файл проходит через разбор и обратную сборку, и если бы
+    сборка теряла поле или меняла его форму, обратная загрузка это поймала бы.
+    """
+
+    downloaded = client.post("/api/scenarios/export", json={"bundled": "01_full_constellation"})
+    assert downloaded.status_code == 200
+    assert "01_full_constellation.json" in downloaded.headers["content-disposition"]
+
+    scenario = downloaded.json()
+    assert scenario["schema_version"] == "cosmo-A-1.0"
+
+    again = client.post("/api/scenarios/validate", json=scenario)
+    assert again.status_code == 200 and again.json()["valid"]
+
+    # И считается так же, как исходный: выгрузка не теряет ничего, что влияет на ответ.
+    first = client.post("/api/runs", json={"bundled": "01_full_constellation"}).json()
+    second = client.post("/api/runs", json={"scenario": scenario}).json()
+    assert first["summary"]["worst_availability"] == second["summary"]["worst_availability"]
+
+
+def test_an_edited_scenario_survives_the_round_trip(client, raw):
+    """Правки пользователя должны доезжать до файла, иначе выгружать его незачем."""
+
+    edited = copy.deepcopy(raw)
+    edited["design"]["planes"][1]["raan_deg"] = 65.0
+    edited["design"]["launch_stage"] = 2
+
+    downloaded = client.post("/api/scenarios/export", json={"scenario": edited}).json()
+    assert downloaded["design"]["planes"][1]["raan_deg"] == 65.0
+    assert downloaded["design"]["launch_stage"] == 2
