@@ -383,12 +383,20 @@ export default function App() {
         >
           Инструкция
         </button>
-        {state.sourceLabel && <span className="scenario-name">{state.sourceLabel}</span>}
+        {state.sourceLabel && (
+          <span className="scenario-name" title={state.sourceLabel}>
+            {state.sourceLabel}
+          </span>
+        )}
         {changed && <span className="pill bad">есть изменения</span>}
         <span className="spacer" />
         {busy && <span className="busy">{busy}…</span>}
         {state.message && (
-          <span className="hint" onClick={() => dispatch({ type: "message", message: null })}>
+          <span
+            className="hint msg"
+            title={state.message}
+            onClick={() => dispatch({ type: "message", message: null })}
+          >
             {state.message}
           </span>
         )}
