@@ -138,7 +138,9 @@ jobs:
             docker pull "${{ steps.image.outputs.name }}:latest"
             docker rm -f krendels || true
             docker run -d --name krendels --restart unless-stopped \
-              -p 8000:8000 "${{ steps.image.outputs.name }}:latest"
+              -p 8000:8000 \
+              -v cosmo-net-data:/app/state \
+              "${{ steps.image.outputs.name }}:latest"
             sleep 5
             curl -fsS http://127.0.0.1:8000/api/health || exit 1
           EOF
