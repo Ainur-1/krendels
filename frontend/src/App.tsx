@@ -361,6 +361,13 @@ export default function App() {
     <div className="app">
       <header className="topbar">
         <h1>cosmo-net</h1>
+        <button
+          className="help"
+          onClick={() => dispatch({ type: "guide", guide: true })}
+          title="Как пользоваться сервисом"
+        >
+          Инструкция
+        </button>
         {state.sourceLabel && <span className="scenario-name">{state.sourceLabel}</span>}
         {changed && <span className="pill bad">есть изменения</span>}
         <span className="spacer" />
@@ -385,13 +392,6 @@ export default function App() {
           <option value="min_distance">минимум длины</option>
           <option value="max_margin">максимум запаса</option>
         </select>
-        <button
-          className="help"
-          onClick={() => dispatch({ type: "guide", guide: true })}
-          title="Как пользоваться сервисом"
-        >
-          Инструкция
-        </button>
         <button className="primary" disabled={!scenario || !!busy} onClick={() => calculate()}>
           Рассчитать
         </button>

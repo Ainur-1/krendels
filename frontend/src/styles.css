@@ -146,7 +146,11 @@ a {
 .topbar {
   display: flex;
   align-items: center;
-  gap: 16px;
+  /* Переносится целой строкой, а не словами внутри кнопок. На узком окне элементы
+     уезжают на второй ряд — это читается, а «Выгрузить\nрезультат» в два этажа
+     внутри одной кнопки не читается. Запрет переноса стоит на самих элементах. */
+  flex-wrap: wrap;
+  gap: 10px 16px;
   padding: 10px 16px;
   border-bottom: 1px solid var(--line);
   background: var(--bg-panel);
@@ -156,6 +160,18 @@ a {
   font-size: 15px;
   margin: 0;
   letter-spacing: 0.02em;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Кнопки в шапке не переносят слова и не сжимаются: на узком окне «Выгрузить
+   результат» разъезжалось на две строки и шапка становилась вдвое выше. Ужиматься
+   разрешено только названию сценария — оно единственное здесь необязательное. */
+.topbar button,
+.topbar select,
+.topbar label {
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .topbar .spacer {
@@ -167,6 +183,12 @@ a {
   font-size: 13px;
   border-left: 1px solid var(--line);
   padding-left: 16px;
+  /* Единственное, чему разрешено ужиматься в шапке. Длинное название сценария
+     обрезается многоточием, а не растягивает строку на два этажа. */
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .body {
