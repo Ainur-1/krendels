@@ -625,3 +625,46 @@ button.help:hover:not(:disabled) {
   color: var(--text-dim);
   font-size: 13px;
 }
+
+/* Диаграмма доступности: подписи терминалов отдельной колонкой слева, полосы —
+   холстом справа. Раньше подписи рисовались внутри холста, и их ширина жила в его
+   координатах, а ползунок — в пикселях страницы. Пока холст не растянут, это
+   совпадало; стоило ему растянуться — полосы уезжали от ползунка на десятки
+   пикселей. Разметкой это решается раз и навсегда. */
+.lanes {
+  display: flex;
+  align-items: flex-start;
+}
+
+.lanes-labels {
+  position: relative;
+  flex: 0 0 54px;
+}
+
+.lanes-plot {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+button.lane-name {
+  position: absolute;
+  left: 0;
+  width: 46px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+button.lane-name.selected {
+  color: var(--text);
+  font-weight: 600;
+}
+
+button.lane-name:hover {
+  color: var(--text);
+}

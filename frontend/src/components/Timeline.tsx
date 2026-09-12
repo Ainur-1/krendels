@@ -18,7 +18,7 @@
  * сознательное решение: причина перерыва остаётся главной картинкой.
  */
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { CAUSE_LABEL, CAUSE_RGB, clock, duration, percent } from "../lib/format";
 import type { OutageCause, RedundancyReport, Run } from "../types";
@@ -30,7 +30,6 @@ const SPARE_GAP = 2;
 
 /** Ноль маршрутов, один, два и более. Ноль совпадает с отсутствием связи на полосе выше. */
 const SPARE_RGB = ["#3a2226", "#d29922", "#3fb950"] as const;
-const LABEL_WIDTH = 54;
 const AXIS_HEIGHT = 18;
 
 // Сколько реальных миллисекунд приходится на один отсчёт сетки. Сутки при шаге 120 с
@@ -69,8 +68,26 @@ export function Timeline({
   onStepMs: (stepMs: number) => void;
 }) {
   const canvas = useRef<HTMLCanvasElement>(null);
-  const wrapper = useRef<HTMLDivElement>(null);
-  const [width, setWidth] = useState(900);
+  const [width, setWidth] = useState(0);
+
+  /**
+   * Следить за шириной начинаем в тот момент, когда блок появился на странице.
+   *
+   * Обычный ref здесь не работал, и это стоило заметного бага. До первого расчёта
+   * компонент возвращает заглушку, в которой этого блока нет, поэтому на
+   * монтировании ref пуст и наблюдатель не подключался вовсе. Холст так и оставался
+   * нарисованным при начальной ширине, а показывался растянутым почти вдвое: подписи
+   * мылились, а левый край полос уезжал от ползунка на четыре десятка пикселей.
+   */
+  const attach = useCallback((element: HTMLDivElement | null) => {
+    observer.current?.disconnect();
+    if (!element) return;
+    observer.current = new ResizeObserver(([entry]) =>
+      setWidth(Math.max(1, Math.round(entry.contentRect.width))),
+    );
+    observer.current.observe(element);
+  }, []);
+  const observer = useRef<ResizeObserver | null>(null);
 
   const clients = run ? Object.keys(run.clients) : [];
   const steps = run?.times_s.length ?? 0;
@@ -80,16 +97,6 @@ export function Timeline({
   const rowHeight =
     BAND_HEIGHT + BAND_GAP + (spare ? SPARE_HEIGHT + SPARE_GAP : 0);
   const height = clients.length * rowHeight + AXIS_HEIGHT;
-
-  useEffect(() => {
-    const element = wrapper.current;
-    if (!element) return;
-    const observer = new ResizeObserver(([entry]) =>
-      setWidth(Math.max(360, Math.floor(entry.contentRect.width))),
-    );
-    observer.observe(element);
-    return () => observer.disconnect();
-  }, []);
 
   // Проигрывание идёт по сетке с постоянной скоростью, а не в реальном времени:
   // честно смотреть суточный прогон пришлось бы сутки, а нужно увидеть, как движется
@@ -112,16 +119,12 @@ export function Timeline({
     context.setTransform(ratio, 0, 0, ratio, 0, 0);
     context.clearRect(0, 0, width, height);
 
-    const plotWidth = width - LABEL_WIDTH;
+    const plotWidth = width;
     const cell = plotWidth / steps;
 
     clients.forEach((clientId, row) => {
       const top = row * rowHeight;
       const series = run.clients[clientId];
-
-      context.fillStyle = clientId === client ? "#e6edf3" : "#9aa7b4";
-      context.font = `${clientId === client ? "600 " : ""}12px system-ui`;
-      context.fillText(clientId, 0, top + BAND_HEIGHT / 2 + 4);
 
       // Идущие подряд отсчёты с одной причиной сливаются в один прямоугольник. При
       // 720 отсчётах на примерно 900 пикселей заливка по отсчёту оставляет швы там,
@@ -134,7 +137,7 @@ export function Timeline({
         if (cause === runCause) continue;
         context.fillStyle = CAUSE_RGB[runCause] ?? CAUSE_RGB.none;
         context.fillRect(
-          LABEL_WIDTH + runStart * cell,
+          runStart * cell,
           top,
           Math.max(cell, (index - runStart) * cell),
           BAND_HEIGHT,
@@ -145,7 +148,7 @@ export function Timeline({
 
       context.strokeStyle = clientId === client ? "#4c9aff" : "#2a3441";
       context.lineWidth = 1;
-      context.strokeRect(LABEL_WIDTH + 0.5, top + 0.5, plotWidth - 1, BAND_HEIGHT - 1);
+      context.strokeRect(0.5, top + 0.5, plotWidth - 1, BAND_HEIGHT - 1);
 
       const counts = spare?.[clientId];
       if (!counts) return;
@@ -160,7 +163,7 @@ export function Timeline({
         if (value === spareValue) continue;
         context.fillStyle = SPARE_RGB[spareValue];
         context.fillRect(
-          LABEL_WIDTH + spareStart * cell,
+          spareStart * cell,
           spareTop,
           Math.max(cell, (index - spareStart) * cell),
           SPARE_HEIGHT,
@@ -179,17 +182,17 @@ export function Timeline({
     const horizon = run.summary.horizon_s;
     const hourStep = horizon > 12 * 3600 ? 3 * 3600 : 3600;
     for (let t = 0; t <= horizon; t += hourStep) {
-      const x = LABEL_WIDTH + (t / horizon) * plotWidth;
+      const x = (t / horizon) * plotWidth;
       context.beginPath();
       context.moveTo(x, axisTop);
       context.lineTo(x, axisTop + 4);
       context.stroke();
-      context.textAlign = "center";
+      context.textAlign = t === 0 ? "left" : t >= horizon ? "right" : "center";
       context.fillText(`${Math.round(t / 3600)}ч`, x, axisTop + 15);
       context.textAlign = "left";
     }
 
-    const cursorX = LABEL_WIDTH + (step + 0.5) * cell;
+    const cursorX = (step + 0.5) * cell;
     context.strokeStyle = "#ffffff";
     context.lineWidth = 1.5;
     context.beginPath();
@@ -201,17 +204,16 @@ export function Timeline({
   /**
    * Куда указывает курсор — в номер отсчёта.
    *
-   * Начало отсчёта совпадает с левым краем полос, а не с краем холста: слева от них
-   * стоят подписи терминалов. Тот же сдвиг задан ползунку ниже, поэтому он и полосы
-   * показывают одно и то же место, а не расходятся на ширину подписи.
+   * Холст занимают только полосы, от края до края, поэтому пересчёт — это простое
+   * отношение. Подписи терминалов вынесены из картинки в разметку намеренно: пока
+   * они были частью холста, их ширина жила в его координатах, ползунок — в пикселях
+   * страницы, и совпадали они лишь до тех пор, пока холст не растянут.
    */
   function seek(event: React.PointerEvent<HTMLCanvasElement>) {
     const box = event.currentTarget.getBoundingClientRect();
-    const plotWidth = box.width - LABEL_WIDTH;
-    if (plotWidth <= 0 || !steps) return;
+    if (box.width <= 0 || !steps) return;
 
-    const offset = event.clientX - box.left - LABEL_WIDTH;
-    const index = Math.floor((offset / plotWidth) * steps);
+    const index = Math.floor(((event.clientX - box.left) / box.width) * steps);
     onStep(Math.min(steps - 1, Math.max(0, index)));
 
     const row = Math.floor((event.clientY - box.top) / rowHeight);
@@ -245,43 +247,56 @@ export function Timeline({
         </span>
       </div>
 
-      <div ref={wrapper}>
-        <canvas
-          ref={canvas}
-          style={{ display: "block", width: "100%", height, cursor: "pointer" }}
-          onPointerDown={(event) => {
-            // Проигрывание останавливается: тянуть время и одновременно бороться с
-            // тем, что оно уезжает само, невозможно.
-            if (playing) onPlaying(false);
-            event.currentTarget.setPointerCapture(event.pointerId);
-            seek(event);
-          }}
-          onPointerMove={(event) => {
-            if (event.currentTarget.hasPointerCapture(event.pointerId)) seek(event);
-          }}
-          onPointerUp={(event) =>
-            event.currentTarget.releasePointerCapture(event.pointerId)
-          }
-        />
+      <div className="lanes">
+        <div className="lanes-labels" style={{ height }}>
+          {clients.map((clientId, row) => (
+            <button
+              key={clientId}
+              type="button"
+              className={clientId === client ? "lane-name selected" : "lane-name"}
+              style={{ top: row * rowHeight, height: BAND_HEIGHT }}
+              onClick={() => onClient(clientId)}
+            >
+              {clientId}
+            </button>
+          ))}
+        </div>
 
-        {/* Ползунок лежит внутри того же блока, что и холст, и сдвинут ровно на
-            ширину подписей терминалов. Снаружи выровнять его не вышло: у соседних
-            блоков панели края оказались разными, и совпадение пришлось бы подбирать
-            числами вместо того, чтобы взять его из разметки. */}
-        <div className="scrub" style={{ marginLeft: LABEL_WIDTH }}>
-          <input
-            type="range"
-            aria-label="время расчёта"
-            min={0}
-            max={Math.max(0, steps - 1)}
-            value={step}
-            onChange={(event) => {
-              // Перетаскивание ползунка — это навигация, а не проигрывание. Оставить
-              // его запущенным значило бы бороться с рукой, которая его двигает.
+        <div className="lanes-plot" ref={attach}>
+          <canvas
+            ref={canvas}
+            style={{ display: "block", width: "100%", height, cursor: "pointer" }}
+            onPointerDown={(event) => {
+              // Проигрывание останавливается: тянуть время и одновременно бороться с
+              // тем, что оно уезжает само, невозможно.
               if (playing) onPlaying(false);
-              onStep(Number(event.target.value));
+              event.currentTarget.setPointerCapture(event.pointerId);
+              seek(event);
             }}
+            onPointerMove={(event) => {
+              if (event.currentTarget.hasPointerCapture(event.pointerId)) seek(event);
+            }}
+            onPointerUp={(event) =>
+              event.currentTarget.releasePointerCapture(event.pointerId)
+            }
           />
+
+          {/* Ползунок ровно той же ширины, что и холст, и в том же блоке. Совпадение
+              теперь следует из разметки, а не из подобранных отступов. */}
+          <div className="scrub">
+            <input
+              type="range"
+              aria-label="время расчёта"
+              min={0}
+              max={Math.max(0, steps - 1)}
+              value={step}
+              onChange={(event) => {
+                // Перетаскивание ползунка — это навигация, а не проигрывание.
+                if (playing) onPlaying(false);
+                onStep(Number(event.target.value));
+              }}
+            />
+          </div>
         </div>
       </div>
 
