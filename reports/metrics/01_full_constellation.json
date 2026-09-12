@@ -253,8 +253,8 @@
       "worst_availability": 0.9666666666666667,
       "worst_max_gap_s": 480,
       "meets_target": true,
-      "mean_rtt_ms": 48.566201415154154,
-      "max_rtt_ms": 337.0944628208486,
+      "mean_rtt_ms": 36.225422065858815,
+      "max_rtt_ms": 79.38642818812934,
       "clients": [
         {
           "client_id": "C65",
@@ -265,12 +265,12 @@
           "max_gap_s": 480,
           "max_interior_gap_s": 480,
           "gap_count": 19,
-          "mean_hops": 3.589080459770115,
-          "max_hops": 21,
-          "mean_route_length_km": 6035.637974321305,
-          "max_route_length_km": 49982.526482019755,
-          "mean_rtt_ms": 40.265442396961866,
-          "max_rtt_ms": 333.44752443385187,
+          "mean_hops": 2.8635057471264367,
+          "max_hops": 6,
+          "mean_route_length_km": 4289.786062196486,
+          "max_route_length_km": 10011.187801387994,
+          "mean_rtt_ms": 28.618372128604285,
+          "max_rtt_ms": 66.78745601657528,
           "causes": {
             "no_client_contact": 16,
             "no_gateway_contact": 8
@@ -285,12 +285,12 @@
           "max_gap_s": 120,
           "max_interior_gap_s": 120,
           "gap_count": 9,
-          "mean_hops": 4.489451476793249,
-          "max_hops": 22,
-          "mean_route_length_km": 7604.727380158053,
-          "max_route_length_km": 50529.18879362591,
-          "mean_rtt_ms": 50.73328015582069,
-          "max_rtt_ms": 337.0944628208486,
+          "mean_hops": 3.6526019690576654,
+          "max_hops": 6,
+          "mean_route_length_km": 5621.512061794322,
+          "max_route_length_km": 9498.499209745094,
+          "mean_rtt_ms": 37.502691690758425,
+          "max_rtt_ms": 63.3671658927797,
           "causes": {
             "no_client_contact": 1,
             "no_gateway_contact": 8
@@ -305,12 +305,12 @@
           "max_gap_s": 120,
           "max_interior_gap_s": 120,
           "gap_count": 8,
-          "mean_hops": 5.056179775280899,
-          "max_hops": 20,
-          "mean_route_length_km": 8199.305992478856,
-          "max_route_length_km": 47266.06890054821,
-          "mean_rtt_ms": 54.69988169267992,
-          "max_rtt_ms": 315.3252701276976,
+          "mean_hops": 4.219101123595506,
+          "max_hops": 7,
+          "mean_route_length_km": 6378.86436082607,
+          "max_route_length_km": 11899.726219179889,
+          "mean_rtt_ms": 42.55520237821373,
+          "max_rtt_ms": 79.38642818812934,
           "causes": {
             "no_gateway_contact": 8
           }
@@ -5172,5 +5172,5 @@
       }
     ]
   },
-  "elapsed_s": 19.01
+  "elapsed_s": 20.07
 }

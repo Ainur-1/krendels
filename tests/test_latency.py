@@ -34,7 +34,7 @@ def test_strategies_agree_on_availability_and_differ_on_delay(runs):
     Одна и та же доступность, разная задержка — вот в чём смысл трёх стратегий.
 
     Измерено на полной группировке: 26.5 мс у кратчайшей трассы, 27.5 мс у минимума
-    переходов и 48.6 мс у максимального запаса.
+    переходов и 36.2 мс у максимального запаса.
     """
 
     availability = {result.worst_availability for result in runs.values()}
@@ -42,7 +42,7 @@ def test_strategies_agree_on_availability_and_differ_on_delay(runs):
 
     assert runs[Strategy.MIN_DISTANCE].mean_rtt_ms == pytest.approx(26.5, abs=0.3)
     assert runs[Strategy.MIN_HOPS].mean_rtt_ms == pytest.approx(27.5, abs=0.3)
-    assert runs[Strategy.MAX_MARGIN].mean_rtt_ms == pytest.approx(48.6, abs=0.5)
+    assert runs[Strategy.MAX_MARGIN].mean_rtt_ms == pytest.approx(36.2, abs=0.3)
 
 
 def test_the_shortest_route_really_is_the_shortest(runs):
@@ -54,9 +54,9 @@ def test_the_shortest_route_really_is_the_shortest(runs):
 
 def test_link_margin_is_paid_for_with_delay(runs):
     """
-    Запас на линиях покупается задержкой, и в худшем случае — пятикратной.
+    Запас на линиях покупается задержкой: в среднем в полтора раза, в худший момент — в 1.2.
 
-    Максимальная задержка за сутки: 67 мс у кратчайшей трассы против 337 мс у
+    Максимальная задержка за сутки: 66.8 мс у кратчайшей трассы против 79.4 мс у
     максимального запаса. Это и есть содержание выбора стратегии, а не доступность.
     """
 
@@ -64,9 +64,9 @@ def test_link_margin_is_paid_for_with_delay(runs):
     safe = runs[Strategy.MAX_MARGIN]
 
     assert short.max_rtt_ms == pytest.approx(66.8, abs=1.0)
-    assert safe.max_rtt_ms == pytest.approx(337.1, abs=2.0)
-    assert safe.max_rtt_ms / short.max_rtt_ms > 4.5
-    assert safe.mean_rtt_ms / short.mean_rtt_ms > 1.7
+    assert safe.max_rtt_ms == pytest.approx(79.4, abs=1.0)
+    assert 1.0 < safe.max_rtt_ms / short.max_rtt_ms < 1.5
+    assert 1.2 < safe.mean_rtt_ms / short.mean_rtt_ms < 1.6
 
 
 def test_the_delay_is_comparable_to_terrestrial_fibre(runs):

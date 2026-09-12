@@ -26,6 +26,12 @@ from cosmo_net.routing.graph import SliceGraph
 # запас по дальности — от самого предела дальности.
 _ZENITH_DEG = 90.0
 
+# До скольких знаков после запятой сравниваются запасы при поиске широчайшего пути.
+# Девять значащих цифр в доле от нуля до единицы — это заведомо тоньше, чем точность
+# любого исходного числа, и заведомо грубее, чем расхождение в последнем разряде
+# между машинами. Именно поэтому маршрут получается один и тот же везде.
+MARGIN_RESOLUTION = 12
+
 
 class Strategy(StrEnum):
     """Какой маршрут предпочесть, когда их несколько."""
@@ -192,49 +198,93 @@ def _search_max_margin(
     graph: SliceGraph, client_id: str, downlink: dict[int, tuple[str, float]]
 ) -> tuple[list[int], str] | None:
     """
-    Широчайший путь: максимизировать наименьший запас вдоль маршрута.
+    Широчайший путь: максимизировать наименьший запас, а при равном запасе брать
+    маршрут покороче.
 
     Максимизируется доля, а не физическая величина, потому что на маршруте
     смешаны два вида запаса — градусы угла места на наземных линиях и километры
     дальности между аппаратами. Чтобы вообще говорить о слабейшем звене, их надо
     привести к сопоставимому виду.
+
+    Второй критерий, длина, — не украшение, и появился он из измерения. Без него
+    поиск брал **любой** из маршрутов с одинаковым слабейшим звеном, и «любой»
+    оказывался буквально любым: на сценарии 01 находились маршруты в 22 перехода и
+    50 529 км при том, что кратчайший на том же отсчёте укладывался в 10 011 км.
+    Вдобавок выбор между почти равными запасами зависел от последнего разряда
+    вычисленных чисел, поэтому на другой машине получался другой маршрут — это и
+    поймали тесты, запущенные на Linux после macOS. Длина различает маршруты
+    сотнями километров, а не долями, и ответ перестаёт зависеть от машины.
+
+    Порядок в очереди лексикографический: сначала больший запас, при равном —
+    меньшая длина. Оба свойства монотонны вдоль маршрута (запас может только падать,
+    длина только расти), поэтому обычный разбор по возрастанию метки остаётся верным.
+
+    Сравнивается при этом не сам запас, а округлённый до `MARGIN_RESOLUTION`. Запас —
+    это доля от нуля до единицы, и различать в ней больше девяти значащих цифр
+    бессмысленно: столько точности нет ни в одном исходном числе. Зато без округления
+    два почти равных запаса упорядочиваются по последнему разряду, а он на разных
+    машинах разный — и маршрут получается разный.
     """
 
-    best: dict[int, float] = {}
-    previous: dict[int, int | None] = {}
-    heap: list[tuple[float, int, int | None]] = []
-    for slot, satellite in enumerate(graph.uplink[client_id]):
-        margin = _elevation_fraction(graph.uplink_margin_deg[client_id][slot])
-        heapq.heappush(heap, (-margin, satellite, None))
+    # Очередь сравнивает кортежи поэлементно, поэтому «родителя нет» надо записать
+    # числом: None рядом с int сравнить нельзя, и на редком совпадении первых трёх
+    # полей поиск падал бы с ошибкой типов.
+    no_parent = -1
 
-    finished: tuple[float, list[int], str] | None = None
+    best: dict[int, tuple[float, float]] = {}
+    previous: dict[int, int] = {}
+    heap: list[tuple[float, float, int, int]] = []
+    for slot, satellite in enumerate(graph.uplink[client_id]):
+        margin = _coarse(_elevation_fraction(graph.uplink_margin_deg[client_id][slot]))
+        heapq.heappush(
+            heap, (-margin, graph.uplink_distance_km[client_id][slot], satellite, no_parent)
+        )
+
+    finished: tuple[float, float, list[int], str] | None = None
     while heap:
-        negative, node, parent = heapq.heappop(heap)
+        negative, length, node, parent = heapq.heappop(heap)
         margin = -negative
         if node in best:
             continue
-        best[node] = margin
+        best[node] = (margin, length)
         previous[node] = parent
 
         if node in downlink:
             gateway_id, _ = downlink[node]
             slot = graph.uplink[gateway_id].index(node)
-            closing = _elevation_fraction(graph.uplink_margin_deg[gateway_id][slot])
+            closing = _coarse(_elevation_fraction(graph.uplink_margin_deg[gateway_id][slot]))
             total = min(margin, closing)
-            if finished is None or total > finished[0]:
-                finished = (total, _unwind(previous, node), gateway_id)
+            reach = length + graph.uplink_distance_km[gateway_id][slot]
+            if finished is None or (total, -reach) > (finished[0], -finished[1]):
+                finished = (total, reach, _unwind(previous, node), gateway_id)
 
-        if finished is not None and finished[0] >= margin:
+        # Запас у всего оставшегося в очереди не больше текущего, поэтому маршрут с
+        # бо́льшим запасом уже не появится. А вот с таким же — ещё может, и он может
+        # оказаться короче, поэтому сравнение строгое.
+        if finished is not None and finished[0] > margin:
             break
 
         for slot, neighbour in enumerate(graph.neighbours[node]):
             if neighbour not in best:
                 link = graph.neighbour_margin_km[node][slot]
-                limit = link + graph.neighbour_distance_km[node][slot]
-                widened = min(margin, link / limit if limit else 0.0)
-                heapq.heappush(heap, (-widened, neighbour, node))
+                hop = graph.neighbour_distance_km[node][slot]
+                limit = link + hop
+                widened = min(margin, _coarse(link / limit if limit else 0.0))
+                heapq.heappush(heap, (-widened, length + hop, neighbour, node))
 
-    return (finished[1], finished[2]) if finished else None
+    return (finished[2], finished[3]) if finished else None
+
+
+def _coarse(fraction: float) -> float:
+    """
+    Огрубить запас до разрешения, ниже которого различать его нет смысла.
+
+    Запас — доля от нуля до единицы. Девяти значащих цифр в исходных данных нет и
+    близко, а вот последний разряд вычисленного числа на разных машинах отличается,
+    и без огрубления он решает, какой маршрут выиграет.
+    """
+
+    return round(fraction, MARGIN_RESOLUTION)
 
 
 def _elevation_fraction(margin_deg: float) -> float:
@@ -244,10 +294,15 @@ def _elevation_fraction(margin_deg: float) -> float:
 
 
 def _unwind(previous: dict[int, int | None], node: int) -> list[int]:
-    """Пройти по цепочке предков до первого аппарата и вернуть её от начала к концу."""
+    """
+    Пройти по цепочке предков до первого аппарата и вернуть её от начала к концу.
+
+    Конец цепочки помечают двумя способами: `None` у поисков, где родителя может не
+    быть, и −1 у широчайшего пути, где очередь обязана уметь сравнивать это поле.
+    """
 
     chain = [node]
-    while previous[chain[-1]] is not None:
+    while previous[chain[-1]] not in (None, -1):
         chain.append(previous[chain[-1]])  # type: ignore[arg-type]
     chain.reverse()
     return chain
