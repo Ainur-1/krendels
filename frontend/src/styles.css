@@ -553,3 +553,75 @@ button.help:hover:not(:disabled) {
   gap: 7px;
   margin: 0;
 }
+
+/* Ползунок времени. Вынесен отдельной строкой и сдвинут на ширину подписей
+   терминалов, чтобы его дорожка совпадала с полосами диаграммы: раньше он начинался
+   от края панели, и одно и то же время оказывалось в двух разных местах экрана.
+
+   Центр бегунка ходит не по всей дорожке, а от своего полурадиуса до конца минус
+   полурадиус, поэтому на самых краях остаётся расхождение в семь пикселей. На сутках
+   это меньше трёх отсчётов из 720, и лечить это отрицательными отступами, которые
+   вылезают за панель, дороже, чем стоит сама ошибка. */
+.scrub {
+  margin-top: 8px;
+}
+
+.scrub input[type="range"] {
+  appearance: none;
+  -webkit-appearance: none;
+  display: block;
+  width: 100%;
+  /* Собственные поля браузера у поля диапазона — 2px с каждой стороны; именно они
+     сдвигали дорожку относительно полос. */
+  margin: 0;
+  height: 14px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.scrub input[type="range"]::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--line);
+}
+
+.scrub input[type="range"]::-moz-range-track {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--line);
+}
+
+.scrub input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  margin-top: -5px;
+  border-radius: 50%;
+  background: var(--text);
+  border: none;
+}
+
+.scrub input[type="range"]::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--text);
+  border: none;
+}
+
+.scrub input[type="range"]:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Устаревшие результаты исследований. Жёлтый, а не красный: это не ошибка, а
+   предупреждение — числа верные, просто относятся к прежней конфигурации. */
+.stale {
+  margin: 0 0 12px;
+  padding: 8px 10px;
+  border-left: 3px solid var(--warn);
+  background: rgba(210, 153, 34, 0.08);
+  color: var(--text-dim);
+  font-size: 13px;
+}

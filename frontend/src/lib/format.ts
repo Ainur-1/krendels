@@ -37,6 +37,21 @@ export function ms(value: number | null, digits = 1): string {
   return value === null ? "—" : `${value.toFixed(digits)} мс`;
 }
 
+/**
+ * Русский счёт: 1 набор, 2 набора, 5 наборов.
+ *
+ * Нужен там, где число приходит из расчёта и подставляется в текст. Писать
+ * «набора(ов)» — значит расписаться в том, что форму слова выбрать не смогли.
+ */
+export function plural(count: number, one: string, few: string, many: string): string {
+  const tail = count % 100;
+  if (tail >= 11 && tail <= 14) return many;
+  const last = count % 10;
+  if (last === 1) return one;
+  if (last >= 2 && last <= 4) return few;
+  return many;
+}
+
 export function decimal(value: number | null, digits = 2): string {
   return value === null ? "—" : value.toFixed(digits);
 }

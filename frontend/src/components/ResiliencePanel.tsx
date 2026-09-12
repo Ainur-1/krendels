@@ -14,7 +14,9 @@
 import { useState } from "react";
 
 import { api, type DesignRef } from "../api";
-import { duration, percent } from "../lib/format";
+import type { StudyResults } from "../App";
+import { duration, percent, plural } from "../lib/format";
+import { StaleNotice } from "./StaleNotice";
 import type {
   DegradationCurve,
   DeliveryReport,
@@ -24,22 +26,30 @@ import type {
 
 export function ResiliencePanel({
   design,
+  results,
+  stale,
+  onResult,
   onError,
 }: {
   design: DesignRef | null;
+  results: StudyResults;
+  stale: boolean;
+  onResult: (patch: Partial<StudyResults>) => void;
   onError: (message: string) => void;
 }) {
-  const [delivery, setDelivery] = useState<DeliveryReport | null>(null);
-  const [degradation, setDegradation] = useState<DegradationCurve | null>(null);
-  const [families, setFamilies] = useState<FamilyReport | null>(null);
-  const [placement, setPlacement] = useState<PlacementReport | null>(null);
+  // Посчитанное хранит оболочка: переключение вкладки не должно стирать результат.
+  const { delivery, degradation, families, placement } = results;
   const [busy, setBusy] = useState<string | null>(null);
 
-  async function load<T>(label: string, work: () => Promise<T>, keep: (value: T) => void) {
+  async function load<T>(
+    label: string,
+    work: () => Promise<T>,
+    keep: (value: T) => Partial<StudyResults>,
+  ) {
     if (!design) return;
     setBusy(label);
     try {
-      keep(await work());
+      onResult(keep(await work()));
     } catch {
       onError(`${label}: расчёт не выполнен`);
     } finally {
@@ -53,7 +63,9 @@ export function ResiliencePanel({
         <button
           disabled={!design || !!busy}
           onClick={() =>
-            void load("Допустимая задержка", () => api.delivery(design!), setDelivery)
+            void load("Допустимая задержка", () => api.delivery(design!), (value) => ({
+              delivery: value,
+            }))
           }
         >
           Допустимая задержка
@@ -61,25 +73,37 @@ export function ResiliencePanel({
         <button
           disabled={!design || !!busy}
           onClick={() =>
-            void load("Кривая деградации", () => api.degradation(design!), setDegradation)
+            void load("Кривая деградации", () => api.degradation(design!), (value) => ({
+              degradation: value,
+            }))
           }
         >
           Кривая деградации
         </button>
         <button
           disabled={!design || !!busy}
-          onClick={() => void load("Семейства разноса", () => api.families(design!), setFamilies)}
+          onClick={() =>
+            void load("Семейства разноса", () => api.families(design!), (value) => ({
+              families: value,
+            }))
+          }
         >
           Семейства разноса
         </button>
         <button
           disabled={!design || !!busy}
-          onClick={() => void load("Место для шлюза", () => api.placement(design!), setPlacement)}
+          onClick={() =>
+            void load("Место для шлюза", () => api.placement(design!), (value) => ({
+              placement: value,
+            }))
+          }
         >
           Место для второго шлюза
         </button>
         {busy && <span className="busy">{busy}…</span>}
       </div>
+
+      {stale && (delivery || degradation || families || placement) && <StaleNotice />}
 
       {delivery && <DeliverySection report={delivery} />}
       {degradation && <DegradationSection curve={degradation} />}
@@ -110,8 +134,8 @@ function DeliverySection({ report }: { report: DeliveryReport }) {
   const instant = report.worst_within[0]?.share ?? 0;
 
   const width = 520;
-  const height = 190;
-  const pad = { left: 46, right: 12, top: 12, bottom: 32 };
+  const height = 214;
+  const pad = { left: 46, right: 12, top: 12, bottom: 56 };
   const x = (i: number) =>
     pad.left + (i / Math.max(1, report.deadlines_s.length - 1)) * (width - pad.left - pad.right);
   const y = (share: number) =>
@@ -172,22 +196,30 @@ function DeliverySection({ report }: { report: DeliveryReport }) {
         {report.deadlines_s.map((seconds, i) => (
           <g key={seconds}>
             <circle cx={x(i)} cy={y(report.worst_within[i].share)} r={i === index ? 5 : 3} fill="#e6edf3" />
-            <text x={x(i)} y={height - 10} textAnchor="middle" fontSize="10" fill="#6b7886">
+            <text x={x(i)} y={height - 32} textAnchor="middle" fontSize="10" fill="#6b7886">
               {seconds === 0 ? "0" : duration(seconds)}
             </text>
           </g>
         ))}
+
+        {/* Ползунок стоит ровно под осью графика и в тех же границах: у графика слева
+            отведено место под подписи процентов, и без этого отступа бегунок указывал
+            бы не на ту точку, над которой стоит. */}
+        <foreignObject x={pad.left} y={height - 22} width={width - pad.left - pad.right} height={22}>
+          <div className="scrub" style={{ marginTop: 0 }}>
+            <input
+              type="range"
+              min={0}
+              max={report.deadlines_s.length - 1}
+              value={index}
+              onChange={(event) => setIndex(Number(event.target.value))}
+              aria-label="допустимая задержка"
+            />
+          </div>
+        </foreignObject>
       </svg>
 
       <div className="row" style={{ marginTop: 6 }}>
-        <input
-          type="range"
-          min={0}
-          max={report.deadlines_s.length - 1}
-          value={index}
-          onChange={(event) => setIndex(Number(event.target.value))}
-          aria-label="допустимая задержка"
-        />
         <span className="hint" style={{ whiteSpace: "nowrap" }}>
           {deadline === 0 ? "без задержки" : `до ${duration(deadline)}`} → худший пункт{" "}
           <strong>{percent(worst)}</strong>
@@ -248,8 +280,9 @@ function DegradationSection({ curve }: { curve: DegradationCurve }) {
     <div style={{ marginBottom: 22 }}>
       <h2>Кривая деградации</h2>
       <p className="hint" style={{ marginTop: 0 }}>
-        Кейс задаёт названные отказы; здесь разыгрываются случайные, по {curve.points[1]?.trials ?? 0}{" "}
-        набора на каждое число. Проект переносит{" "}
+        Кейс задаёт названные отказы; здесь разыгрываются случайные, по{" "}
+        {curve.points[1]?.trials ?? 0}{" "}
+        {plural(curve.points[1]?.trials ?? 0, "набору", "набора", "наборов")} на каждое число. Проект переносит{" "}
         <strong>{curve.tolerated_failures}</strong>{" "}
         {plural(curve.tolerated_failures, "отказ", "отказа", "отказов")}, не теряя цель ни в одном
         наборе, и теряет по {curve.slope_pp_per_satellite.toFixed(1)} п.п. за каждый потерянный
@@ -328,27 +361,46 @@ function DegradationSection({ curve }: { curve: DegradationCurve }) {
 /** Кривая по разносу плоскостей: два семейства как два максимума. */
 function FamiliesSection({ report }: { report: FamilyReport }) {
   const width = 520;
-  const height = 190;
-  const pad = { left: 46, right: 12, top: 12, bottom: 30 };
+  const height = 210;
+  const pad = { left: 46, right: 14, top: 30, bottom: 42 };
   const shares = report.points.map((p) => p.worst_availability);
   const low = Math.min(...shares);
   const high = Math.max(...shares);
+  // Запас сверху: подписи максимумов стоят над точками, и без него верхняя из них
+  // вылезала за край рисунка.
+  const ceiling = high + (high - low) * 0.14;
 
   const x = (spacing: number) => pad.left + (spacing / 180) * (width - pad.left - pad.right);
   const y = (share: number) =>
-    height - pad.bottom - ((share - low) / Math.max(high - low, 0.01)) * (height - pad.top - pad.bottom);
+    height - pad.bottom - ((share - low) / Math.max(ceiling - low, 0.01)) * (height - pad.top - pad.bottom);
+
+  const supplied =
+    report.supplied_spacing_deg === null
+      ? null
+      : report.points.reduce((best, point) =>
+          Math.abs(point.spacing_deg - report.supplied_spacing_deg!) <
+          Math.abs(best.spacing_deg - report.supplied_spacing_deg!)
+            ? point
+            : best,
+        );
 
   return (
     <div style={{ marginBottom: 22 }}>
       <h2>Семейства разноса плоскостей</h2>
       <p className="hint" style={{ marginTop: 0 }}>
-        У звезды плоскости разносят по 180°, у дельты — по 360°. Для {report.planes}{" "}
-        плоскостей это {report.star_spacing_deg.toFixed(0)}° и {report.delta_spacing_deg.toFixed(0)}°.
+        Плоскости можно разнести по-разному, и есть два классических способа.{" "}
+        <b>Звезда</b> — плоскости раскладывают на половину окружности: при наклонении,
+        близком к полярному, плоскость с узлом θ и плоскость с θ + 180° дают почти одну и
+        ту же трассу по земле, поэтому полезен только полукруг. Для {report.planes}{" "}
+        плоскостей это {report.star_spacing_deg.toFixed(0)}° между соседними.{" "}
+        <b>Дельта</b> — плоскости раскладывают на полную окружность, по{" "}
+        {report.delta_spacing_deg.toFixed(0)}°; так делают, когда покрывать надо средние
+        широты, а не полюса.
         {report.supplied_family
           ? ` Выданный проект стоит на ${report.supplied_spacing_deg?.toFixed(1)}°, то есть это ${
               report.supplied_family === "star" ? "звезда" : "дельта"
             }.`
-          : " Плоскости разнесены неравномерно, поэтому относить проект не к чему."}
+          : " Плоскости разнесены неравномерно, поэтому отнести проект к семейству не к чему."}
       </p>
 
       <svg
@@ -359,13 +411,16 @@ function FamiliesSection({ report }: { report: FamilyReport }) {
       >
         <line x1={pad.left} y1={y(low)} x2={width - pad.right} y2={y(low)} stroke="var(--line)" />
         <line x1={pad.left} y1={pad.top} x2={pad.left} y2={y(low)} stroke="var(--line)" />
-        <text x={4} y={pad.top + 8} fontSize="10" fill="#6b7886">
+        <text x={4} y={pad.top - 6} fontSize="10" fill="#6b7886">
           {percent(high)}
+        </text>
+        <text x={4} y={y(low) + 3} fontSize="10" fill="#6b7886">
+          {percent(low)}
         </text>
 
         {[
-          { value: report.star_spacing_deg, label: "180/P" },
-          { value: report.delta_spacing_deg, label: "360/P" },
+          { value: report.star_spacing_deg, label: "звезда" },
+          { value: report.delta_spacing_deg, label: "дельта" },
         ].map((rule) => (
           <g key={rule.label}>
             <line
@@ -376,8 +431,8 @@ function FamiliesSection({ report }: { report: FamilyReport }) {
               stroke="#6b7886"
               strokeDasharray="3 3"
             />
-            <text x={x(rule.value) + 3} y={pad.top + 8} fontSize="9" fill="#6b7886">
-              {rule.label}
+            <text x={x(rule.value)} y={pad.top - 6} textAnchor="middle" fontSize="9" fill="#6b7886">
+              {rule.label} {rule.value.toFixed(0)}°
             </text>
           </g>
         ))}
@@ -400,7 +455,7 @@ function FamiliesSection({ report }: { report: FamilyReport }) {
                 </circle>
                 <text
                   x={x(peak.spacing_deg)}
-                  y={y(peak.worst_availability) - 9}
+                  y={y(peak.worst_availability) - 10}
                   textAnchor="middle"
                   fontSize="10"
                   fill="#3fb950"
@@ -411,17 +466,10 @@ function FamiliesSection({ report }: { report: FamilyReport }) {
             ),
         )}
 
-        {report.supplied_spacing_deg !== null && (
+        {supplied && (
           <circle
-            cx={x(report.supplied_spacing_deg)}
-            cy={y(
-              report.points.reduce((best, point) =>
-                Math.abs(point.spacing_deg - report.supplied_spacing_deg!) <
-                Math.abs(best.spacing_deg - report.supplied_spacing_deg!)
-                  ? point
-                  : best,
-              ).worst_availability,
-            )}
+            cx={x(supplied.spacing_deg)}
+            cy={y(supplied.worst_availability)}
             r={5}
             fill="none"
             stroke="#d29922"
@@ -431,8 +479,24 @@ function FamiliesSection({ report }: { report: FamilyReport }) {
           </circle>
         )}
 
-        <text x={width - pad.right} y={height - 10} textAnchor="end" fontSize="10" fill="#6b7886">
-          разнос плоскостей, градусы →
+        {/* Засечки по оси разноса. Без них единицы приходилось бы угадывать: подпись
+            «градусы» под осью про конкретные числа ничего не говорит. */}
+        {[0, 45, 90, 135, 180].map((tick) => (
+          <g key={tick}>
+            <line x1={x(tick)} y1={y(low)} x2={x(tick)} y2={y(low) + 4} stroke="var(--line)" />
+            <text x={x(tick)} y={y(low) + 16} textAnchor="middle" fontSize="10" fill="#6b7886">
+              {tick}
+            </text>
+          </g>
+        ))}
+        <text
+          x={(pad.left + width - pad.right) / 2}
+          y={height - 6}
+          textAnchor="middle"
+          fontSize="10"
+          fill="#6b7886"
+        >
+          разнос между соседними плоскостями, градусы
         </text>
       </svg>
     </div>
@@ -475,8 +539,8 @@ function PlacementSection({ report }: { report: PlacementReport }) {
           </>
         )}
         {flat
-          ? ` Поверхность почти ровная: между лучшим и худшим местом ${spread.toFixed(1)} п.п., то есть место почти ничего не решает. Так бывает, когда межспутниковая сеть цела и довозит трафик куда угодно.`
-          : ` Чем темнее клетка, тем больше прирост; между лучшим и худшим местом ${spread.toFixed(1)} п.п. Неровная поверхность означает, что сеть не довозит трафик сама и шлюз должен стоять ближе к пунктам.`}
+          ? ` Поверхность почти ровная: между лучшим и худшим местом ${spread.toFixed(1)} п.п., то есть место почти ничего не решает. Так бывает, когда межспутниковая сеть цела и доставляет трафик куда угодно.`
+          : ` Чем темнее клетка, тем больше прирост; между лучшим и худшим местом ${spread.toFixed(1)} п.п. Неровная поверхность означает, что сеть не доставляет трафик сама и шлюз должен стоять ближе к пунктам.`}
       </p>
 
       <div className="scroll-x">
@@ -540,14 +604,4 @@ function PlacementSection({ report }: { report: PlacementReport }) {
       </div>
     </div>
   );
-}
-
-/** Русский счёт: 1 отказ, 2 отказа, 5 отказов. */
-function plural(count: number, one: string, few: string, many: string): string {
-  const tail = count % 100;
-  if (tail >= 11 && tail <= 14) return many;
-  const last = count % 10;
-  if (last === 1) return one;
-  if (last >= 2 && last <= 4) return few;
-  return many;
 }

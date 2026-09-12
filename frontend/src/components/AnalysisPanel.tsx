@@ -16,29 +16,38 @@
 import { useState } from "react";
 
 import { api, type DesignRef } from "../api";
+import type { StudyResults } from "../App";
 import { duration, percent } from "../lib/format";
+import { StaleNotice } from "./StaleNotice";
 import type { CriticalityReport, Scenario, SweepReport } from "../types";
 
 export function AnalysisPanel({
   design,
   scenario,
+  results,
+  stale,
+  onResult,
   onApply,
   onError,
 }: {
   design: DesignRef | null;
   scenario: Scenario | null;
+  results: StudyResults;
+  stale: boolean;
+  onResult: (patch: Partial<StudyResults>) => void;
   onApply: (scenario: Scenario) => void;
   onError: (message: string) => void;
 }) {
-  const [sweep, setSweep] = useState<SweepReport | null>(null);
-  const [criticality, setCriticality] = useState<CriticalityReport | null>(null);
+  // Посчитанное хранит оболочка: иначе переключение вкладки стирало бы результат, и
+  // эксперту приходилось бы нажимать кнопку заново.
+  const { sweep, criticality } = results;
   const [busy, setBusy] = useState<string | null>(null);
 
   async function runSweep(mode: "spacing" | "refine") {
     if (!design) return;
     setBusy("Перебор конфигураций");
     try {
-      setSweep(await api.sweep(design, mode));
+      onResult({ sweep: await api.sweep(design, mode) });
     } catch {
       onError("Перебор не выполнен");
     } finally {
@@ -50,7 +59,7 @@ export function AnalysisPanel({
     if (!design) return;
     setBusy("Анализ критичности");
     try {
-      setCriticality(await api.criticality(design));
+      onResult({ criticality: await api.criticality(design) });
     } catch {
       onError("Анализ критичности не выполнен");
     } finally {
@@ -82,6 +91,8 @@ export function AnalysisPanel({
         </button>
         {busy && <span className="busy">{busy}…</span>}
       </div>
+
+      {stale && (sweep || criticality) && <StaleNotice />}
 
       {sweep && (
         <div style={{ marginBottom: 20 }}>

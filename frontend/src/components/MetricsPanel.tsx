@@ -162,8 +162,8 @@ export function MetricsPanel({
                   {path.join(" → ")}
                 </p>
                 <p className="hint" style={{ margin: 0 }}>
-                  {series.hops[step]} переходов, включая обе наземные линии ·{" "}
-                  {km(series.length_km[step])} · шлюз {series.gateway[step]}
+                  Переходов: {series.hops[step]} (обе наземные линии включены) · Длина
+                  трассы: {km(series.length_km[step])} · Шлюз: {series.gateway[step]}
                 </p>
               </>
             )}

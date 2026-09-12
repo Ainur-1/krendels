@@ -28,7 +28,7 @@ const BAND_GAP = 6;
 const SPARE_HEIGHT = 6;
 const SPARE_GAP = 2;
 
-/** Ноль маршрутов, один, два и больше. Ноль совпадает с отсутствием связи на полосе выше. */
+/** Ноль маршрутов, один, два и более. Ноль совпадает с отсутствием связи на полосе выше. */
 const SPARE_RGB = ["#3a2226", "#d29922", "#3fb950"] as const;
 const LABEL_WIDTH = 54;
 const AXIS_HEIGHT = 18;
@@ -184,7 +184,9 @@ export function Timeline({
       context.moveTo(x, axisTop);
       context.lineTo(x, axisTop + 4);
       context.stroke();
-      context.fillText(`${Math.round(t / 3600)}ч`, x - 6, axisTop + 15);
+      context.textAlign = "center";
+      context.fillText(`${Math.round(t / 3600)}ч`, x, axisTop + 15);
+      context.textAlign = "left";
     }
 
     const cursorX = LABEL_WIDTH + (step + 0.5) * cell;
@@ -195,6 +197,26 @@ export function Timeline({
     context.lineTo(cursorX, axisTop);
     context.stroke();
   }, [run, width, height, step, client, clients, steps, spare, rowHeight]);
+
+  /**
+   * Куда указывает курсор — в номер отсчёта.
+   *
+   * Начало отсчёта совпадает с левым краем полос, а не с краем холста: слева от них
+   * стоят подписи терминалов. Тот же сдвиг задан ползунку ниже, поэтому он и полосы
+   * показывают одно и то же место, а не расходятся на ширину подписи.
+   */
+  function seek(event: React.PointerEvent<HTMLCanvasElement>) {
+    const box = event.currentTarget.getBoundingClientRect();
+    const plotWidth = box.width - LABEL_WIDTH;
+    if (plotWidth <= 0 || !steps) return;
+
+    const offset = event.clientX - box.left - LABEL_WIDTH;
+    const index = Math.floor((offset / plotWidth) * steps);
+    onStep(Math.min(steps - 1, Math.max(0, index)));
+
+    const row = Math.floor((event.clientY - box.top) / rowHeight);
+    if (row >= 0 && row < clients.length) onClient(clients[row]);
+  }
 
   if (!run) {
     return (
@@ -227,36 +249,46 @@ export function Timeline({
         <canvas
           ref={canvas}
           style={{ display: "block", width: "100%", height, cursor: "pointer" }}
-          onClick={(event) => {
-            const box = event.currentTarget.getBoundingClientRect();
-            const x = event.clientX - box.left - LABEL_WIDTH;
-            const y = event.clientY - box.top;
-            const plotWidth = width - LABEL_WIDTH;
-            if (x >= 0 && plotWidth > 0) {
-              onStep(Math.min(steps - 1, Math.max(0, Math.floor((x / plotWidth) * steps))));
-            }
-            const row = Math.floor(y / rowHeight);
-            if (row >= 0 && row < clients.length) onClient(clients[row]);
+          onPointerDown={(event) => {
+            // Проигрывание останавливается: тянуть время и одновременно бороться с
+            // тем, что оно уезжает само, невозможно.
+            if (playing) onPlaying(false);
+            event.currentTarget.setPointerCapture(event.pointerId);
+            seek(event);
           }}
+          onPointerMove={(event) => {
+            if (event.currentTarget.hasPointerCapture(event.pointerId)) seek(event);
+          }}
+          onPointerUp={(event) =>
+            event.currentTarget.releasePointerCapture(event.pointerId)
+          }
         />
+
+        {/* Ползунок лежит внутри того же блока, что и холст, и сдвинут ровно на
+            ширину подписей терминалов. Снаружи выровнять его не вышло: у соседних
+            блоков панели края оказались разными, и совпадение пришлось бы подбирать
+            числами вместо того, чтобы взять его из разметки. */}
+        <div className="scrub" style={{ marginLeft: LABEL_WIDTH }}>
+          <input
+            type="range"
+            aria-label="время расчёта"
+            min={0}
+            max={Math.max(0, steps - 1)}
+            value={step}
+            onChange={(event) => {
+              // Перетаскивание ползунка — это навигация, а не проигрывание. Оставить
+              // его запущенным значило бы бороться с рукой, которая его двигает.
+              if (playing) onPlaying(false);
+              onStep(Number(event.target.value));
+            }}
+          />
+        </div>
       </div>
 
-      <div className="row" style={{ marginTop: 8 }}>
+      <div className="row" style={{ marginTop: 6 }}>
         <button className="ghost" onClick={() => onPlaying(!playing)}>
           {playing ? "❚❚" : "▶"}
         </button>
-        <input
-          type="range"
-          min={0}
-          max={Math.max(0, steps - 1)}
-          value={step}
-          onChange={(event) => {
-            // Перетаскивание ползунка — это навигация, а не проигрывание. Оставить
-            // его запущенным значило бы бороться с рукой, которая его двигает.
-            if (playing) onPlaying(false);
-            onStep(Number(event.target.value));
-          }}
-        />
         <select
           aria-label="скорость проигрывания"
           style={{ width: "auto", flexShrink: 0 }}
@@ -269,6 +301,7 @@ export function Timeline({
             </option>
           ))}
         </select>
+        <span className="hint">щелчок или протяжка по диаграмме переносит время туда же</span>
       </div>
 
       <div className="legend" style={{ marginTop: 8 }}>
@@ -289,7 +322,7 @@ export function Timeline({
           </span>
           <span>
             <i className="swatch" style={{ background: SPARE_RGB[2] }} />
-            два и больше
+            два и более
           </span>
         </div>
       )}

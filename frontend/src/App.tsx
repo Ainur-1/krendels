@@ -24,13 +24,44 @@ import { ResiliencePanel } from "./components/ResiliencePanel";
 import { Timeline } from "./components/Timeline";
 import { VariantsPanel } from "./components/VariantsPanel";
 import type {
+  CriticalityReport,
+  DegradationCurve,
+  DeliveryReport,
+  FamilyReport,
   FieldError,
+  PlacementReport,
   RedundancyReport,
   Run,
   Scenario,
   ScenarioSummary,
   Strategy,
+  SweepReport,
 } from "./types";
+
+/**
+ * Посчитанные исследования держит оболочка, а не сами вкладки.
+ *
+ * Вкладка, хранящая результат у себя, теряет его при каждом переключении — эксперту
+ * приходится нажимать кнопку заново, чтобы увидеть то, что уже считали. Поэтому
+ * результаты живут здесь и переживают переключение вкладок.
+ */
+export interface StudyResults {
+  sweep: SweepReport | null;
+  criticality: CriticalityReport | null;
+  delivery: DeliveryReport | null;
+  degradation: DegradationCurve | null;
+  families: FamilyReport | null;
+  placement: PlacementReport | null;
+}
+
+const NO_STUDIES: StudyResults = {
+  sweep: null,
+  criticality: null,
+  delivery: null,
+  degradation: null,
+  families: null,
+  placement: null,
+};
 
 export interface SavedRun {
   runId: string;
@@ -53,6 +84,10 @@ interface State {
   playing: boolean;
   stepMs: number;
   saved: SavedRun[];
+  studies: StudyResults;
+  /** Проект, на котором посчитаны сохранённые исследования. Нужен, чтобы отличить
+      устаревшие числа от свежих, а не показывать их молча. */
+  studiesFor: Scenario | null;
   guide: boolean;
   busy: string | null;
   errors: FieldError[] | null;
@@ -75,6 +110,7 @@ type Action =
   | { type: "remember"; run: SavedRun }
   | { type: "forget"; runId: string }
   | { type: "guide"; guide: boolean }
+  | { type: "study"; patch: Partial<StudyResults>; scenario: Scenario }
   | { type: "busy"; busy: string | null }
   | { type: "errors"; errors: FieldError[] | null }
   | { type: "message"; message: string | null };
@@ -93,6 +129,8 @@ const initial: State = {
   playing: false,
   stepMs: 160,
   saved: [],
+  studies: NO_STUDIES,
+  studiesFor: null,
   guide: false,
   busy: null,
   errors: null,
@@ -116,6 +154,10 @@ function reducer(state: State, action: Action): State {
         sourceLabel: action.label,
         run: null,
         redundancy: null,
+        // Исследования принадлежали прежнему проекту. Оставить их на экране значило бы
+        // подписать старые числа под новым сценарием — ровно то, чего делать нельзя.
+        studies: NO_STUDIES,
+        studiesFor: null,
         step: 0,
         client: null,
         playing: false,
@@ -178,6 +220,18 @@ function reducer(state: State, action: Action): State {
 
     case "guide":
       return { ...state, guide: action.guide };
+
+    case "study":
+      // Если проект с прошлого исследования изменился, прежние результаты относятся
+      // уже к другой конфигурации, и держать их рядом со свежим нельзя.
+      return {
+        ...state,
+        studies:
+          state.studiesFor === action.scenario
+            ? { ...state.studies, ...action.patch }
+            : { ...NO_STUDIES, ...action.patch },
+        studiesFor: action.scenario,
+      };
 
     case "busy":
       return { ...state, busy: action.busy };
@@ -287,6 +341,18 @@ export default function App() {
       alive = false;
     };
   }, [run]);
+
+  const keepStudy = useCallback(
+    (patch: Partial<StudyResults>) => {
+      if (scenario) dispatch({ type: "study", patch, scenario });
+    },
+    [scenario],
+  );
+
+  // Исследования считались для той конфигурации, что была на экране в тот момент.
+  // После правки ползунков они всё ещё полезны, но это уже другие числа, и молчать
+  // об этом нельзя.
+  const studiesStale = state.studiesFor !== null && state.studiesFor !== scenario;
 
   const changed = scenario !== baseline;
   const clients = run ? Object.keys(run.clients) : [];
@@ -430,6 +496,9 @@ export default function App() {
               <AnalysisPanel
                 design={design}
                 scenario={scenario}
+                results={state.studies}
+                stale={studiesStale}
+                onResult={keepStudy}
                 onApply={(next) => dispatch({ type: "edit", scenario: next })}
                 onError={(message) => dispatch({ type: "message", message })}
               />
@@ -438,6 +507,9 @@ export default function App() {
             {state.tab === "resilience" && (
               <ResiliencePanel
                 design={design}
+                results={state.studies}
+                stale={studiesStale}
+                onResult={keepStudy}
                 onError={(message) => dispatch({ type: "message", message })}
               />
             )}
