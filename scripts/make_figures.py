@@ -66,41 +66,88 @@ plt.rcParams.update(
 
 
 def figure_batches(scenario, path: Path) -> str:
-    """Очередь запуска против плоскости: совпадают ли они."""
+    """
+    Очередь запуска против плоскости, нарисованная по самой орбите.
+
+    Широта аппарата на круговой орбите — это синус от пройденного вдоль орбиты угла,
+    поджатый наклонением: arcsin(sin i · sin u). Поэтому по горизонтали здесь
+    положение вдоль орбиты, а не долгота. Трасса по земле при наклонении 87° почти
+    вертикальна и на карте читается как частокол — пробовали, отказались.
+
+    Что видно с одного взгляда: в каждой плоскости ровно один цвет, то есть очередь
+    запуска и плоскость — одно и то же. Заодно видно фазирование: соседи внутри
+    плоскости стоят через 22.5°, а сами плоскости смещены друг относительно друга на
+    7.5°, и это смещение читается как сдвиг точек от панели к панели.
+    """
 
     found = explore(scenario)
     planes = [p.plane_id for p in found.planes]
-    fig, ax = plt.subplots(figsize=(9, 3.2))
+    inclination = scenario.environment.inclination_deg
+    phase = {p.id: p.phase_deg for p in scenario.design.planes}
 
-    batches = sorted({s.launch_batch for s in scenario.design.satellites})
-    for batch in batches:
-        xs = [s.slot_deg for s in scenario.design.satellites if s.launch_batch == batch]
-        ys = [
-            planes.index(s.plane_id)
-            for s in scenario.design.satellites
-            if s.launch_batch == batch
-        ]
-        ax.scatter(
-            xs, ys, s=70, label=f"очередь {batch}",
-            color=PLANE_COLOURS[(batch - 1) % len(PLANE_COLOURS)], zorder=3,
-        )
+    height = 1.6 + 1.6 * len(planes)
+    fig, axes = plt.subplots(len(planes), 1, figsize=(9, height), sharex=True)
+    axes = np.atleast_1d(axes)
 
-    ax.set_yticks(range(len(planes)), planes)
-    ax.set_xlabel("положение аппарата внутри плоскости, градусы")
-    ax.set_title(
+    angle = np.linspace(0, 360, 721)
+    wave = _latitude_deg(inclination, angle)
+
+    for ax, plane_id in zip(axes, planes, strict=True):
+        satellites = [s for s in scenario.design.satellites if s.plane_id == plane_id]
+        ax.plot(angle, wave, color="#adb5bd", linewidth=1.2, zorder=1)
+
+        for batch in sorted({s.launch_batch for s in satellites}):
+            along = np.array(
+                [(s.slot_deg + phase[plane_id]) % 360 for s in satellites
+                 if s.launch_batch == batch]
+            )
+            ax.scatter(
+                along, _latitude_deg(inclination, along),
+                s=55, zorder=3, label=f"очередь {batch}",
+                color=PLANE_COLOURS[(batch - 1) % len(PLANE_COLOURS)],
+                edgecolor="white", linewidth=0.6,
+            )
+
+        ax.set_ylabel(f"{plane_id}\nширота, °")
+        ax.set_ylim(-118, 118)
+        ax.set_yticks([-90, 0, 90])
+        ax.legend(frameon=False, loc="upper right", fontsize=9, ncol=2)
+
+    # Расстояние между соседями подписывается на первой панели: это то самое число,
+    # из которого потом берётся хорда 2700 км на следующем графике.
+    first = [s for s in scenario.design.satellites if s.plane_id == planes[0]]
+    if len(first) > 1:
+        spacing = 360.0 / len(first)
+        # Подпись уходит в левый нижний угол: там кривая уже ушла вверх и место пустое.
+        axes[0].annotate(f"соседи через {spacing:.1f}°", xy=(8, -66), fontsize=9, color=GREY)
+
+    axes[-1].set_xlabel("положение аппарата вдоль орбиты, градусы")
+    axes[-1].set_xticks(range(0, 361, 45))
+    # Заголовок читается с картинки, а не назначен заранее: на сценарии, где очереди
+    # идут поперёк плоскостей, прежний текст противоречил бы собственным точкам.
+    axes[0].set_title(
         "Очередь запуска совпадает с орбитальной плоскостью\n"
-        "первая очередь — это одна плоскость, а не треть группировки",
+        "в каждой плоскости один цвет: первая очередь — это одна плоскость целиком"
+        if found.batches_match_planes
+        else "Очередь запуска и плоскость — разные вещи\n"
+        "в каждой плоскости встречаются аппараты из разных очередей",
         loc="left", fontsize=12,
     )
-    ax.set_ylim(-0.6, len(planes) - 0.4)
-    ax.legend(frameon=False, ncol=len(batches), loc="upper center",
-              bbox_to_anchor=(0.5, -0.28))
+
     fig.savefig(path)
     plt.close(fig)
     return (
         "очередь запуска совпадает с плоскостью"
         if found.batches_match_planes
-        else "не совпадает"
+        else "не совпадает: в плоскости встречается больше одной очереди"
+    )
+
+
+def _latitude_deg(inclination_deg: float, along_deg: np.ndarray) -> np.ndarray:
+    """Широта аппарата по пройденному вдоль орбиты углу: arcsin(sin i · sin u)."""
+
+    return np.degrees(
+        np.arcsin(np.sin(np.radians(inclination_deg)) * np.sin(np.radians(along_deg)))
     )
 
 
