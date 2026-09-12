@@ -397,3 +397,159 @@ tr.selected td {
   color: var(--accent);
   font-size: 12px;
 }
+
+/* Инструкция. Кейс требует документацию «как пользоваться платформой», и место ей
+   в самом интерфейсе: человек, впервые открывший сервис, читает экран, а не
+   репозиторий. Кнопка подписана словом — знак вопроса пропускают взглядом. */
+button.help {
+  border-color: var(--accent-dim);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+button.help:hover:not(:disabled) {
+  background: var(--bg-raised);
+  border-color: var(--accent);
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(5, 8, 12, 0.72);
+}
+
+.modal {
+  display: flex;
+  flex-direction: column;
+  /* Предел по высоте нужен, чтобы прокручивался текст внутри, а не страница под
+     окном: иначе заголовок и кнопка закрытия уезжают с экрана. */
+  max-height: 100%;
+  max-width: 860px;
+  width: 100%;
+  background: var(--bg-panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.55);
+}
+
+.modal:focus {
+  outline: none;
+}
+
+.guide-head,
+.guide-foot {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  flex-shrink: 0;
+}
+
+.guide-head {
+  border-bottom: 1px solid var(--line);
+}
+
+.guide-head h2 {
+  margin: 0;
+  flex: 1;
+  font-size: 17px;
+}
+
+.guide-foot {
+  border-top: 1px solid var(--line);
+}
+
+.guide-body {
+  overflow-y: auto;
+  padding: 4px 20px 16px;
+  /* На проекторе 13px уже не читается из зала, поэтому здесь шрифт крупнее, чем в
+     остальном интерфейсе, а строки — свободнее. */
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.guide-body section {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.guide-body section:last-child {
+  border-bottom: none;
+}
+
+.guide-body h3 {
+  margin: 0 0 8px;
+  font-size: 14px;
+  color: var(--accent);
+}
+
+.guide-body p {
+  margin: 8px 0;
+  color: var(--text-dim);
+}
+
+.guide-body b {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.guide-body ol,
+.guide-body ul {
+  margin: 8px 0;
+  padding-left: 22px;
+  color: var(--text-dim);
+}
+
+.guide-body li {
+  margin: 5px 0;
+}
+
+.guide-body dl {
+  margin: 8px 0;
+}
+
+.guide-body dt {
+  color: var(--text);
+  font-weight: 600;
+  margin-top: 10px;
+}
+
+.guide-body dd {
+  margin: 3px 0 0;
+  color: var(--text-dim);
+}
+
+.guide-body code {
+  font-family: var(--mono);
+  font-size: 12.5px;
+  background: var(--bg-input);
+  border: 1px solid var(--line-soft);
+  border-radius: 3px;
+  padding: 1px 4px;
+}
+
+.guide-body .note {
+  border-left: 2px solid var(--accent-dim);
+  padding-left: 10px;
+  color: var(--text-faint);
+}
+
+.guide-body ul.swatches {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 4px 14px;
+}
+
+.guide-body ul.swatches li {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0;
+}

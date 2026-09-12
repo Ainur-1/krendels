@@ -17,6 +17,7 @@ import { AnalysisPanel } from "./components/AnalysisPanel";
 import { ComparePanel } from "./components/ComparePanel";
 import { ConfigPanel } from "./components/ConfigPanel";
 import { ErrorList } from "./components/ErrorList";
+import { Guide } from "./components/Guide";
 import { MapView } from "./components/MapView";
 import { MetricsPanel } from "./components/MetricsPanel";
 import { ResiliencePanel } from "./components/ResiliencePanel";
@@ -52,6 +53,7 @@ interface State {
   playing: boolean;
   stepMs: number;
   saved: SavedRun[];
+  guide: boolean;
   busy: string | null;
   errors: FieldError[] | null;
   message: string | null;
@@ -72,6 +74,7 @@ type Action =
   | { type: "stepMs"; stepMs: number }
   | { type: "remember"; run: SavedRun }
   | { type: "forget"; runId: string }
+  | { type: "guide"; guide: boolean }
   | { type: "busy"; busy: string | null }
   | { type: "errors"; errors: FieldError[] | null }
   | { type: "message"; message: string | null };
@@ -90,6 +93,7 @@ const initial: State = {
   playing: false,
   stepMs: 160,
   saved: [],
+  guide: false,
   busy: null,
   errors: null,
   message: null,
@@ -171,6 +175,9 @@ function reducer(state: State, action: Action): State {
 
     case "forget":
       return { ...state, saved: state.saved.filter((r) => r.runId !== action.runId) };
+
+    case "guide":
+      return { ...state, guide: action.guide };
 
     case "busy":
       return { ...state, busy: action.busy };
@@ -312,6 +319,13 @@ export default function App() {
           <option value="min_distance">минимум длины</option>
           <option value="max_margin">максимум запаса</option>
         </select>
+        <button
+          className="help"
+          onClick={() => dispatch({ type: "guide", guide: true })}
+          title="Как пользоваться сервисом"
+        >
+          Инструкция
+        </button>
         <button className="primary" disabled={!scenario || !!busy} onClick={() => calculate()}>
           Рассчитать
         </button>
@@ -322,6 +336,8 @@ export default function App() {
           Выгрузить результат
         </button>
       </header>
+
+      {state.guide && <Guide onClose={() => dispatch({ type: "guide", guide: false })} />}
 
       <div className="body">
         <aside className="sidebar">
